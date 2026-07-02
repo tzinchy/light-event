@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings>=2.6",
     "redis>=5.2",
     "uuid-utils>=0.10",
+    "pyjwt>=2.13.0",
 ]
 
 [dependency-groups]

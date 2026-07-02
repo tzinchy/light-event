@@ -3,3 +3,5 @@
 Alembic autogenerate видит только модели, зарегистрированные в Base.metadata,
 поэтому каждый новый app/<entity>/models.py импортируется здесь.
 """
+
+import app.user.models  # noqa: F401

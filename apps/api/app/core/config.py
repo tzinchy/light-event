@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     company_test_fee_kop: int = 150_000
     platform_commission_pct: int = 6
 
+    # OTP / сессии
+    otp_ttl_sec: int = 300
+    otp_request_limit: int = 3          # запросов кода на телефон за окно
+    otp_request_window_sec: int = 600
+    otp_verify_max_attempts: int = 5
+    access_token_ttl_sec: int = 900
+    refresh_token_ttl_sec: int = 60 * 60 * 24 * 30
+
 
 @lru_cache
 def get_settings() -> Settings:
