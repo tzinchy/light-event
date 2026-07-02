@@ -1,65 +1,178 @@
-import Image from "next/image";
+import Link from "next/link";
+import {
+  BadgeCheck,
+  CalendarClock,
+  MessagesSquare,
+  ShieldCheck,
+  Star,
+  Zap,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { SiteHeader } from "@/components/site-header";
+import { DICT } from "@/lib/dict";
 
-export default function Home() {
+const workerSteps = [
+  {
+    icon: BadgeCheck,
+    title: "Создайте профиль",
+    text: "Телефон, паспорт и медкнижка — верификация онлайн за несколько минут.",
+  },
+  {
+    icon: CalendarClock,
+    title: "Выбирайте смены",
+    text: "Лента смен рядом с вами: ставка в час, требования и адрес сразу в карточке.",
+  },
+  {
+    icon: Zap,
+    title: "Работайте и получайте выплаты",
+    text: "Подтверждение в чате, честный расчёт после смены и рейтинг за каждую работу.",
+  },
+];
+
+const features = [
+  {
+    icon: Zap,
+    title: "Отклик в один тап",
+    text: "Никаких резюме и собеседований — рейтинг и подтверждённые документы говорят сами за себя.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Проверенные профили",
+    text: "Паспорт и медкнижка каждого сотрудника проходят модерацию платформы.",
+  },
+  {
+    icon: Star,
+    title: "Рейтинг и отзывы",
+    text: "Обе стороны оценивают друг друга после каждой смены — качество видно сразу.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Чат по заявке",
+    text: "Детали смены, форма одежды и вход для персонала — всё в одном треде.",
+  },
+];
+
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+
+      <main className="flex-1">
+        {/* hero */}
+        <section className="mx-auto w-full max-w-6xl px-4 pb-16 pt-20 text-center">
+          <Badge
+            variant="outline"
+            className="mb-6 border-brand-border bg-brand-soft text-brand-strong"
+          >
+            <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-brand" />
+            {DICT.heroBadge}
+          </Badge>
+          <h1 className="mx-auto max-w-3xl text-balance text-4xl font-bold tracking-tight sm:text-5xl">
+            {DICT.heroH1}
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mx-auto mt-5 max-w-2xl text-pretty text-muted-foreground">
+            {DICT.heroSub}
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Button asChild size="lg">
+              <Link href="/auth">{DICT.ctaWorker}</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/auth">{DICT.ctaOrg}</Link>
+            </Button>
+          </div>
+        </section>
+
+        {/* как это работает */}
+        <section className="border-t bg-card">
+          <div className="mx-auto w-full max-w-6xl px-4 py-16">
+            <h2 className="text-center text-2xl font-semibold">{DICT.howItWorks}</h2>
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {workerSteps.map((step, i) => (
+                <Card key={step.title}>
+                  <CardContent className="pt-6">
+                    <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
+                      <step.icon className="size-5" />
+                    </div>
+                    <div className="text-sm font-medium text-muted-foreground">
+                      Шаг {i + 1}
+                    </div>
+                    <h3 className="mt-1 font-semibold">{step.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{step.text}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* сотрудникам / организациям */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16">
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardContent className="pt-6">
+                <Badge variant="secondary" className="mb-3">
+                  {DICT.forWorkers}
+                </Badge>
+                <h3 className="text-xl font-semibold">{DICT.workerPitch}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{DICT.workerPitchSub}</p>
+                <Button asChild className="mt-6" variant="outline">
+                  <Link href="/auth">{DICT.ctaWorker}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <Badge variant="secondary" className="mb-3">
+                  {DICT.forOrg}
+                </Badge>
+                <h3 className="text-xl font-semibold">{DICT.orgPitch}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{DICT.orgPitchSub}</p>
+                <Button asChild className="mt-6" variant="outline">
+                  <Link href="/auth">{DICT.openOrgConsole}</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* фичи */}
+        <section className="border-t bg-card">
+          <div className="mx-auto w-full max-w-6xl px-4 py-16">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {features.map((f) => (
+                <div key={f.title}>
+                  <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-secondary">
+                    <f.icon className="size-4" />
+                  </div>
+                  <h3 className="text-sm font-semibold">{f.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{f.text}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* CTA-band */}
+        <section className="mx-auto w-full max-w-6xl px-4 py-16">
+          <div className="rounded-2xl bg-primary px-6 py-12 text-center text-primary-foreground">
+            <h2 className="text-2xl font-semibold">{DICT.ctaBandTitle}</h2>
+            <p className="mx-auto mt-2 max-w-xl text-sm opacity-80">{DICT.ctaBandSub}</p>
+            <Button asChild size="lg" variant="secondary" className="mt-6">
+              <Link href="/auth">{DICT.signUpFree}</Link>
+            </Button>
+          </div>
+        </section>
       </main>
+
+      <footer className="border-t">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-6 text-sm text-muted-foreground">
+          <span>light-event</span>
+          <span>{DICT.footNote}</span>
+        </div>
+      </footer>
     </div>
   );
 }
