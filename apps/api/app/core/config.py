@@ -14,6 +14,16 @@ class Settings(BaseSettings):
     s3_secret_key: str = ""
     s3_bucket: str = "light-event"
 
+    # хранилище: auto — S3, а при его недоступности фолбэк в локальную папку
+    storage_backend: str = "auto"  # auto | s3 | local
+    local_storage_path: str = "var/storage"
+    document_max_size_mb: int = 15
+
+    # каталог желаемых ролей (из референса)
+    desired_role_catalog: list[str] = [
+        "Официант", "Бариста", "Хостес", "Бармен", "Повар", "Ресепшн", "Гардероб", "Промоутер",
+    ]
+
     app_secret_key: str = ""
 
     # тарифы — целые копейки (skill money-ledger)

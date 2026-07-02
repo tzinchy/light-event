@@ -8,7 +8,7 @@ CLAUDE.md — постоянные правила проекта «light-event»
 Backend: Python + FastAPI, SQLAlchemy 2.x async, Alembic.
 БД: PostgreSQL. Кэш/OTP/rate-limit: Redis.
 Frontend: React + Next.js (App Router) + TypeScript + shadcn/ui + Tailwind. Mobile-first.
-Файлы: S3-совместимое (MinIO в dev). Карта: см. PLAN.md.
+Файлы: S3-совместимое (MinIO в dev); если S3/MinIO недоступен — автоматический фолбэк в локальную папку (var/storage), слой за интерфейсом Storage. Карта: см. PLAN.md.
 Тесты: pytest + testcontainers (реальные Postgres/Redis/MinIO), Vitest + Testing Library, Playwright (e2e).
 Прокси: Nginx. Все образы — Alpine. docker-compose для dev и для тестов.
 

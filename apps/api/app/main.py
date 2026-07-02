@@ -5,10 +5,13 @@ from fastapi import FastAPI
 
 from app.auth import router as auth_router
 from app.core import health
+from app.document import router as document_router
+from app.user import router as user_router
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import DomainError, domain_error_handler
 from app.core.sms import ConsoleSmsProvider, SmsProvider
+from app.core.storage import build_storage
 
 
 def create_app(settings: Settings | None = None, sms_provider: SmsProvider | None = None) -> FastAPI:
@@ -22,6 +25,7 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
         app.state.session_factory = create_session_factory(app.state.engine)
         app.state.redis = aioredis.from_url(settings.redis_url, decode_responses=True)
         app.state.sms_provider = sms
+        app.state.storage = await build_storage(settings)
         yield
         await app.state.redis.aclose()
         await app.state.engine.dispose()
@@ -30,6 +34,8 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
     app.add_exception_handler(DomainError, domain_error_handler)
     app.include_router(health.router)
     app.include_router(auth_router.router)
+    app.include_router(user_router.router)
+    app.include_router(document_router.router)
     return app
 
 
