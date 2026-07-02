@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.company.schemas import CompanyCreateIn, CompanyOut, CompanyUpdateIn
+from app.company.schemas import CompanyCreateIn, CompanyOut, CompanyUpdateIn, MyCompanyOut
 from app.company.service import CompanyService
 from app.core.deps import get_current_user, get_session
 from app.core.permissions import require_member
@@ -24,6 +24,18 @@ async def create_company(
     service: CompanyService = Depends(get_company_service),
 ) -> CompanyOut:
     return CompanyOut.model_validate(await service.create(user, payload))
+
+
+# объявлен до /{company_uuid}, иначе «my» попадает в UUID-парсер
+@router.get("/my", response_model=list[MyCompanyOut])
+async def my_companies(
+    user: User = Depends(get_current_user),
+    service: CompanyService = Depends(get_company_service),
+) -> list[MyCompanyOut]:
+    return [
+        MyCompanyOut(company=CompanyOut.model_validate(company), company_role=member.company_role)
+        for company, member in await service.list_my(user)
+    ]
 
 
 @router.get("/{company_uuid}", response_model=CompanyOut)

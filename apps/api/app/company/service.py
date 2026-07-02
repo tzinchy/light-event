@@ -32,6 +32,9 @@ class CompanyService:
         )
         return company
 
+    async def list_my(self, user: User) -> list[tuple[Company, TeamMember]]:
+        return await self.companies.list_for_user(user.user_uuid)
+
     async def get(self, company_uuid: UUID) -> Company:
         company = await self.companies.get(company_uuid)
         if company is None:

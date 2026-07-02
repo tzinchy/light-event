@@ -60,3 +60,19 @@ async def test_team_list_requires_membership(client, login_user):
 
     resp = await client.get(f"/api/v1/companies/{company['company_uuid']}/team")
     assert resp.status_code == 401
+
+
+async def test_my_companies_lists_only_memberships(client, login_user):
+    owner = await login_user("+79051230060")
+    outsider = await login_user("+79051230061")
+    company = await create_company(client, owner["headers"])
+
+    resp = await client.get("/api/v1/companies/my", headers=owner["headers"])
+    assert resp.status_code == 200, resp.text
+    mine = resp.json()
+    assert [c["company"]["company_uuid"] for c in mine] == [company["company_uuid"]]
+    assert mine[0]["company_role"] == "main_manager"
+
+    resp = await client.get("/api/v1/companies/my", headers=outsider["headers"])
+    assert resp.status_code == 200
+    assert resp.json() == []

@@ -22,3 +22,8 @@ class CompanyOut(BaseModel):
     description: str | None
     status: str
     created_at: datetime
+
+
+class MyCompanyOut(BaseModel):
+    company: CompanyOut
+    company_role: str
