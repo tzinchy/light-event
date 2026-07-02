@@ -1,0 +1,27 @@
+from functools import lru_cache
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    database_url: str = "postgresql+asyncpg://light_event:light_event@localhost:5432/light_event"
+    redis_url: str = "redis://localhost:6379/0"
+
+    s3_endpoint_url: str = "http://localhost:9000"
+    s3_access_key: str = "light-event"
+    s3_secret_key: str = ""
+    s3_bucket: str = "light-event"
+
+    app_secret_key: str = ""
+
+    # тарифы — целые копейки (skill money-ledger)
+    vacancy_publish_fee_kop: int = 99_000
+    company_test_fee_kop: int = 150_000
+    platform_commission_pct: int = 6
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

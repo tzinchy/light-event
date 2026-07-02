@@ -1,17 +1,24 @@
-.PHONY: run-infra
-.PHONY: stop-infra
-.PHONY: app
-.PHONY: src-file
+.PHONY: infra infra-down api test-api migrate revision openapi-client
 
-run-infra:
-	docker-compose up -d
+# postgres + redis + minio для локальной разработки
+infra:
+	docker compose -f infra/docker-compose.yml up -d db redis minio minio-init
 
-stop-infra:
-	docker-compose down && docker compose rm -f
+infra-down:
+	docker compose -f infra/docker-compose.yml down
 
-app:
-	uv run uvicorn src.main:app --reload
+api:
+	cd apps/api && uv run uvicorn app.main:app --reload --port 8000
 
-#filename=name make src-file
-src-file:
-	uv run python -m src.${filename}
+test-api:
+	cd apps/api && uv run pytest
+
+migrate:
+	cd apps/api && uv run alembic upgrade head
+
+# make revision m="описание"
+revision:
+	cd apps/api && uv run alembic revision --autogenerate -m "$(m)"
+
+openapi-client:
+	cd apps/api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi(), ensure_ascii=False))" > packages/shared-types/openapi.json 2>/dev/null || true
