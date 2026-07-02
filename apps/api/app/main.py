@@ -4,8 +4,10 @@ import redis.asyncio as aioredis
 from fastapi import FastAPI
 
 from app.auth import router as auth_router
+from app.company import router as company_router
 from app.core import health
 from app.document import router as document_router
+from app.filial import router as filial_router
 from app.user import router as user_router
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
@@ -36,6 +38,8 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
     app.include_router(auth_router.router)
     app.include_router(user_router.router)
     app.include_router(document_router.router)
+    app.include_router(company_router.router)
+    app.include_router(filial_router.router)
     return app
 
 

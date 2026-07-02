@@ -102,6 +102,34 @@ def login_user(client, sms_outbox):
 
 
 @pytest.fixture
+def add_team_member(settings):
+    """Добавление участника команды через реальный repo (инвайт-ссылки появятся на этапе 5)."""
+    from uuid import UUID
+
+    from app.core.db import create_session_factory
+    from app.team.models import CompanyRole
+    from app.team.repo import TeamRepo
+
+    async def _add(company_uuid: str, user_uuid: str, role: str = "manager", **perms) -> None:
+        engine = create_engine(settings.database_url)
+        factory = create_session_factory(engine)
+        async with factory() as session:
+            async with session.begin():
+                await TeamRepo(session).add_member(
+                    company_uuid=UUID(company_uuid),
+                    user_uuid=UUID(user_uuid),
+                    role=CompanyRole(role),
+                    perm_create=perms.get("perm_create", False),
+                    perm_hire=perms.get("perm_hire", False),
+                    perm_finance=perms.get("perm_finance", False),
+                    perm_invite=perms.get("perm_invite", False),
+                )
+        await engine.dispose()
+
+    return _add
+
+
+@pytest.fixture
 def make_admin(settings):
     """Бутстрап админа: до этапа админки роль назначается напрямую в БД."""
     from sqlalchemy import text
