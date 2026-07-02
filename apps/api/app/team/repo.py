@@ -10,6 +10,9 @@ class TeamRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def get(self, team_member_uuid: UUID) -> TeamMember | None:
+        return await self.session.get(TeamMember, team_member_uuid)
+
     async def get_membership(self, user_uuid: UUID, company_uuid: UUID) -> TeamMember | None:
         result = await self.session.execute(
             select(TeamMember).where(

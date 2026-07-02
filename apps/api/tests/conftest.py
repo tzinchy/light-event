@@ -103,7 +103,7 @@ def login_user(client, sms_outbox):
 
 @pytest.fixture
 def add_team_member(settings):
-    """Добавление участника команды через реальный repo (инвайт-ссылки появятся на этапе 5)."""
+    """Участник с заданной матрицей прав через реальный repo — инвайт выдаёт только роль, без прав."""
     from uuid import UUID
 
     from app.core.db import create_session_factory
@@ -127,6 +127,23 @@ def add_team_member(settings):
         await engine.dispose()
 
     return _add
+
+
+@pytest.fixture
+def expire_invite(settings):
+    """Перевод срока действия инвайта в прошлое — машину времени в тестах заменяет прямое UPDATE."""
+    from sqlalchemy import text
+
+    async def _expire(invite_link_uuid: str) -> None:
+        engine = create_engine(settings.database_url)
+        async with engine.begin() as conn:
+            await conn.execute(
+                text("UPDATE invite_link SET expires_at = now() - interval '1 hour' WHERE invite_link_uuid = :u"),
+                {"u": invite_link_uuid},
+            )
+        await engine.dispose()
+
+    return _expire
 
 
 @pytest.fixture

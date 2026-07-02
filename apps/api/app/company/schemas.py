@@ -22,17 +22,3 @@ class CompanyOut(BaseModel):
     description: str | None
     status: str
     created_at: datetime
-
-
-class TeamMemberOut(BaseModel):
-    model_config = {"from_attributes": True}
-
-    team_member_uuid: UUID
-    user_uuid: UUID
-    company_role: str
-    filial_uuid: UUID | None
-    email: str | None
-    perm_create: bool
-    perm_hire: bool
-    perm_finance: bool
-    perm_invite: bool

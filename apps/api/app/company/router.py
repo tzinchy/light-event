@@ -3,10 +3,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.company.schemas import CompanyCreateIn, CompanyOut, CompanyUpdateIn, TeamMemberOut
+from app.company.schemas import CompanyCreateIn, CompanyOut, CompanyUpdateIn
 from app.company.service import CompanyService
 from app.core.deps import get_current_user, get_session
 from app.core.permissions import require_member
+from app.team.schemas import TeamMemberOut
 from app.user.models import User
 
 router = APIRouter(prefix="/api/v1/companies", tags=["companies"])
