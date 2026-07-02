@@ -12,6 +12,7 @@ from app.filial import router as filial_router
 from app.invite import router as invite_router
 from app.team import router as team_router
 from app.user import router as user_router
+from app.vacancy import router as vacancy_router
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import DomainError, domain_error_handler
@@ -46,6 +47,7 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
     app.include_router(team_router.router)
     app.include_router(invite_router.router)
     app.include_router(balance_router.router)
+    app.include_router(vacancy_router.router)
     return app
 
 

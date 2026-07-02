@@ -11,3 +11,4 @@ import app.filial.models  # noqa: F401
 import app.invite.models  # noqa: F401
 import app.team.models  # noqa: F401
 import app.user.models  # noqa: F401
+import app.vacancy.models  # noqa: F401
