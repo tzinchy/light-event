@@ -1,1 +1,1 @@
-from src.user.model import MedCard, User, UserMedCard  # noqa
+from src.auth.model import MedCard, User, UserMedCard  # noqa

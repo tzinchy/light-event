@@ -1,3 +1,4 @@
+from asyncio.base_events import Server
 from datetime import datetime, timezone
 
 from sqlalchemy import MetaData
@@ -19,8 +20,17 @@ CONVENTION = {
 
 
 class Base(DeclarativeBase):
-    created_at: Mapped[datetime] = MappedColumn(default=datetime.now(timezone.utc))
-    updated_at: Mapped[datetime] = MappedColumn(default=datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = MappedColumn(
+        server_default=datetime.now(timezone.utc)
+    )
+    updated_at: Mapped[datetime] = MappedColumn(
+        server_default=datetime.now(timezone.utc)
+    )
+    deleted_at: Mapped[datetime] = MappedColumn(
+        server_default=datetime.now(timezone.utc)
+    )
+    is_deleted: Mapped[bool] = MappedColumn(default=False)
+
     metadata = MetaData(naming_convention=CONVENTION)
 
 
