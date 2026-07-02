@@ -1,11 +1,10 @@
 import enum
-from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -16,7 +15,7 @@ class CompanyRole(str, enum.Enum):
     staff = "staff"
 
 
-class TeamMember(Base):
+class TeamMember(TimestampMixin, Base):
     __tablename__ = "team_member"
     __table_args__ = (UniqueConstraint("user_uuid", "company_uuid", name="uq_team_member_user_company"),)
 
@@ -31,10 +30,6 @@ class TeamMember(Base):
     perm_finance: Mapped[bool] = mapped_column(default=False)
     perm_invite: Mapped[bool] = mapped_column(default=False)
     email: Mapped[str | None] = mapped_column(String(254))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
 
     def has_permission(self, perm: str) -> bool:
         if self.company_role == CompanyRole.main_manager:

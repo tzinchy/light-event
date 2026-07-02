@@ -1,11 +1,10 @@
 import enum
-from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import BigInteger, DateTime, Enum, ForeignKey, String, func
+from sqlalchemy import BigInteger, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -23,7 +22,7 @@ class DocumentStatus(str, enum.Enum):
     rejected = "rejected"
 
 
-class Document(Base):
+class Document(TimestampMixin, Base):
     __tablename__ = "document"
 
     document_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -38,7 +37,3 @@ class Document(Base):
     reject_reason: Mapped[str | None] = mapped_column(String(500))
     flag: Mapped[str | None] = mapped_column(String(120))
     reviewed_by_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("user.user_uuid"))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )

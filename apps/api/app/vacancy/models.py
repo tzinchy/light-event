@@ -2,10 +2,10 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, Float, ForeignKey, String, func
+from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, Float, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -17,7 +17,7 @@ class VacancyStatus(str, enum.Enum):
     done = "done"
 
 
-class Vacancy(Base):
+class Vacancy(TimestampMixin, Base):
     __tablename__ = "vacancy"
 
     vacancy_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -42,7 +42,3 @@ class Vacancy(Base):
     )
     reject_reason: Mapped[str | None] = mapped_column(String(500))
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )

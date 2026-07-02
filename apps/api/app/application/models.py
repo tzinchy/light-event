@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import DateTime, Enum, ForeignKey, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -26,7 +26,7 @@ class ApplicationEventKind(str, enum.Enum):
     payout = "payout"
 
 
-class Application(Base):
+class Application(TimestampMixin, Base):
     __tablename__ = "application"
     __table_args__ = (UniqueConstraint("vacancy_uuid", "user_uuid", name="uq_application_vacancy_user"),)
 
@@ -37,13 +37,11 @@ class Application(Base):
         Enum(ApplicationStatus, native_enum=False, length=20), default=ApplicationStatus.review
     )
     archived_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
 
 
 class ApplicationEvent(Base):
+    """Событие таймлайна — факт, а не запись с жизненным циклом: только occurred_at."""
+
     __tablename__ = "application_event"
 
     application_event_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)

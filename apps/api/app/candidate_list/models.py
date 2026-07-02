@@ -1,11 +1,10 @@
 import enum
-from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -15,7 +14,7 @@ class CandidateList(str, enum.Enum):
     blacklist = "blacklist"
 
 
-class CandidateListEntry(Base):
+class CandidateListEntry(TimestampMixin, Base):
     """Кандидат состоит максимум в одном списке компании; ЧС скрывает его отклики от компании."""
 
     __tablename__ = "candidate_list_entry"
@@ -26,7 +25,3 @@ class CandidateListEntry(Base):
     user_uuid: Mapped[UUID] = mapped_column(ForeignKey("user.user_uuid"), index=True)
     list: Mapped[CandidateList] = mapped_column(Enum(CandidateList, native_enum=False, length=20))
     note: Mapped[str | None] = mapped_column(String(300))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )

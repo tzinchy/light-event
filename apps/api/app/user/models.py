@@ -2,10 +2,10 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, DateTime, Enum, String, func
+from sqlalchemy import ARRAY, DateTime, Enum, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 
@@ -15,7 +15,7 @@ class PlatformRole(str, enum.Enum):
     admin = "admin"
 
 
-class User(Base):
+class User(TimestampMixin, Base):
     __tablename__ = "user"
 
     user_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -28,7 +28,3 @@ class User(Base):
     desired_roles: Mapped[list[str]] = mapped_column(ARRAY(String(50)), default=list, server_default="{}")
     pd_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_active: Mapped[bool] = mapped_column(default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )

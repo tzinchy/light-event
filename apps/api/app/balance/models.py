@@ -5,7 +5,7 @@ from uuid import UUID
 from sqlalchemy import BigInteger, CheckConstraint, DateTime, Enum, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base
+from app.core.db import Base, TimestampMixin
 from app.core.ids import uuid7
 
 # счёт платформы (owner_type=platform) один; фиксированный owner_uuid держит уникальность (owner_type, owner_uuid)
@@ -34,7 +34,7 @@ class TopupStatus(str, enum.Enum):
     rejected = "rejected"
 
 
-class Account(Base):
+class Account(TimestampMixin, Base):
     __tablename__ = "account"
     __table_args__ = (UniqueConstraint("owner_type", "owner_uuid", name="uq_account_owner"),)
 
@@ -44,10 +44,6 @@ class Account(Base):
     # денормализованный кэш поверх ledger_entry, сверяется в тестах (skill money-ledger)
     available_kop: Mapped[int] = mapped_column(BigInteger, default=0)
     on_hold_kop: Mapped[int] = mapped_column(BigInteger, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
 
     @property
     def total_kop(self) -> int:
@@ -55,7 +51,7 @@ class Account(Base):
 
 
 class LedgerEntry(Base):
-    """Журнал двойной записи. Append-only: сервисный слой не даёт UPDATE/DELETE."""
+    """Журнал двойной записи. Append-only (без updated_at): сервисный слой не даёт UPDATE/DELETE."""
 
     __tablename__ = "ledger_entry"
     __table_args__ = (
@@ -74,7 +70,7 @@ class LedgerEntry(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
-class TopupRequest(Base):
+class TopupRequest(TimestampMixin, Base):
     __tablename__ = "topup_request"
 
     topup_request_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
@@ -88,7 +84,3 @@ class TopupRequest(Base):
     reviewed_by_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("user.user_uuid"))
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     reject_reason: Mapped[str | None] = mapped_column(String(500))
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
-    )
