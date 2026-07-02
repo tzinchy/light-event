@@ -1,0 +1,9 @@
+{
+  "name": "light-event",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "test:web": "pnpm --filter web test"
+  },
+  "packageManager": "pnpm@11.9.0"
+}

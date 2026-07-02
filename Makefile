@@ -1,4 +1,4 @@
-.PHONY: infra infra-down api test-api migrate revision openapi-client
+.PHONY: infra infra-down api web test-api test-web migrate revision openapi-client
 
 # postgres + redis + minio для локальной разработки
 infra:
@@ -10,8 +10,14 @@ infra-down:
 api:
 	cd apps/api && uv run uvicorn app.main:app --reload --port 8000
 
+web:
+	pnpm --filter web dev
+
 test-api:
 	cd apps/api && uv run pytest
+
+test-web:
+	pnpm --filter web test
 
 migrate:
 	cd apps/api && uv run alembic upgrade head
@@ -21,4 +27,5 @@ revision:
 	cd apps/api && uv run alembic revision --autogenerate -m "$(m)"
 
 openapi-client:
-	cd apps/api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi(), ensure_ascii=False))" > packages/shared-types/openapi.json 2>/dev/null || true
+	cd apps/api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi(), ensure_ascii=False))" > ../../packages/shared-types/openapi.json
+	pnpm --filter @light-event/shared-types generate
