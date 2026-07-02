@@ -7,7 +7,7 @@ from app.core.deps import get_current_user, get_session
 from app.core.errors import DomainError
 from app.team.models import CompanyRole, TeamMember
 from app.team.repo import TeamRepo
-from app.user.models import User
+from app.user.models import PlatformRole, User
 
 
 async def ensure_membership(session: AsyncSession, user: User, company_uuid: UUID) -> TeamMember:
@@ -53,6 +53,17 @@ def require_permission(perm: str):
         session: AsyncSession = Depends(get_session),
     ) -> TeamMember:
         return await ensure_permission(session, user, company_uuid, perm)
+
+    return dep
+
+
+def require_admin():
+    """FastAPI-зависимость: platform_role = admin (модерация, финансы платформы)."""
+
+    async def dep(user: User = Depends(get_current_user)) -> User:
+        if user.platform_role != PlatformRole.admin:
+            raise DomainError(403, "Доступно только администратору")
+        return user
 
     return dep
 
