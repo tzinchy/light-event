@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FeedPreview } from "@/components/feed-preview";
 import { SiteHeader } from "@/components/site-header";
 import { DICT } from "@/lib/dict";
 
@@ -84,6 +85,8 @@ export default function LandingPage() {
             </Button>
           </div>
         </section>
+
+        <FeedPreview />
 
         {/* как это работает */}
         <section className="border-t bg-card">

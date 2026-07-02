@@ -132,6 +132,101 @@ export type DocumentOut = {
 };
 
 /**
+ * FeedItemOut
+ * Карточка ленты: вакансия + витринные поля компании.
+ */
+export type FeedItemOut = {
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+    /**
+     * Filial Uuid
+     */
+    filial_uuid: string;
+    /**
+     * Role Name
+     */
+    role_name: string;
+    /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    /**
+     * Venue Address
+     */
+    venue_address: string;
+    /**
+     * Lat
+     */
+    lat: number | null;
+    /**
+     * Lon
+     */
+    lon: number | null;
+    /**
+     * Pay Hour Kop
+     */
+    pay_hour_kop: number;
+    /**
+     * Pay Total Kop
+     */
+    pay_total_kop: number;
+    /**
+     * Slots
+     */
+    slots: number;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
+    /**
+     * Tags
+     */
+    tags: Array<string>;
+    /**
+     * Requirements
+     */
+    requirements: Array<string>;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Archived At
+     */
+    archived_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Company Name
+     */
+    company_name: string;
+    /**
+     * Company Rating
+     */
+    company_rating?: number | null;
+};
+
+/**
  * FilialCreateIn
  */
 export type FilialCreateIn = {
@@ -303,6 +398,20 @@ export type MeOut = {
      * Pd Consent At
      */
     pd_consent_at: string | null;
+};
+
+/**
+ * ModerateIn
+ */
+export type ModerateIn = {
+    /**
+     * Action
+     */
+    action: 'approve' | 'reject';
+    /**
+     * Reason
+     */
+    reason?: string | null;
 };
 
 /**
@@ -590,6 +699,204 @@ export type UserUpdateIn = {
      * Desired Roles
      */
     desired_roles?: Array<string> | null;
+};
+
+/**
+ * VacancyCreateIn
+ */
+export type VacancyCreateIn = {
+    /**
+     * Filial Uuid
+     */
+    filial_uuid: string;
+    /**
+     * Role Name
+     */
+    role_name: string;
+    /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    /**
+     * Venue Address
+     */
+    venue_address: string;
+    /**
+     * Lat
+     */
+    lat?: number | null;
+    /**
+     * Lon
+     */
+    lon?: number | null;
+    /**
+     * Pay Hour Kop
+     */
+    pay_hour_kop: number;
+    /**
+     * Slots
+     */
+    slots: number;
+    /**
+     * Urgent
+     */
+    urgent?: boolean;
+    /**
+     * Tags
+     */
+    tags?: Array<string>;
+    /**
+     * Requirements
+     */
+    requirements?: Array<string>;
+};
+
+/**
+ * VacancyOut
+ */
+export type VacancyOut = {
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+    /**
+     * Filial Uuid
+     */
+    filial_uuid: string;
+    /**
+     * Role Name
+     */
+    role_name: string;
+    /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    /**
+     * Venue Address
+     */
+    venue_address: string;
+    /**
+     * Lat
+     */
+    lat: number | null;
+    /**
+     * Lon
+     */
+    lon: number | null;
+    /**
+     * Pay Hour Kop
+     */
+    pay_hour_kop: number;
+    /**
+     * Pay Total Kop
+     */
+    pay_total_kop: number;
+    /**
+     * Slots
+     */
+    slots: number;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
+    /**
+     * Tags
+     */
+    tags: Array<string>;
+    /**
+     * Requirements
+     */
+    requirements: Array<string>;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Archived At
+     */
+    archived_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * VacancyUpdateIn
+ */
+export type VacancyUpdateIn = {
+    /**
+     * Role Name
+     */
+    role_name?: string | null;
+    /**
+     * Event Title
+     */
+    event_title?: string | null;
+    /**
+     * Starts At
+     */
+    starts_at?: string | null;
+    /**
+     * Ends At
+     */
+    ends_at?: string | null;
+    /**
+     * Venue Address
+     */
+    venue_address?: string | null;
+    /**
+     * Lat
+     */
+    lat?: number | null;
+    /**
+     * Lon
+     */
+    lon?: number | null;
+    /**
+     * Pay Hour Kop
+     */
+    pay_hour_kop?: number | null;
+    /**
+     * Slots
+     */
+    slots?: number | null;
+    /**
+     * Urgent
+     */
+    urgent?: boolean | null;
+    /**
+     * Tags
+     */
+    tags?: Array<string> | null;
+    /**
+     * Requirements
+     */
+    requirements?: Array<string> | null;
 };
 
 /**
@@ -1457,3 +1764,253 @@ export type AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostR
 };
 
 export type AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponse = AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses[keyof AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses];
+
+export type FeedApiV1VacanciesGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Role
+         */
+        role?: string | null;
+        /**
+         * Date From
+         */
+        date_from?: string | null;
+        /**
+         * Date To
+         */
+        date_to?: string | null;
+    };
+    url: '/api/v1/vacancies';
+};
+
+export type FeedApiV1VacanciesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type FeedApiV1VacanciesGetError = FeedApiV1VacanciesGetErrors[keyof FeedApiV1VacanciesGetErrors];
+
+export type FeedApiV1VacanciesGetResponses = {
+    /**
+     * Response Feed Api V1 Vacancies Get
+     * Successful Response
+     */
+    200: Array<FeedItemOut>;
+};
+
+export type FeedApiV1VacanciesGetResponse = FeedApiV1VacanciesGetResponses[keyof FeedApiV1VacanciesGetResponses];
+
+export type VacancyDetailApiV1VacanciesVacancyUuidGetData = {
+    body?: never;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}';
+};
+
+export type VacancyDetailApiV1VacanciesVacancyUuidGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VacancyDetailApiV1VacanciesVacancyUuidGetError = VacancyDetailApiV1VacanciesVacancyUuidGetErrors[keyof VacancyDetailApiV1VacanciesVacancyUuidGetErrors];
+
+export type VacancyDetailApiV1VacanciesVacancyUuidGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: VacancyOut;
+};
+
+export type VacancyDetailApiV1VacanciesVacancyUuidGetResponse = VacancyDetailApiV1VacanciesVacancyUuidGetResponses[keyof VacancyDetailApiV1VacanciesVacancyUuidGetResponses];
+
+export type UpdateVacancyApiV1VacanciesVacancyUuidPatchData = {
+    body: VacancyUpdateIn;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}';
+};
+
+export type UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateVacancyApiV1VacanciesVacancyUuidPatchError = UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors[keyof UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors];
+
+export type UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: VacancyOut;
+};
+
+export type UpdateVacancyApiV1VacanciesVacancyUuidPatchResponse = UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses[keyof UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses];
+
+export type CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/vacancies';
+};
+
+export type CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetError = CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors[keyof CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors];
+
+export type CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses = {
+    /**
+     * Response Company Vacancies Api V1 Companies  Company Uuid  Vacancies Get
+     * Successful Response
+     */
+    200: Array<VacancyOut>;
+};
+
+export type CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponse = CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses[keyof CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses];
+
+export type CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostData = {
+    body: VacancyCreateIn;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/vacancies';
+};
+
+export type CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostError = CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors[keyof CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors];
+
+export type CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: VacancyOut;
+};
+
+export type CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponse = CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses[keyof CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses];
+
+export type PublishVacancyApiV1VacanciesVacancyUuidPublishPostData = {
+    body?: never;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}/publish';
+};
+
+export type PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PublishVacancyApiV1VacanciesVacancyUuidPublishPostError = PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors[keyof PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors];
+
+export type PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: VacancyOut;
+};
+
+export type PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponse = PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses[keyof PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses];
+
+export type ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostData = {
+    body?: never;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}/archive';
+};
+
+export type ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostError = ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors[keyof ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors];
+
+export type ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: VacancyOut;
+};
+
+export type ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponse = ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses[keyof ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses];
+
+export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostData = {
+    body: ModerateIn;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/vacancies/{vacancy_uuid}/moderate';
+};
+
+export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostError = ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors[keyof ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors];
+
+export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: VacancyOut;
+};
+
+export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponse = ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses[keyof ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses];

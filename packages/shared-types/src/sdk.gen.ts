@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInviteApiV1InvitesCodeAcceptPostData, AcceptInviteApiV1InvitesCodeAcceptPostErrors, AcceptInviteApiV1InvitesCodeAcceptPostResponses, AdminListTopupRequestsApiV1AdminTopupRequestsGetData, AdminListTopupRequestsApiV1AdminTopupRequestsGetResponses, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostData, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostErrors, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses, CompanyAccountApiV1CompaniesCompanyUuidAccountGetData, CompanyAccountApiV1CompaniesCompanyUuidAccountGetErrors, CompanyAccountApiV1CompaniesCompanyUuidAccountGetResponses, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetData, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetErrors, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses, ConsentApiV1AuthConsentPostData, ConsentApiV1AuthConsentPostResponses, CreateCompanyApiV1CompaniesPostData, CreateCompanyApiV1CompaniesPostErrors, CreateCompanyApiV1CompaniesPostResponses, CreateFilialApiV1CompaniesCompanyUuidFilialsPostData, CreateFilialApiV1CompaniesCompanyUuidFilialsPostErrors, CreateFilialApiV1CompaniesCompanyUuidFilialsPostResponses, CreateInviteApiV1CompaniesCompanyUuidInvitesPostData, CreateInviteApiV1CompaniesCompanyUuidInvitesPostErrors, CreateInviteApiV1CompaniesCompanyUuidInvitesPostResponses, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostData, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostErrors, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostResponses, DeleteFilialApiV1FilialsFilialUuidDeleteData, DeleteFilialApiV1FilialsFilialUuidDeleteErrors, DeleteFilialApiV1FilialsFilialUuidDeleteResponses, DocumentContentApiV1DocumentsDocumentUuidContentGetData, DocumentContentApiV1DocumentsDocumentUuidContentGetErrors, DocumentContentApiV1DocumentsDocumentUuidContentGetResponses, GetCompanyApiV1CompaniesCompanyUuidGetData, GetCompanyApiV1CompaniesCompanyUuidGetErrors, GetCompanyApiV1CompaniesCompanyUuidGetResponses, GetMeApiV1UsersMeGetData, GetMeApiV1UsersMeGetResponses, HealthApiV1HealthGetData, HealthApiV1HealthGetResponses, ListFilialsApiV1CompaniesCompanyUuidFilialsGetData, ListFilialsApiV1CompaniesCompanyUuidFilialsGetErrors, ListFilialsApiV1CompaniesCompanyUuidFilialsGetResponses, ListInvitesApiV1CompaniesCompanyUuidInvitesGetData, ListInvitesApiV1CompaniesCompanyUuidInvitesGetErrors, ListInvitesApiV1CompaniesCompanyUuidInvitesGetResponses, ListTeamApiV1CompaniesCompanyUuidTeamGetData, ListTeamApiV1CompaniesCompanyUuidTeamGetErrors, ListTeamApiV1CompaniesCompanyUuidTeamGetResponses, LogoutApiV1AuthLogoutPostData, LogoutApiV1AuthLogoutPostErrors, LogoutApiV1AuthLogoutPostResponses, MeApiV1AuthMeGetData, MeApiV1AuthMeGetResponses, MyCompaniesApiV1CompaniesMyGetData, MyCompaniesApiV1CompaniesMyGetResponses, MyDocumentsApiV1DocumentsMyGetData, MyDocumentsApiV1DocumentsMyGetResponses, RefreshApiV1AuthRefreshPostData, RefreshApiV1AuthRefreshPostErrors, RefreshApiV1AuthRefreshPostResponses, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteData, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteErrors, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteResponses, RequestOtpApiV1AuthOtpRequestPostData, RequestOtpApiV1AuthOtpRequestPostErrors, RequestOtpApiV1AuthOtpRequestPostResponses, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostData, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostErrors, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses, UpdateCompanyApiV1CompaniesCompanyUuidPatchData, UpdateCompanyApiV1CompaniesCompanyUuidPatchErrors, UpdateCompanyApiV1CompaniesCompanyUuidPatchResponses, UpdateFilialApiV1FilialsFilialUuidPatchData, UpdateFilialApiV1FilialsFilialUuidPatchErrors, UpdateFilialApiV1FilialsFilialUuidPatchResponses, UpdateMeApiV1UsersMePatchData, UpdateMeApiV1UsersMePatchErrors, UpdateMeApiV1UsersMePatchResponses, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchData, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchErrors, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchResponses, UploadDocumentApiV1DocumentsPostData, UploadDocumentApiV1DocumentsPostErrors, UploadDocumentApiV1DocumentsPostResponses, VerifyOtpApiV1AuthOtpVerifyPostData, VerifyOtpApiV1AuthOtpVerifyPostErrors, VerifyOtpApiV1AuthOtpVerifyPostResponses } from './types.gen';
+import type { AcceptInviteApiV1InvitesCodeAcceptPostData, AcceptInviteApiV1InvitesCodeAcceptPostErrors, AcceptInviteApiV1InvitesCodeAcceptPostResponses, AdminListTopupRequestsApiV1AdminTopupRequestsGetData, AdminListTopupRequestsApiV1AdminTopupRequestsGetResponses, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostData, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostErrors, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostData, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses, CompanyAccountApiV1CompaniesCompanyUuidAccountGetData, CompanyAccountApiV1CompaniesCompanyUuidAccountGetErrors, CompanyAccountApiV1CompaniesCompanyUuidAccountGetResponses, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetData, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetErrors, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetData, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses, ConsentApiV1AuthConsentPostData, ConsentApiV1AuthConsentPostResponses, CreateCompanyApiV1CompaniesPostData, CreateCompanyApiV1CompaniesPostErrors, CreateCompanyApiV1CompaniesPostResponses, CreateFilialApiV1CompaniesCompanyUuidFilialsPostData, CreateFilialApiV1CompaniesCompanyUuidFilialsPostErrors, CreateFilialApiV1CompaniesCompanyUuidFilialsPostResponses, CreateInviteApiV1CompaniesCompanyUuidInvitesPostData, CreateInviteApiV1CompaniesCompanyUuidInvitesPostErrors, CreateInviteApiV1CompaniesCompanyUuidInvitesPostResponses, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostData, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostErrors, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostResponses, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostData, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses, DeleteFilialApiV1FilialsFilialUuidDeleteData, DeleteFilialApiV1FilialsFilialUuidDeleteErrors, DeleteFilialApiV1FilialsFilialUuidDeleteResponses, DocumentContentApiV1DocumentsDocumentUuidContentGetData, DocumentContentApiV1DocumentsDocumentUuidContentGetErrors, DocumentContentApiV1DocumentsDocumentUuidContentGetResponses, FeedApiV1VacanciesGetData, FeedApiV1VacanciesGetErrors, FeedApiV1VacanciesGetResponses, GetCompanyApiV1CompaniesCompanyUuidGetData, GetCompanyApiV1CompaniesCompanyUuidGetErrors, GetCompanyApiV1CompaniesCompanyUuidGetResponses, GetMeApiV1UsersMeGetData, GetMeApiV1UsersMeGetResponses, HealthApiV1HealthGetData, HealthApiV1HealthGetResponses, ListFilialsApiV1CompaniesCompanyUuidFilialsGetData, ListFilialsApiV1CompaniesCompanyUuidFilialsGetErrors, ListFilialsApiV1CompaniesCompanyUuidFilialsGetResponses, ListInvitesApiV1CompaniesCompanyUuidInvitesGetData, ListInvitesApiV1CompaniesCompanyUuidInvitesGetErrors, ListInvitesApiV1CompaniesCompanyUuidInvitesGetResponses, ListTeamApiV1CompaniesCompanyUuidTeamGetData, ListTeamApiV1CompaniesCompanyUuidTeamGetErrors, ListTeamApiV1CompaniesCompanyUuidTeamGetResponses, LogoutApiV1AuthLogoutPostData, LogoutApiV1AuthLogoutPostErrors, LogoutApiV1AuthLogoutPostResponses, MeApiV1AuthMeGetData, MeApiV1AuthMeGetResponses, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostData, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses, MyCompaniesApiV1CompaniesMyGetData, MyCompaniesApiV1CompaniesMyGetResponses, MyDocumentsApiV1DocumentsMyGetData, MyDocumentsApiV1DocumentsMyGetResponses, PublishVacancyApiV1VacanciesVacancyUuidPublishPostData, PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors, PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses, RefreshApiV1AuthRefreshPostData, RefreshApiV1AuthRefreshPostErrors, RefreshApiV1AuthRefreshPostResponses, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteData, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteErrors, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteResponses, RequestOtpApiV1AuthOtpRequestPostData, RequestOtpApiV1AuthOtpRequestPostErrors, RequestOtpApiV1AuthOtpRequestPostResponses, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostData, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostErrors, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses, UpdateCompanyApiV1CompaniesCompanyUuidPatchData, UpdateCompanyApiV1CompaniesCompanyUuidPatchErrors, UpdateCompanyApiV1CompaniesCompanyUuidPatchResponses, UpdateFilialApiV1FilialsFilialUuidPatchData, UpdateFilialApiV1FilialsFilialUuidPatchErrors, UpdateFilialApiV1FilialsFilialUuidPatchResponses, UpdateMeApiV1UsersMePatchData, UpdateMeApiV1UsersMePatchErrors, UpdateMeApiV1UsersMePatchResponses, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchData, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchErrors, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchResponses, UpdateVacancyApiV1VacanciesVacancyUuidPatchData, UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors, UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses, UploadDocumentApiV1DocumentsPostData, UploadDocumentApiV1DocumentsPostErrors, UploadDocumentApiV1DocumentsPostResponses, VacancyDetailApiV1VacanciesVacancyUuidGetData, VacancyDetailApiV1VacanciesVacancyUuidGetErrors, VacancyDetailApiV1VacanciesVacancyUuidGetResponses, VerifyOtpApiV1AuthOtpVerifyPostData, VerifyOtpApiV1AuthOtpVerifyPostErrors, VerifyOtpApiV1AuthOtpVerifyPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -549,6 +549,134 @@ export const adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost
             }
         ],
         url: '/api/v1/admin/topup-requests/{topup_request_uuid}/resolve',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Feed
+ */
+export const feedApiV1VacanciesGet = <ThrowOnError extends boolean = false>(options?: Options<FeedApiV1VacanciesGetData, ThrowOnError>) => {
+    return (options?.client ?? client).get<FeedApiV1VacanciesGetResponses, FeedApiV1VacanciesGetErrors, ThrowOnError>({
+        url: '/api/v1/vacancies',
+        ...options
+    });
+};
+
+/**
+ * Vacancy Detail
+ */
+export const vacancyDetailApiV1VacanciesVacancyUuidGet = <ThrowOnError extends boolean = false>(options: Options<VacancyDetailApiV1VacanciesVacancyUuidGetData, ThrowOnError>) => {
+    return (options.client ?? client).get<VacancyDetailApiV1VacanciesVacancyUuidGetResponses, VacancyDetailApiV1VacanciesVacancyUuidGetErrors, ThrowOnError>({
+        url: '/api/v1/vacancies/{vacancy_uuid}',
+        ...options
+    });
+};
+
+/**
+ * Update Vacancy
+ */
+export const updateVacancyApiV1VacanciesVacancyUuidPatch = <ThrowOnError extends boolean = false>(options: Options<UpdateVacancyApiV1VacanciesVacancyUuidPatchData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses, UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/vacancies/{vacancy_uuid}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Company Vacancies
+ */
+export const companyVacanciesApiV1CompaniesCompanyUuidVacanciesGet = <ThrowOnError extends boolean = false>(options: Options<CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetData, ThrowOnError>) => {
+    return (options.client ?? client).get<CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/companies/{company_uuid}/vacancies',
+        ...options
+    });
+};
+
+/**
+ * Create Vacancy
+ */
+export const createVacancyApiV1CompaniesCompanyUuidVacanciesPost = <ThrowOnError extends boolean = false>(options: Options<CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/companies/{company_uuid}/vacancies',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Publish Vacancy
+ */
+export const publishVacancyApiV1VacanciesVacancyUuidPublishPost = <ThrowOnError extends boolean = false>(options: Options<PublishVacancyApiV1VacanciesVacancyUuidPublishPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses, PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/vacancies/{vacancy_uuid}/publish',
+        ...options
+    });
+};
+
+/**
+ * Archive Vacancy
+ */
+export const archiveVacancyApiV1VacanciesVacancyUuidArchivePost = <ThrowOnError extends boolean = false>(options: Options<ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostData, ThrowOnError>) => {
+    return (options.client ?? client).post<ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/vacancies/{vacancy_uuid}/archive',
+        ...options
+    });
+};
+
+/**
+ * Moderate Vacancy
+ */
+export const moderateVacancyApiV1AdminVacanciesVacancyUuidModeratePost = <ThrowOnError extends boolean = false>(options: Options<ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostData, ThrowOnError>) => {
+    return (options.client ?? client).post<ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/admin/vacancies/{vacancy_uuid}/moderate',
         ...options,
         headers: {
             'Content-Type': 'application/json',
