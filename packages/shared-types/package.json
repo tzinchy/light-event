@@ -1,0 +1,17 @@
+{
+  "name": "@light-event/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.gen.ts"
+  },
+  "scripts": {
+    "generate": "openapi-ts"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "^0.84.4",
+    "typescript": "^5"
+  }
+}
