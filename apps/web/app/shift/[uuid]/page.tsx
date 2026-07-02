@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2, Lock, MapPin, Zap } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowLeft, CheckCircle2, Loader2, Lock, MapPin, Zap } from "lucide-react";
 import {
+  applyApiV1VacanciesVacancyUuidApplicationsPost,
+  myApplicationsApiV1ApplicationsMyGet,
   vacancyDetailApiV1VacanciesVacancyUuidGet,
   type VacancyOut,
 } from "@light-event/shared-types";
@@ -21,6 +24,8 @@ export default function ShiftPage() {
   const { me, loading } = useAuth();
   const [shift, setShift] = useState<VacancyOut | null>(null);
   const [notFound, setNotFound] = useState(false);
+  const [myStatus, setMyStatus] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -31,6 +36,29 @@ export default function ShiftPage() {
       else setShift(data);
     })();
   }, [uuid]);
+
+  useEffect(() => {
+    if (!me) return;
+    void (async () => {
+      const { data } = await myApplicationsApiV1ApplicationsMyGet();
+      const mine = (data ?? []).find((a) => a.vacancy_uuid === uuid);
+      setMyStatus(mine?.status ?? null);
+    })();
+  }, [me, uuid]);
+
+  async function apply() {
+    setBusy(true);
+    const { data, error } = await applyApiV1VacanciesVacancyUuidApplicationsPost({
+      path: { vacancy_uuid: uuid },
+    });
+    setBusy(false);
+    if (error || !data) {
+      toast.error(String((error as { detail?: string })?.detail ?? "Не удалось откликнуться"));
+      return;
+    }
+    setMyStatus(data.status);
+    toast.success(DICT.applied);
+  }
 
   if (notFound) {
     return (
@@ -148,12 +176,26 @@ export default function ShiftPage() {
           </CardContent>
         </Card>
 
-        {/* отклик появится вместе с application-модулем (шаг 8) */}
-        {me && (
-          <Button className="mt-6 w-full" disabled title="Скоро">
-            Отклики скоро откроются
-          </Button>
-        )}
+        {me &&
+          (myStatus ? (
+            <div className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-brand-soft py-3 text-sm font-medium text-brand-strong">
+              <CheckCircle2 className="size-4" />
+              {myStatus === "reserve"
+                ? DICT.inReserve
+                : myStatus === "confirmed"
+                  ? DICT.confirmedApp
+                  : DICT.applied}
+            </div>
+          ) : (
+            <Button
+              className="mt-6 w-full"
+              disabled={busy || shift.status !== "active"}
+              onClick={() => void apply()}
+            >
+              {busy && <Loader2 className="size-4 animate-spin" />}
+              {DICT.apply}
+            </Button>
+          ))}
       </main>
     </div>
   );

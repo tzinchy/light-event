@@ -20,9 +20,14 @@ export function SiteHeader() {
         {!loading && (
           <nav className="flex items-center gap-2">
             {me ? (
-              <Button asChild size="sm">
-                <Link href="/org">{DICT.openOrgConsole}</Link>
-              </Button>
+              <>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/apps">{DICT.myApps}</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/org">{DICT.openOrgConsole}</Link>
+                </Button>
+              </>
             ) : (
               <>
                 <Button asChild variant="ghost" size="sm">

@@ -7,6 +7,7 @@ import { DICT } from "@/lib/dict";
 import { formatShiftWindow, kopToRub } from "@/lib/format";
 
 export function ShiftCard({ shift }: { shift: FeedItemOut }) {
+  const filled = shift.filled ?? 0;
   return (
     <Link href={`/shift/${shift.vacancy_uuid}`}>
       <Card className="transition-colors hover:bg-secondary/50">
@@ -52,6 +53,17 @@ export function ShiftCard({ shift }: { shift: FeedItemOut }) {
               ))}
             </div>
           )}
+          <div className="mt-3 flex items-center gap-2">
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-secondary">
+              <div
+                className="h-full rounded-full bg-brand"
+                style={{ width: `${Math.min(100, (filled / shift.slots) * 100)}%` }}
+              />
+            </div>
+            <span className="text-xs text-muted-foreground">
+              {filled}/{shift.slots} {DICT.filled}
+            </span>
+          </div>
         </CardContent>
       </Card>
     </Link>

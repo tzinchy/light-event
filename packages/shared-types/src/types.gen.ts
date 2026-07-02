@@ -27,6 +27,62 @@ export type AccountOut = {
 };
 
 /**
+ * ApplicationDetailOut
+ */
+export type ApplicationDetailOut = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Timeline
+     */
+    timeline: Array<TimelineEventOut>;
+};
+
+/**
+ * ApplicationOut
+ */
+export type ApplicationOut = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
  * Body_upload_document_api_v1_documents_post
  */
 export type BodyUploadDocumentApiV1DocumentsPost = {
@@ -35,6 +91,82 @@ export type BodyUploadDocumentApiV1DocumentsPost = {
      * File
      */
     file: string;
+};
+
+/**
+ * CandidateEntryIn
+ */
+export type CandidateEntryIn = {
+    /**
+     * List
+     */
+    list: 'shortlist' | 'reserve' | 'blacklist';
+    /**
+     * Note
+     */
+    note?: string | null;
+};
+
+/**
+ * CandidateEntryOut
+ */
+export type CandidateEntryOut = {
+    /**
+     * Entry Uuid
+     */
+    entry_uuid: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * List
+     */
+    list: string;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * CompanyApplicationOut
+ * Строка отклика для компании: заявка + профиль кандидата (без KYC-контента).
+ */
+export type CompanyApplicationOut = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * User Name
+     */
+    user_name: string | null;
+    vacancy: VacancyOut;
 };
 
 /**
@@ -133,7 +265,7 @@ export type DocumentOut = {
 
 /**
  * FeedItemOut
- * Карточка ленты: вакансия + витринные поля компании.
+ * Карточка ленты: вакансия + витринные поля компании и заполняемость.
  */
 export type FeedItemOut = {
     /**
@@ -224,6 +356,10 @@ export type FeedItemOut = {
      * Company Rating
      */
     company_rating?: number | null;
+    /**
+     * Filled
+     */
+    filled?: number;
 };
 
 /**
@@ -415,6 +551,38 @@ export type ModerateIn = {
 };
 
 /**
+ * MyApplicationOut
+ * Карточка «Мои заявки»: заявка + смена + компания.
+ */
+export type MyApplicationOut = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    vacancy: VacancyOut;
+    /**
+     * Company Name
+     */
+    company_name: string;
+};
+
+/**
  * MyCompanyOut
  */
 export type MyCompanyOut = {
@@ -490,6 +658,16 @@ export type RefreshIn = {
 };
 
 /**
+ * StatusChangeIn
+ */
+export type StatusChangeIn = {
+    /**
+     * Action
+     */
+    action: 'confirm' | 'reserve';
+};
+
+/**
  * TeamMemberOut
  */
 export type TeamMemberOut = {
@@ -551,6 +729,20 @@ export type TeamPermissionsPatchIn = {
      * Perm Invite
      */
     perm_invite?: boolean | null;
+};
+
+/**
+ * TimelineEventOut
+ */
+export type TimelineEventOut = {
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Occurred At
+     */
+    occurred_at: string;
 };
 
 /**
@@ -2014,3 +2206,276 @@ export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses =
 };
 
 export type ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponse = ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses[keyof ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses];
+
+export type VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}/applications';
+};
+
+export type VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetError = VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetErrors[keyof VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetErrors];
+
+export type VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponses = {
+    /**
+     * Response Vacancy Applications Api V1 Vacancies  Vacancy Uuid  Applications Get
+     * Successful Response
+     */
+    200: Array<CompanyApplicationOut>;
+};
+
+export type VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponse = VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponses[keyof VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponses];
+
+export type ApplyApiV1VacanciesVacancyUuidApplicationsPostData = {
+    body?: never;
+    path: {
+        /**
+         * Vacancy Uuid
+         */
+        vacancy_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/vacancies/{vacancy_uuid}/applications';
+};
+
+export type ApplyApiV1VacanciesVacancyUuidApplicationsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ApplyApiV1VacanciesVacancyUuidApplicationsPostError = ApplyApiV1VacanciesVacancyUuidApplicationsPostErrors[keyof ApplyApiV1VacanciesVacancyUuidApplicationsPostErrors];
+
+export type ApplyApiV1VacanciesVacancyUuidApplicationsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ApplicationOut;
+};
+
+export type ApplyApiV1VacanciesVacancyUuidApplicationsPostResponse = ApplyApiV1VacanciesVacancyUuidApplicationsPostResponses[keyof ApplyApiV1VacanciesVacancyUuidApplicationsPostResponses];
+
+export type MyApplicationsApiV1ApplicationsMyGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/applications/my';
+};
+
+export type MyApplicationsApiV1ApplicationsMyGetResponses = {
+    /**
+     * Response My Applications Api V1 Applications My Get
+     * Successful Response
+     */
+    200: Array<MyApplicationOut>;
+};
+
+export type MyApplicationsApiV1ApplicationsMyGetResponse = MyApplicationsApiV1ApplicationsMyGetResponses[keyof MyApplicationsApiV1ApplicationsMyGetResponses];
+
+export type ApplicationDetailApiV1ApplicationsApplicationUuidGetData = {
+    body?: never;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/applications/{application_uuid}';
+};
+
+export type ApplicationDetailApiV1ApplicationsApplicationUuidGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ApplicationDetailApiV1ApplicationsApplicationUuidGetError = ApplicationDetailApiV1ApplicationsApplicationUuidGetErrors[keyof ApplicationDetailApiV1ApplicationsApplicationUuidGetErrors];
+
+export type ApplicationDetailApiV1ApplicationsApplicationUuidGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApplicationDetailOut;
+};
+
+export type ApplicationDetailApiV1ApplicationsApplicationUuidGetResponse = ApplicationDetailApiV1ApplicationsApplicationUuidGetResponses[keyof ApplicationDetailApiV1ApplicationsApplicationUuidGetResponses];
+
+export type ChangeStatusApiV1ApplicationsApplicationUuidStatusPostData = {
+    body: StatusChangeIn;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/applications/{application_uuid}/status';
+};
+
+export type ChangeStatusApiV1ApplicationsApplicationUuidStatusPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ChangeStatusApiV1ApplicationsApplicationUuidStatusPostError = ChangeStatusApiV1ApplicationsApplicationUuidStatusPostErrors[keyof ChangeStatusApiV1ApplicationsApplicationUuidStatusPostErrors];
+
+export type ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApplicationOut;
+};
+
+export type ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponse = ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponses[keyof ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponses];
+
+export type CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/applications';
+};
+
+export type CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetError = CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetErrors[keyof CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetErrors];
+
+export type CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponses = {
+    /**
+     * Response Company Applications Api V1 Companies  Company Uuid  Applications Get
+     * Successful Response
+     */
+    200: Array<CompanyApplicationOut>;
+};
+
+export type CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponse = CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponses[keyof CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponses];
+
+export type ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: {
+        /**
+         * List
+         */
+        list?: 'shortlist' | 'reserve' | 'blacklist' | null;
+    };
+    url: '/api/v1/companies/{company_uuid}/candidates';
+};
+
+export type ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetError = ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetErrors[keyof ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetErrors];
+
+export type ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponses = {
+    /**
+     * Response List Candidates Api V1 Companies  Company Uuid  Candidates Get
+     * Successful Response
+     */
+    200: Array<CandidateEntryOut>;
+};
+
+export type ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponse = ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponses[keyof ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponses];
+
+export type DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/candidates/{user_uuid}';
+};
+
+export type DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteError = DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteErrors[keyof DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteErrors];
+
+export type DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponse = DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponses[keyof DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponses];
+
+export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutData = {
+    body: CandidateEntryIn;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/candidates/{user_uuid}';
+};
+
+export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutError = PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutErrors[keyof PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutErrors];
+
+export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: CandidateEntryOut;
+};
+
+export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponse = PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses[keyof PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses];
