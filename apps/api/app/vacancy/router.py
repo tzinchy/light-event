@@ -26,8 +26,10 @@ async def feed(
 ) -> list[FeedItemOut]:
     rows = await service.feed(role=role, date_from=date_from, date_to=date_to)
     return [
-        FeedItemOut(**VacancyOut.model_validate(vacancy).model_dump(), company_name=company.name)
-        for vacancy, company in rows
+        FeedItemOut(
+            **VacancyOut.model_validate(vacancy).model_dump(), company_name=company.name, filled=filled
+        )
+        for vacancy, company, filled in rows
     ]
 
 

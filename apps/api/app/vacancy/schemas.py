@@ -68,10 +68,11 @@ class VacancyOut(BaseModel):
 
 
 class FeedItemOut(VacancyOut):
-    """Карточка ленты: вакансия + витринные поля компании."""
+    """Карточка ленты: вакансия + витринные поля компании и заполняемость."""
 
     company_name: str
     company_rating: float | None = None
+    filled: int = 0
 
 
 class ModerateIn(BaseModel):

@@ -1,11 +1,26 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.application.models import Application, ApplicationStatus
 from app.company.models import Company
 from app.vacancy.models import Vacancy, VacancyStatus
+
+
+def _filled_subquery():
+    """Набрано мест = подтверждённые заявки смены."""
+    return (
+        select(func.count())
+        .select_from(Application)
+        .where(
+            Application.vacancy_uuid == Vacancy.vacancy_uuid,
+            Application.status == ApplicationStatus.confirmed,
+        )
+        .correlate(Vacancy)
+        .scalar_subquery()
+    )
 
 
 class VacancyRepo:
@@ -30,9 +45,9 @@ class VacancyRepo:
         role: str | None = None,
         date_from: datetime | None = None,
         date_to: datetime | None = None,
-    ) -> list[tuple[Vacancy, Company]]:
+    ) -> list[tuple[Vacancy, Company, int]]:
         query = (
-            select(Vacancy, Company)
+            select(Vacancy, Company, _filled_subquery().label("filled"))
             .join(Company, Company.company_uuid == Vacancy.company_uuid)
             .where(Vacancy.status == VacancyStatus.active, Vacancy.archived_at.is_(None))
             .order_by(Vacancy.starts_at)
@@ -44,7 +59,7 @@ class VacancyRepo:
         if date_to:
             query = query.where(Vacancy.starts_at <= date_to)
         result = await self.session.execute(query)
-        return [(vacancy, company) for vacancy, company in result.all()]
+        return [(vacancy, company, filled) for vacancy, company, filled in result.all()]
 
     async def list_by_company(self, company_uuid: UUID) -> list[Vacancy]:
         result = await self.session.execute(
