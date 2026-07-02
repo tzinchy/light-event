@@ -2,10 +2,10 @@
 
 # postgres + redis + minio для локальной разработки
 infra:
-	docker compose -f infra/docker-compose.yml up -d db redis minio minio-init
+	docker compose --env-file .env -f infra/docker-compose.yml up -d db redis minio minio-init
 
 infra-down:
-	docker compose -f infra/docker-compose.yml down
+	docker compose --env-file .env -f infra/docker-compose.yml down
 
 api:
 	cd apps/api && uv run uvicorn app.main:app --reload --port 8000
