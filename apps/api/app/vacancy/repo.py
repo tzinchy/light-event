@@ -68,3 +68,13 @@ class VacancyRepo:
             .order_by(Vacancy.vacancy_uuid.desc())
         )
         return list(result.scalars())
+
+    async def list_pending_moderation(self) -> list[tuple[Vacancy, str]]:
+        """Очередь модерации: pending-вакансии с названием компании (admin/requests)."""
+        result = await self.session.execute(
+            select(Vacancy, Company.name)
+            .join(Company, Company.company_uuid == Vacancy.company_uuid)
+            .where(Vacancy.status == VacancyStatus.pending_moderation)
+            .order_by(Vacancy.updated_at)
+        )
+        return [tuple(row) for row in result.all()]

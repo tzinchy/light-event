@@ -107,3 +107,13 @@ class TestRepo:
             .distinct()
         )
         return set(result.scalars())
+
+    async def list_pending_moderation(self) -> list[tuple[Test, str | None]]:
+        """Очередь модерации: pending-тесты с названием компании (admin/requests)."""
+        result = await self.session.execute(
+            select(Test, Company.name)
+            .join(Company, Company.company_uuid == Test.company_uuid, isouter=True)
+            .where(Test.status == TestStatus.pending_moderation)
+            .order_by(Test.updated_at)
+        )
+        return [tuple(row) for row in result.all()]

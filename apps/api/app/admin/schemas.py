@@ -26,3 +26,14 @@ class CompanyModerationOut(BaseModel):
 
 class CompanyRejectIn(BaseModel):
     reason: str = Field(min_length=3, max_length=500)
+
+
+class ModerationRequestOut(BaseModel):
+    """Элемент единой очереди модерации: платная публикация смены или теста компании."""
+
+    kind: str  # vacancy | test
+    ref_uuid: UUID
+    title: str
+    company_uuid: UUID | None
+    company_name: str | None
+    submitted_at: datetime

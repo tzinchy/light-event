@@ -3,9 +3,12 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.admin.schemas import ModerationRequestOut
 from app.company.models import Company, CompanyStatus
 from app.company.repo import CompanyRepo
 from app.core.errors import DomainError
+from app.test.repo import TestRepo
+from app.vacancy.repo import VacancyRepo
 
 
 class AdminCompanyService:
@@ -37,3 +40,35 @@ class AdminCompanyService:
         company.reject_reason = reason
         await self.session.flush()
         return company
+
+
+class AdminQueueService:
+    """Единая очередь модерации (PLAN §11.1): pending-вакансии и pending-тесты."""
+
+    def __init__(self, session: AsyncSession):
+        self.vacancies = VacancyRepo(session)
+        self.tests = TestRepo(session)
+
+    async def list_requests(self) -> list[ModerationRequestOut]:
+        items = [
+            ModerationRequestOut(
+                kind="vacancy",
+                ref_uuid=vacancy.vacancy_uuid,
+                title=vacancy.event_title,
+                company_uuid=vacancy.company_uuid,
+                company_name=company_name,
+                submitted_at=vacancy.updated_at,
+            )
+            for vacancy, company_name in await self.vacancies.list_pending_moderation()
+        ] + [
+            ModerationRequestOut(
+                kind="test",
+                ref_uuid=test.test_uuid,
+                title=test.title,
+                company_uuid=test.company_uuid,
+                company_name=company_name,
+                submitted_at=test.updated_at,
+            )
+            for test, company_name in await self.tests.list_pending_moderation()
+        ]
+        return sorted(items, key=lambda i: i.submitted_at)
