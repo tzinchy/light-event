@@ -261,6 +261,7 @@ export type CompanyApplicationOut = {
 
 /**
  * CompanyCreateIn
+ * Заявка на регистрацию организации — уходит на модерацию админу (PLAN §10.4).
  */
 export type CompanyCreateIn = {
     /**
@@ -271,6 +272,89 @@ export type CompanyCreateIn = {
      * Description
      */
     description?: string | null;
+    /**
+     * Inn
+     */
+    inn: string;
+    /**
+     * Ogrn
+     */
+    ogrn: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+    /**
+     * Contact Phone
+     */
+    contact_phone: string;
+};
+
+/**
+ * CompanyModerationOut
+ * Карточка заявки для админа — с реквизитами, которые не отдаются наружу.
+ */
+export type CompanyModerationOut = {
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Inn
+     */
+    inn: string;
+    /**
+     * Ogrn
+     */
+    ogrn: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+    /**
+     * Contact Phone
+     */
+    contact_phone: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Verified At
+     */
+    verified_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
 };
 
 /**
@@ -290,14 +374,49 @@ export type CompanyOut = {
      */
     description: string | null;
     /**
+     * Address
+     */
+    address: string;
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+    /**
      * Status
      */
     status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Verified At
+     */
+    verified_at: string | null;
     /**
      * Created At
      */
     created_at: string;
 };
+
+/**
+ * CompanyRejectIn
+ */
+export type CompanyRejectIn = {
+    /**
+     * Reason
+     */
+    reason: string;
+};
+
+/**
+ * CompanyStatus
+ */
+export type CompanyStatus = 'pending' | 'verified' | 'rejected';
 
 /**
  * CompanyTestItemOut
@@ -3056,3 +3175,91 @@ export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses = {
 };
 
 export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponse = AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses[keyof AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses];
+
+export type ListCompaniesApiV1AdminCompaniesGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: CompanyStatus;
+    };
+    url: '/api/v1/admin/companies';
+};
+
+export type ListCompaniesApiV1AdminCompaniesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListCompaniesApiV1AdminCompaniesGetError = ListCompaniesApiV1AdminCompaniesGetErrors[keyof ListCompaniesApiV1AdminCompaniesGetErrors];
+
+export type ListCompaniesApiV1AdminCompaniesGetResponses = {
+    /**
+     * Response List Companies Api V1 Admin Companies Get
+     * Successful Response
+     */
+    200: Array<CompanyModerationOut>;
+};
+
+export type ListCompaniesApiV1AdminCompaniesGetResponse = ListCompaniesApiV1AdminCompaniesGetResponses[keyof ListCompaniesApiV1AdminCompaniesGetResponses];
+
+export type VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/companies/{company_uuid}/verify';
+};
+
+export type VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostError = VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostErrors[keyof VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostErrors];
+
+export type VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: CompanyModerationOut;
+};
+
+export type VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostResponse = VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostResponses[keyof VerifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPostResponses];
+
+export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostData = {
+    body: CompanyRejectIn;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/companies/{company_uuid}/reject';
+};
+
+export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostError = RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostErrors[keyof RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostErrors];
+
+export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: CompanyModerationOut;
+};
+
+export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponse = RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses[keyof RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses];
