@@ -1,6 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
-// e2e ходят на живой dev-стенд: make infra + make api + make web (см. README).
+// e2e ходят на живой стенд: `make full` (nginx на :8080 — дефолт `make e2e`)
+// или dev-стенд make infra + make api + make web (E2E_BASE_URL=http://localhost:3000).
 // Коды перехватываются через реальные интерфейсы: SMS — Redis, почта — Mailpit API.
 export default defineConfig({
   testDir: "./e2e",
