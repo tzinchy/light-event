@@ -524,6 +524,26 @@ export type DocumentOut = {
 };
 
 /**
+ * EmailConfirmIn
+ */
+export type EmailConfirmIn = {
+    /**
+     * Code
+     */
+    code: string;
+};
+
+/**
+ * EmailRequestIn
+ */
+export type EmailRequestIn = {
+    /**
+     * Email
+     */
+    email: string;
+};
+
+/**
  * FeedItemOut
  * Карточка ленты: вакансия + витринные поля компании и заполняемость.
  */
@@ -778,6 +798,14 @@ export type MeOut = {
      * Phone
      */
     phone: string;
+    /**
+     * Email
+     */
+    email: string | null;
+    /**
+     * Email Verified At
+     */
+    email_verified_at: string | null;
     /**
      * Name
      */
@@ -1297,6 +1325,14 @@ export type UserOut = {
      */
     phone: string;
     /**
+     * Email
+     */
+    email: string | null;
+    /**
+     * Email Verified At
+     */
+    email_verified_at: string | null;
+    /**
      * Name
      */
     name: string | null;
@@ -1756,6 +1792,59 @@ export type UpdateMeApiV1UsersMePatchResponses = {
 };
 
 export type UpdateMeApiV1UsersMePatchResponse = UpdateMeApiV1UsersMePatchResponses[keyof UpdateMeApiV1UsersMePatchResponses];
+
+export type RequestEmailCodeApiV1UsersMeEmailPostData = {
+    body: EmailRequestIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/me/email';
+};
+
+export type RequestEmailCodeApiV1UsersMeEmailPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RequestEmailCodeApiV1UsersMeEmailPostError = RequestEmailCodeApiV1UsersMeEmailPostErrors[keyof RequestEmailCodeApiV1UsersMeEmailPostErrors];
+
+export type RequestEmailCodeApiV1UsersMeEmailPostResponses = {
+    /**
+     * Response Request Email Code Api V1 Users Me Email Post
+     * Successful Response
+     */
+    202: {
+        [key: string]: unknown;
+    };
+};
+
+export type RequestEmailCodeApiV1UsersMeEmailPostResponse = RequestEmailCodeApiV1UsersMeEmailPostResponses[keyof RequestEmailCodeApiV1UsersMeEmailPostResponses];
+
+export type ConfirmEmailApiV1UsersMeEmailConfirmPostData = {
+    body: EmailConfirmIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/me/email/confirm';
+};
+
+export type ConfirmEmailApiV1UsersMeEmailConfirmPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ConfirmEmailApiV1UsersMeEmailConfirmPostError = ConfirmEmailApiV1UsersMeEmailConfirmPostErrors[keyof ConfirmEmailApiV1UsersMeEmailConfirmPostErrors];
+
+export type ConfirmEmailApiV1UsersMeEmailConfirmPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserOut;
+};
+
+export type ConfirmEmailApiV1UsersMeEmailConfirmPostResponse = ConfirmEmailApiV1UsersMeEmailConfirmPostResponses[keyof ConfirmEmailApiV1UsersMeEmailConfirmPostResponses];
 
 export type UploadDocumentApiV1DocumentsPostData = {
     body: BodyUploadDocumentApiV1DocumentsPost;

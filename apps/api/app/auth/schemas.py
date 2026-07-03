@@ -31,6 +31,8 @@ class MeOut(BaseModel):
 
     user_uuid: UUID
     phone: str
+    email: str | None
+    email_verified_at: datetime | None
     name: str | None
     city: str | None
     platform_role: str

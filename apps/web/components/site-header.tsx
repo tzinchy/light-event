@@ -22,6 +22,9 @@ export function SiteHeader() {
             {me ? (
               <>
                 <Button asChild variant="ghost" size="sm">
+                  <Link href="/profile">Профиль</Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm">
                   <Link href="/apps">{DICT.myApps}</Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
