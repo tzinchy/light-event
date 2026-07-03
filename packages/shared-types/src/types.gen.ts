@@ -985,6 +985,14 @@ export type OtpVerifyIn = {
  */
 export type PayoutOut = {
     /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Company Name
+     */
+    company_name: string;
+    /**
      * Payout Uuid
      */
     payout_uuid: string;
