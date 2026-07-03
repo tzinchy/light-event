@@ -484,6 +484,104 @@ export type CompanyUpdateIn = {
 };
 
 /**
+ * ComplaintCreateIn
+ */
+export type ComplaintCreateIn = {
+    /**
+     * Target Type
+     */
+    target_type: 'user' | 'company';
+    /**
+     * Target Uuid
+     */
+    target_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid?: string | null;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Severity
+     */
+    severity: 'low' | 'medium' | 'high';
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
+ * ComplaintOut
+ */
+export type ComplaintOut = {
+    /**
+     * Complaint Uuid
+     */
+    complaint_uuid: string;
+    /**
+     * Author Uuid
+     */
+    author_uuid: string;
+    /**
+     * Target Type
+     */
+    target_type: string;
+    /**
+     * Target Uuid
+     */
+    target_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string | null;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Severity
+     */
+    severity: string;
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Resolution
+     */
+    resolution: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Resolved At
+     */
+    resolved_at: string | null;
+};
+
+/**
+ * ComplaintResolveIn
+ */
+export type ComplaintResolveIn = {
+    /**
+     * Action
+     */
+    action: 'resolved' | 'dismissed';
+    /**
+     * Resolution
+     */
+    resolution: string;
+};
+
+/**
  * DocumentKind
  */
 export type DocumentKind = 'passport' | 'selfie_with_passport' | 'medbook' | 'diploma' | 'payment_proof';
@@ -1083,6 +1181,93 @@ export type RefreshIn = {
      * Refresh Token
      */
     refresh_token: string;
+};
+
+/**
+ * ReviewCreateIn
+ */
+export type ReviewCreateIn = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Rating
+     */
+    rating: number;
+    /**
+     * Text
+     */
+    text?: string | null;
+    /**
+     * Kind
+     */
+    kind: 'about_org' | 'about_event' | 'about_worker';
+};
+
+/**
+ * ReviewListOut
+ * Список отзывов с агрегатами — рейтинг цели считается на лету (PLAN §3.7).
+ */
+export type ReviewListOut = {
+    /**
+     * Avg Rating
+     */
+    avg_rating: number | null;
+    /**
+     * Count
+     */
+    count: number;
+    /**
+     * Items
+     */
+    items: Array<ReviewOut>;
+};
+
+/**
+ * ReviewOut
+ */
+export type ReviewOut = {
+    /**
+     * Review Uuid
+     */
+    review_uuid: string;
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * Author Uuid
+     */
+    author_uuid: string;
+    /**
+     * Target Type
+     */
+    target_type: string;
+    /**
+     * Target Uuid
+     */
+    target_uuid: string;
+    /**
+     * Rating
+     */
+    rating: number;
+    /**
+     * Text
+     */
+    text: string | null;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Created At
+     */
+    created_at: string;
 };
 
 /**
@@ -2427,6 +2612,180 @@ export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses = {
 };
 
 export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponse = RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses[keyof RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses];
+
+export type CreateReviewApiV1ReviewsPostData = {
+    body: ReviewCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/reviews';
+};
+
+export type CreateReviewApiV1ReviewsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateReviewApiV1ReviewsPostError = CreateReviewApiV1ReviewsPostErrors[keyof CreateReviewApiV1ReviewsPostErrors];
+
+export type CreateReviewApiV1ReviewsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ReviewOut;
+};
+
+export type CreateReviewApiV1ReviewsPostResponse = CreateReviewApiV1ReviewsPostResponses[keyof CreateReviewApiV1ReviewsPostResponses];
+
+export type UserReviewsApiV1UsersUserUuidReviewsGetData = {
+    body?: never;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_uuid}/reviews';
+};
+
+export type UserReviewsApiV1UsersUserUuidReviewsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UserReviewsApiV1UsersUserUuidReviewsGetError = UserReviewsApiV1UsersUserUuidReviewsGetErrors[keyof UserReviewsApiV1UsersUserUuidReviewsGetErrors];
+
+export type UserReviewsApiV1UsersUserUuidReviewsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReviewListOut;
+};
+
+export type UserReviewsApiV1UsersUserUuidReviewsGetResponse = UserReviewsApiV1UsersUserUuidReviewsGetResponses[keyof UserReviewsApiV1UsersUserUuidReviewsGetResponses];
+
+export type CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/reviews';
+};
+
+export type CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetError = CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetErrors[keyof CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetErrors];
+
+export type CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReviewListOut;
+};
+
+export type CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetResponse = CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetResponses[keyof CompanyReviewsApiV1CompaniesCompanyUuidReviewsGetResponses];
+
+export type CreateComplaintApiV1ComplaintsPostData = {
+    body: ComplaintCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/complaints';
+};
+
+export type CreateComplaintApiV1ComplaintsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateComplaintApiV1ComplaintsPostError = CreateComplaintApiV1ComplaintsPostErrors[keyof CreateComplaintApiV1ComplaintsPostErrors];
+
+export type CreateComplaintApiV1ComplaintsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ComplaintOut;
+};
+
+export type CreateComplaintApiV1ComplaintsPostResponse = CreateComplaintApiV1ComplaintsPostResponses[keyof CreateComplaintApiV1ComplaintsPostResponses];
+
+export type MyComplaintsApiV1ComplaintsMyGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/complaints/my';
+};
+
+export type MyComplaintsApiV1ComplaintsMyGetResponses = {
+    /**
+     * Response My Complaints Api V1 Complaints My Get
+     * Successful Response
+     */
+    200: Array<ComplaintOut>;
+};
+
+export type MyComplaintsApiV1ComplaintsMyGetResponse = MyComplaintsApiV1ComplaintsMyGetResponses[keyof MyComplaintsApiV1ComplaintsMyGetResponses];
+
+export type AdminOpenComplaintsApiV1AdminComplaintsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/complaints';
+};
+
+export type AdminOpenComplaintsApiV1AdminComplaintsGetResponses = {
+    /**
+     * Response Admin Open Complaints Api V1 Admin Complaints Get
+     * Successful Response
+     */
+    200: Array<ComplaintOut>;
+};
+
+export type AdminOpenComplaintsApiV1AdminComplaintsGetResponse = AdminOpenComplaintsApiV1AdminComplaintsGetResponses[keyof AdminOpenComplaintsApiV1AdminComplaintsGetResponses];
+
+export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostData = {
+    body: ComplaintResolveIn;
+    path: {
+        /**
+         * Complaint Uuid
+         */
+        complaint_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/complaints/{complaint_uuid}/resolve';
+};
+
+export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostError = AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostErrors[keyof AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostErrors];
+
+export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: ComplaintOut;
+};
+
+export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponse = AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponses[keyof AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponses];
 
 export type CompanyAccountApiV1CompaniesCompanyUuidAccountGetData = {
     body?: never;
