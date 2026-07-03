@@ -839,6 +839,37 @@ export type ModerateIn = {
 };
 
 /**
+ * ModerationRequestOut
+ * Элемент единой очереди модерации: платная публикация смены или теста компании.
+ */
+export type ModerationRequestOut = {
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Ref Uuid
+     */
+    ref_uuid: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Company Name
+     */
+    company_name: string | null;
+    /**
+     * Submitted At
+     */
+    submitted_at: string;
+};
+
+/**
  * MyApplicationOut
  * Карточка «Мои заявки»: заявка + смена + компания.
  */
@@ -3264,6 +3295,23 @@ export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses = {
 };
 
 export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponse = AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses[keyof AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses];
+
+export type ListRequestsApiV1AdminRequestsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/requests';
+};
+
+export type ListRequestsApiV1AdminRequestsGetResponses = {
+    /**
+     * Response List Requests Api V1 Admin Requests Get
+     * Successful Response
+     */
+    200: Array<ModerationRequestOut>;
+};
+
+export type ListRequestsApiV1AdminRequestsGetResponse = ListRequestsApiV1AdminRequestsGetResponses[keyof ListRequestsApiV1AdminRequestsGetResponses];
 
 export type ListCompaniesApiV1AdminCompaniesGetData = {
     body?: never;
