@@ -981,6 +981,44 @@ export type OtpVerifyIn = {
 };
 
 /**
+ * PayoutOut
+ */
+export type PayoutOut = {
+    /**
+     * Payout Uuid
+     */
+    payout_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+    /**
+     * Workers Count
+     */
+    workers_count: number;
+    /**
+     * Amount Kop
+     */
+    amount_kop: number;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Paid At
+     */
+    paid_at: string | null;
+};
+
+/**
  * QuestionIn
  */
 export type QuestionIn = {
@@ -2519,6 +2557,84 @@ export type AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostR
 };
 
 export type AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponse = AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses[keyof AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses];
+
+export type CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/payouts';
+};
+
+export type CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetError = CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetErrors[keyof CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetErrors];
+
+export type CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetResponses = {
+    /**
+     * Response Company Payouts Api V1 Companies  Company Uuid  Payouts Get
+     * Successful Response
+     */
+    200: Array<PayoutOut>;
+};
+
+export type CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetResponse = CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetResponses[keyof CompanyPayoutsApiV1CompaniesCompanyUuidPayoutsGetResponses];
+
+export type AdminListPayoutsApiV1AdminPayoutsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/payouts';
+};
+
+export type AdminListPayoutsApiV1AdminPayoutsGetResponses = {
+    /**
+     * Response Admin List Payouts Api V1 Admin Payouts Get
+     * Successful Response
+     */
+    200: Array<PayoutOut>;
+};
+
+export type AdminListPayoutsApiV1AdminPayoutsGetResponse = AdminListPayoutsApiV1AdminPayoutsGetResponses[keyof AdminListPayoutsApiV1AdminPayoutsGetResponses];
+
+export type AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostData = {
+    body?: never;
+    path: {
+        /**
+         * Payout Uuid
+         */
+        payout_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/payouts/{payout_uuid}/execute';
+};
+
+export type AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostError = AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostErrors[keyof AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostErrors];
+
+export type AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: PayoutOut;
+};
+
+export type AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostResponse = AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostResponses[keyof AdminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePostResponses];
 
 export type FeedApiV1VacanciesGetData = {
     body?: never;
