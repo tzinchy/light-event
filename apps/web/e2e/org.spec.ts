@@ -1,11 +1,12 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { grantAdmin, loginByPhone } from "./helpers";
 
-// Полный путь организации: заявка с точкой на карте → верификация админом →
-// кабинет открылся → филиал → черновик смены. Дальше цикла (публикация,
-// модерация вакансии, отклик) пока нет админского UI — сценарий дорастим вместе с ним.
-test("организация: заявка → верификация админом → черновик смены", async ({ browser }) => {
-  test.setTimeout(90_000);
+// Полный продуктовый цикл (PLAN §11.3): заявка организации с точкой на карте →
+// верификация админом → пополнение с пруфом → зачисление админом →
+// платная публикация смены → модерация публикации → отклик соискателя → найм.
+// Нужен полный стенд (make full): grant-admin выполняется в api-контейнере.
+test("полный цикл: организация → модерация → публикация → отклик → найм", async ({ browser }) => {
+  test.setTimeout(120_000);
   const orgName = `Гранд Холл E2E ${Date.now()}`;
   const eventTitle = `Банкет E2E ${Date.now()}`;
 
@@ -22,8 +23,7 @@ test("организация: заявка → верификация админ
   await manager.getByLabel("Адрес").fill("Москва, Тверская, 1");
 
   // точка на карте: клик по центру canvas MapLibre ставит маркер
-  const canvas = manager.locator(".maplibregl-canvas");
-  await canvas.click();
+  await manager.locator(".maplibregl-canvas").click();
   await expect(manager.getByText(/^5\d\.\d+, \d+\.\d+$/)).toBeVisible();
 
   const submit = manager.getByRole("button", { name: "Отправить заявку" });
@@ -38,30 +38,70 @@ test("организация: заявка → верификация админ
   grantAdmin(adminPhone);
 
   await admin.goto("/admin");
-  const card = admin.locator('[data-slot="card"]').filter({ hasText: orgName });
-  await expect(card.getByText("На проверке")).toBeVisible();
-  await card.getByRole("button", { name: "Подтвердить" }).click();
+  const orgCard = admin.locator('[data-slot="card"]').filter({ hasText: orgName });
+  await expect(orgCard.getByText("На проверке")).toBeVisible();
+  await orgCard.getByRole("button", { name: "Подтвердить" }).click();
   await expect(admin.getByText(`«${orgName}» подтверждена`)).toBeVisible();
 
-  // — кабинет менеджера открылся: филиал + черновик смены
-  await manager.goto("/org/create");
-  await expect(manager.getByRole("heading", { name: "Карточка события" })).toBeVisible();
+  // — кабинет открылся: заявка на пополнение с пруфом платежа
+  await manager.goto("/org/balance");
+  await manager.getByRole("button", { name: "Пополнить" }).click();
+  const topupDialog = manager.getByRole("dialog");
+  await topupDialog.getByLabel("Сумма, ₽").fill("2000");
+  await topupDialog
+    .locator('input[type="file"]')
+    .setInputFiles({ name: "proof.jpg", mimeType: "image/jpeg", buffer: Buffer.from("proof-bytes") });
+  await topupDialog.getByRole("button", { name: "Отправить заявку" }).click();
+  await expect(manager.getByText("Заявка на пополнение отправлена администратору")).toBeVisible();
 
+  // — админ зачисляет пополнение во вкладке «Пополнения»
+  await admin.goto("/admin");
+  await admin.getByRole("button", { name: "Пополнения" }).click();
+  const topupCard = admin.locator('[data-slot="card"]').filter({ hasText: "2 000 ₽" }).first();
+  await topupCard.getByRole("button", { name: "Зачислить" }).click();
+  await expect(admin.getByText("Пополнение зачислено")).toBeVisible();
+
+  await manager.goto("/org/balance");
+  await expect(manager.getByText("2 000 ₽").first()).toBeVisible();
+
+  // — создание смены и платная публикация (990 ₽)
+  await manager.goto("/org/create");
   await manager.getByRole("button", { name: "Новый филиал" }).click();
-  const dialog = manager.getByRole("dialog");
-  await dialog.getByLabel("Название").fill("Основная площадка");
-  await dialog.getByLabel("Адрес").fill("Тверская, 9");
-  await dialog.getByRole("button", { name: "Создать" }).click();
-  await expect(dialog).toBeHidden();
+  const filialDialog = manager.getByRole("dialog");
+  await filialDialog.getByLabel("Название").fill("Основная площадка");
+  await filialDialog.getByLabel("Адрес").fill("Тверская, 9");
+  await filialDialog.getByRole("button", { name: "Создать" }).click();
+  await expect(filialDialog).toBeHidden();
 
   await manager.getByLabel("Название события").fill(eventTitle);
   const tomorrow = new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10);
   await manager.getByLabel("Дата").fill(tomorrow);
 
-  await manager.getByRole("button", { name: "Сохранить черновик" }).click();
-  await expect(manager.getByText("Черновик сохранён")).toBeVisible();
-  await expect(manager).toHaveURL(/\/org\/events$/);
-  await expect(manager.getByText(eventTitle)).toBeVisible();
+  await manager.getByRole("button", { name: "Оплатить и опубликовать" }).click();
+  await expect(manager.getByText("Оплачено · отправлено на модерацию администратора")).toBeVisible();
+
+  // — админ одобряет публикацию во вкладке «Публикации»
+  await admin.goto("/admin");
+  await admin.getByRole("button", { name: "Публикации" }).click();
+  const pubCard = admin.locator('[data-slot="card"]').filter({ hasText: eventTitle });
+  await expect(pubCard.getByText("Публикация смены")).toBeVisible();
+  await pubCard.getByRole("button", { name: "Одобрить" }).click();
+  await expect(pubCard).toBeHidden();
+
+  // — соискатель находит смену в ленте и откликается
+  const workerCtx = await browser.newContext();
+  const worker = await workerCtx.newPage();
+  await loginByPhone(worker);
+  await worker.goto("/feed");
+  await worker.getByText(eventTitle).first().click();
+  await worker.getByRole("button", { name: "Откликнуться" }).click();
+  await expect(worker.getByText("Отклик отправлен").first()).toBeVisible();
+
+  // — менеджер нанимает
+  await manager.goto("/org/candidates");
+  const candidateCard = manager.locator('[data-slot="card"]').filter({ hasText: eventTitle });
+  await candidateCard.getByRole("button", { name: "Нанять", exact: true }).click();
+  await expect(candidateCard.getByRole("button", { name: "Нанят", exact: true })).toBeVisible();
 
   // мобильный адаптив: на <md сайдбар скрыт, навигация кабинета — чипсами в main
   await manager.setViewportSize({ width: 390, height: 844 });
@@ -69,4 +109,5 @@ test("организация: заявка → верификация админ
 
   await managerCtx.close();
   await adminCtx.close();
+  await workerCtx.close();
 });
