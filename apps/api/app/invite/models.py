@@ -1,18 +1,17 @@
 from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, Enum, ForeignKey, String
+from sqlalchemy import DateTime, Enum, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 from app.team.models import CompanyRole
 
 
 class InviteLink(TimestampMixin, Base):
     __tablename__ = "invite_link"
 
-    invite_link_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    invite_link_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     company_uuid: Mapped[UUID] = mapped_column(ForeignKey("company.company_uuid"), index=True)
     filial_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("filial.filial_uuid"))  # None = все филиалы
     company_role: Mapped[CompanyRole] = mapped_column(Enum(CompanyRole, native_enum=False, length=20))

@@ -1,11 +1,10 @@
 import enum
 from uuid import UUID
 
-from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, String, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 
 class CompanyRole(str, enum.Enum):
@@ -19,7 +18,7 @@ class TeamMember(TimestampMixin, Base):
     __tablename__ = "team_member"
     __table_args__ = (UniqueConstraint("user_uuid", "company_uuid", name="uq_team_member_user_company"),)
 
-    team_member_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    team_member_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     user_uuid: Mapped[UUID] = mapped_column(ForeignKey("user.user_uuid"), index=True)
     company_uuid: Mapped[UUID] = mapped_column(ForeignKey("company.company_uuid"), index=True)
     filial_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("filial.filial_uuid"))  # None = все филиалы

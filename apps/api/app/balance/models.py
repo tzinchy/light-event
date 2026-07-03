@@ -2,11 +2,10 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import BigInteger, CheckConstraint, DateTime, Enum, ForeignKey, String, UniqueConstraint, func
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, Enum, ForeignKey, String, UniqueConstraint, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 # счёт платформы (owner_type=platform) один; фиксированный owner_uuid держит уникальность (owner_type, owner_uuid)
 PLATFORM_OWNER_UUID = UUID(int=0)
@@ -38,7 +37,7 @@ class Account(TimestampMixin, Base):
     __tablename__ = "account"
     __table_args__ = (UniqueConstraint("owner_type", "owner_uuid", name="uq_account_owner"),)
 
-    account_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    account_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     owner_type: Mapped[AccountOwnerType] = mapped_column(Enum(AccountOwnerType, native_enum=False, length=20))
     owner_uuid: Mapped[UUID] = mapped_column(index=True)
     # денормализованный кэш поверх ledger_entry, сверяется в тестах (skill money-ledger)
@@ -59,7 +58,7 @@ class LedgerEntry(Base):
         CheckConstraint("debit_account_uuid <> credit_account_uuid", name="different_accounts"),
     )
 
-    ledger_entry_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    ledger_entry_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     debit_account_uuid: Mapped[UUID] = mapped_column(ForeignKey("account.account_uuid"), index=True)
     credit_account_uuid: Mapped[UUID] = mapped_column(ForeignKey("account.account_uuid"), index=True)
     amount_kop: Mapped[int] = mapped_column(BigInteger)
@@ -73,7 +72,7 @@ class LedgerEntry(Base):
 class TopupRequest(TimestampMixin, Base):
     __tablename__ = "topup_request"
 
-    topup_request_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    topup_request_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     account_uuid: Mapped[UUID] = mapped_column(ForeignKey("account.account_uuid"), index=True)
     amount_kop: Mapped[int] = mapped_column(BigInteger)
     proof_document_uuid: Mapped[UUID] = mapped_column(ForeignKey("document.document_uuid"))

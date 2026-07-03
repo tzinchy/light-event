@@ -2,11 +2,10 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, Float, ForeignKey, String
+from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, Float, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 
 class VacancyStatus(str, enum.Enum):
@@ -20,7 +19,7 @@ class VacancyStatus(str, enum.Enum):
 class Vacancy(TimestampMixin, Base):
     __tablename__ = "vacancy"
 
-    vacancy_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    vacancy_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     company_uuid: Mapped[UUID] = mapped_column(ForeignKey("company.company_uuid"), index=True)
     filial_uuid: Mapped[UUID] = mapped_column(ForeignKey("filial.filial_uuid"))
     created_by_uuid: Mapped[UUID] = mapped_column(ForeignKey("team_member.team_member_uuid"))

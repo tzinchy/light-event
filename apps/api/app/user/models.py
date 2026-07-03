@@ -2,11 +2,10 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, DateTime, Enum, String
+from sqlalchemy import ARRAY, DateTime, Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 
 class PlatformRole(str, enum.Enum):
@@ -18,7 +17,7 @@ class PlatformRole(str, enum.Enum):
 class User(TimestampMixin, Base):
     __tablename__ = "user"
 
-    user_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    user_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     phone: Mapped[str] = mapped_column(String(16), unique=True, index=True)
     name: Mapped[str | None] = mapped_column(String(120))
     city: Mapped[str | None] = mapped_column(String(120))

@@ -1,11 +1,10 @@
 import enum
 from uuid import UUID
 
-from sqlalchemy import BigInteger, Enum, ForeignKey, String
+from sqlalchemy import BigInteger, Enum, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 
 class DocumentKind(str, enum.Enum):
@@ -25,7 +24,7 @@ class DocumentStatus(str, enum.Enum):
 class Document(TimestampMixin, Base):
     __tablename__ = "document"
 
-    document_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    document_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     owner_uuid: Mapped[UUID] = mapped_column(ForeignKey("user.user_uuid"), index=True)
     kind: Mapped[DocumentKind] = mapped_column(Enum(DocumentKind, native_enum=False, length=30))
     storage_key: Mapped[str] = mapped_column(String(255))

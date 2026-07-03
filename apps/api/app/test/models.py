@@ -2,12 +2,11 @@ import enum
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, ForeignKey, Integer, String, func
+from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, ForeignKey, Integer, String, func, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
-from app.core.ids import uuid7
 
 
 class TestKind(str, enum.Enum):
@@ -31,7 +30,7 @@ class AttemptStatus(str, enum.Enum):
 class Test(TimestampMixin, Base):
     __tablename__ = "test"
 
-    test_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    test_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     kind: Mapped[TestKind] = mapped_column(Enum(TestKind, native_enum=False, length=20))
     company_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("company.company_uuid"), index=True)
     title: Mapped[str] = mapped_column(String(200))
@@ -47,7 +46,7 @@ class Test(TimestampMixin, Base):
 class TestQuestion(TimestampMixin, Base):
     __tablename__ = "test_question"
 
-    test_question_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    test_question_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     test_uuid: Mapped[UUID] = mapped_column(ForeignKey("test.test_uuid"), index=True)
     position: Mapped[int]
     text: Mapped[str] = mapped_column(String(500))
@@ -60,7 +59,7 @@ class TestQuestion(TimestampMixin, Base):
 class TestAttempt(TimestampMixin, Base):
     __tablename__ = "test_attempt"
 
-    test_attempt_uuid: Mapped[UUID] = mapped_column(primary_key=True, default=uuid7)
+    test_attempt_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
     test_uuid: Mapped[UUID] = mapped_column(ForeignKey("test.test_uuid"), index=True)
     user_uuid: Mapped[UUID] = mapped_column(ForeignKey("user.user_uuid"), index=True)
     status: Mapped[AttemptStatus] = mapped_column(
