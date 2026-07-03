@@ -1,8 +1,9 @@
+from tests.helpers import create_verified_company
+
 async def setup_company(client, login_user, add_team_member, base_phone: str) -> dict:
     owner = await login_user(base_phone + "1")
     manager = await login_user(base_phone + "2")
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл"}, headers=owner["headers"])
-    company_uuid = resp.json()["company_uuid"]
+    company_uuid = (await create_verified_company(client, owner["headers"]))["company_uuid"]
     await add_team_member(company_uuid, manager["me"]["user_uuid"], role="manager", perm_create=True)
 
     team = (await client.get(f"/api/v1/companies/{company_uuid}/team", headers=owner["headers"])).json()

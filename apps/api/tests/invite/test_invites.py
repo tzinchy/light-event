@@ -1,7 +1,9 @@
+from tests.helpers import create_verified_company
+
 async def setup_company(client, login_user, phone: str) -> dict:
     owner = await login_user(phone)
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл"}, headers=owner["headers"])
-    return {"owner": owner, "company_uuid": resp.json()["company_uuid"]}
+    company = await create_verified_company(client, owner["headers"])
+    return {"owner": owner, "company_uuid": company["company_uuid"]}
 
 
 async def create_invite(client, headers, company_uuid, role="manager", expires_in="7d", max_uses=5):

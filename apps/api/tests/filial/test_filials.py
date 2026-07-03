@@ -1,7 +1,8 @@
+from tests.helpers import create_verified_company
+
+
 async def make_company(client, headers) -> str:
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл"}, headers=headers)
-    assert resp.status_code == 201
-    return resp.json()["company_uuid"]
+    return (await create_verified_company(client, headers))["company_uuid"]
 
 
 async def test_main_manager_manages_filials(client, login_user):

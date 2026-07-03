@@ -1,10 +1,13 @@
+from tests.helpers import create_verified_company
+
 VACANCY_FEE_KOP = 99_000  # 990 ₽ из конфига (skill money-ledger)
 
 
 async def setup_company(client, login_user, phone: str) -> dict:
     owner = await login_user(phone)
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл «Метрополь»"}, headers=owner["headers"])
-    company_uuid = resp.json()["company_uuid"]
+    company_uuid = (await create_verified_company(client, owner["headers"], name="Гранд Холл «Метрополь»"))[
+        "company_uuid"
+    ]
     resp = await client.post(
         f"/api/v1/companies/{company_uuid}/filials",
         json={"name": "Гранд Холл — Тверская", "address": "Тверская, 9", "lat": 55.76, "lon": 37.61},

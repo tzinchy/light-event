@@ -1,10 +1,12 @@
+from tests.helpers import create_verified_company
+
 from sqlalchemy import text
 
 
 async def setup_company(client, login_user, base_phone: str) -> dict:
     owner = await login_user(base_phone + "1")
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл"}, headers=owner["headers"])
-    return {"owner": owner, "company_uuid": resp.json()["company_uuid"]}
+    company = await create_verified_company(client, owner["headers"])
+    return {"owner": owner, "company_uuid": company["company_uuid"]}
 
 
 async def upload_proof(client, headers) -> str:

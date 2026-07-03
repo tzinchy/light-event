@@ -1,11 +1,12 @@
+from tests.helpers import create_verified_company
+
 async def setup_active_vacancy(client, login_user, make_admin, base_phone: str, slots: int = 2) -> dict:
     """Компания с деньгами и опубликованной сменой — целиком через реальное API."""
     owner = await login_user(base_phone + "1")
     admin = await login_user(base_phone + "2")
     await make_admin(admin["me"]["user_uuid"])
 
-    resp = await client.post("/api/v1/companies", json={"name": "Гранд Холл"}, headers=owner["headers"])
-    company_uuid = resp.json()["company_uuid"]
+    company_uuid = (await create_verified_company(client, owner["headers"]))["company_uuid"]
     resp = await client.post(
         f"/api/v1/companies/{company_uuid}/filials",
         json={"name": "Тверская", "address": "Тверская, 9"},

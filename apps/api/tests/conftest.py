@@ -37,8 +37,11 @@ def redis_container():
 
 @pytest.fixture(scope="session")
 def settings(pg_container, redis_container, tmp_path_factory) -> Settings:
+    from tests import helpers
+
     redis_host = redis_container.get_container_host_ip()
     redis_port = redis_container.get_exposed_port(6379)
+    helpers.DB_URL = pg_container.get_connection_url()
     return Settings(
         database_url=pg_container.get_connection_url(),
         redis_url=f"redis://{redis_host}:{redis_port}/0",

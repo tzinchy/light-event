@@ -1,14 +1,16 @@
+from tests.helpers import create_verified_company
+
+
 async def create_company(client, headers, name="Гранд Холл «Метрополь»") -> dict:
-    resp = await client.post("/api/v1/companies", json={"name": name}, headers=headers)
-    assert resp.status_code == 201, resp.text
-    return resp.json()
+    """Компания, уже подтверждённая админом; сам флоу заявки — test_company_application.py."""
+    return await create_verified_company(client, headers, name=name)
 
 
 async def test_create_company_makes_creator_main_manager(client, login_user):
     session = await login_user()
 
     company = await create_company(client, session["headers"])
-    assert company["status"] == "pending"
+    assert company["status"] == "verified"
     assert company["name"] == "Гранд Холл «Метрополь»"
 
     resp = await client.get(f"/api/v1/companies/{company['company_uuid']}/team", headers=session["headers"])
