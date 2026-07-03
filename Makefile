@@ -29,3 +29,7 @@ revision:
 openapi-client:
 	cd apps/api && uv run python -c "import json; from app.main import app; print(json.dumps(app.openapi(), ensure_ascii=False))" > ../../packages/shared-types/openapi.json
 	pnpm --filter @light-event/shared-types generate
+
+# e2e против запущенного dev-стенда (make infra + make api + make web)
+e2e:
+	pnpm --filter web exec playwright test
