@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // standalone — минимальный рантайм для docker-образа (infra/docker-compose.yml, профиль full)
+  output: "standalone",
   // в dev проксируем API на uvicorn; в проде это делает nginx (infra/nginx)
   async rewrites() {
     return [

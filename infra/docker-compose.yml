@@ -82,13 +82,26 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY}
       S3_BUCKET: ${S3_BUCKET:-light-event}
       APP_SECRET_KEY: ${APP_SECRET_KEY}
+      SMS_RU_API_KEY: ${SMS_RU_API_KEY:-}
+      SMTP_HOST: ${DOCKER_SMTP_HOST:-mailpit}
+      SMTP_PORT: 1025
+      SMTP_FROM: ${SMTP_FROM:-light-event <no-reply@light-event.local>}
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
+      mailpit:
+        condition: service_healthy
 
-  # web + nginx подключаются на этапе фронтенда (см. PLAN.md §9, п.14)
+  web:
+    profiles: ["full"]
+    build:
+      context: ..
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      - api
+
   nginx:
     profiles: ["full"]
     image: nginx:alpine
@@ -98,6 +111,7 @@ services:
       - "8080:80"
     depends_on:
       - api
+      - web
 
 volumes:
   postgres_data:
