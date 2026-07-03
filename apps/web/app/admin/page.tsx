@@ -15,6 +15,8 @@ import {
   XCircle,
 } from "lucide-react";
 import {
+  adminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePost,
+  adminListPayoutsApiV1AdminPayoutsGet,
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
   listCompaniesApiV1AdminCompaniesGet,
@@ -25,6 +27,7 @@ import {
   verifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPost,
   type CompanyModerationOut,
   type ModerationRequestOut,
+  type PayoutOut,
   type TopupRequestOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
@@ -32,6 +35,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth-context";
 import { formatDateTime, kopToRub } from "@/lib/format";
+import { Banknote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function detailText(error: unknown, fallback: string): string {
@@ -319,6 +323,53 @@ function TopupCard({ topup, onDone }: { topup: TopupRequestOut; onDone: () => vo
   );
 }
 
+function PayoutCard({ payout, onDone }: { payout: PayoutOut; onDone: () => void }) {
+  const [busy, setBusy] = useState(false);
+
+  async function execute() {
+    setBusy(true);
+    const { error } = await adminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePost({
+      path: { payout_uuid: payout.payout_uuid },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось провести выплату"));
+      return;
+    }
+    toast.success("Выплата проведена");
+    onDone();
+  }
+
+  return (
+    <Card>
+      <CardContent className="pt-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-2 font-semibold">
+              <Banknote className="size-4 text-muted-foreground" />
+              {payout.event_title}
+            </h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {payout.company_name} · {payout.workers_count} чел. · подана{" "}
+              {formatDateTime(payout.created_at)}
+            </p>
+          </div>
+          <span className="shrink-0 font-mono text-lg font-semibold">
+            {kopToRub(payout.amount_kop)}
+          </span>
+        </div>
+
+        <div className="mt-4">
+          <Button size="sm" disabled={busy} onClick={() => void execute()}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : <BadgeCheck className="size-4" />}
+            Провести выплату
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function EmptyCard({ text }: { text: string }) {
   return (
     <Card>
@@ -327,7 +378,7 @@ function EmptyCard({ text }: { text: string }) {
   );
 }
 
-type TabKey = "companies" | "requests" | "topups";
+type TabKey = "companies" | "requests" | "topups" | "payouts";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -336,18 +387,21 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<CompanyModerationOut[] | null>(null);
   const [requests, setRequests] = useState<ModerationRequestOut[] | null>(null);
   const [topups, setTopups] = useState<TopupRequestOut[] | null>(null);
+  const [payouts, setPayouts] = useState<PayoutOut[] | null>(null);
 
   const isAdmin = me?.platform_role === "admin";
 
   const reload = useCallback(async () => {
-    const [companiesResp, requestsResp, topupsResp] = await Promise.all([
+    const [companiesResp, requestsResp, topupsResp, payoutsResp] = await Promise.all([
       listCompaniesApiV1AdminCompaniesGet({ query: { status: "pending" } }),
       listRequestsApiV1AdminRequestsGet(),
       adminListTopupRequestsApiV1AdminTopupRequestsGet(),
+      adminListPayoutsApiV1AdminPayoutsGet(),
     ]);
     setCompanies(companiesResp.data ?? []);
     setRequests(requestsResp.data ?? []);
     setTopups((topupsResp.data ?? []).filter((t) => t.status === "pending"));
+    setPayouts(payoutsResp.data ?? []);
   }, []);
 
   useEffect(() => {
@@ -363,7 +417,14 @@ export default function AdminPage() {
     void reload();
   }, [authLoading, me, isAdmin, router, reload]);
 
-  if (authLoading || !isAdmin || companies === null || requests === null || topups === null) {
+  if (
+    authLoading ||
+    !isAdmin ||
+    companies === null ||
+    requests === null ||
+    topups === null ||
+    payouts === null
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
         <Loader2 className="size-5 animate-spin" />
@@ -375,6 +436,7 @@ export default function AdminPage() {
     { key: "companies", label: "Организации", count: companies.length },
     { key: "requests", label: "Публикации", count: requests.length },
     { key: "topups", label: "Пополнения", count: topups.length },
+    { key: "payouts", label: "Выплаты", count: payouts.length },
   ];
 
   return (
@@ -425,6 +487,14 @@ export default function AdminPage() {
           ) : (
             requests.map((r) => (
               <RequestCard key={`${r.kind}-${r.ref_uuid}`} item={r} onDone={() => void reload()} />
+            ))
+          ))}
+        {tab === "payouts" &&
+          (payouts.length === 0 ? (
+            <EmptyCard text="Нет выплат к проведению" />
+          ) : (
+            payouts.map((p) => (
+              <PayoutCard key={p.payout_uuid} payout={p} onDone={() => void reload()} />
             ))
           ))}
         {tab === "topups" &&

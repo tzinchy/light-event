@@ -6,10 +6,12 @@ import { ArrowDownLeft, ArrowUpRight, FileUp, Loader2, ShieldAlert } from "lucid
 import {
   companyAccountApiV1CompaniesCompanyUuidAccountGet,
   companyOperationsApiV1CompaniesCompanyUuidAccountOperationsGet,
+  companyPayoutsApiV1CompaniesCompanyUuidPayoutsGet,
   createTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPost,
   uploadDocumentApiV1DocumentsPost,
   type AccountOut,
   type OperationOut,
+  type PayoutOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +29,12 @@ import { DICT } from "@/lib/dict";
 import { useOrg } from "@/lib/org-context";
 import { formatDateTime, kopToRub, rubInputToKop } from "@/lib/format";
 import { cn } from "@/lib/utils";
+
+const PAYOUT_STATUS: Record<string, { label: string; className: string }> = {
+  pending: { label: "Ожидает проведения", className: "bg-amber-50 text-amber-700" },
+  processing: { label: "Обрабатывается", className: "bg-blue-50 text-blue-700" },
+  paid: { label: "Выплачено", className: "bg-brand-soft text-brand-strong" },
+};
 
 const OP_LABEL: Record<string, string> = {
   topup: "Пополнение счёта",
@@ -141,6 +149,7 @@ export default function BalancePage() {
   const { current } = useOrg();
   const [account, setAccount] = useState<AccountOut | null>(null);
   const [operations, setOperations] = useState<OperationOut[]>([]);
+  const [payouts, setPayouts] = useState<PayoutOut[]>([]);
   const [forbidden, setForbidden] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -148,11 +157,12 @@ export default function BalancePage() {
 
   const load = useCallback(async () => {
     if (!companyUuid) return;
-    const [acc, ops] = await Promise.all([
+    const [acc, ops, pays] = await Promise.all([
       companyAccountApiV1CompaniesCompanyUuidAccountGet({ path: { company_uuid: companyUuid } }),
       companyOperationsApiV1CompaniesCompanyUuidAccountOperationsGet({
         path: { company_uuid: companyUuid },
       }),
+      companyPayoutsApiV1CompaniesCompanyUuidPayoutsGet({ path: { company_uuid: companyUuid } }),
     ]);
     if (acc.error) {
       setForbidden(true);
@@ -161,6 +171,7 @@ export default function BalancePage() {
     }
     setAccount(acc.data ?? null);
     setOperations(ops.data ?? []);
+    setPayouts(pays.data ?? []);
     setLoading(false);
   }, [companyUuid]);
 
@@ -226,6 +237,44 @@ export default function BalancePage() {
           </Card>
         ))}
       </div>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">Выплаты к проведению</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {payouts.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Пока нет выплат: они появляются после подтверждения соискателей на смену.
+            </p>
+          ) : (
+            <div className="divide-y">
+              {payouts.map((payout) => {
+                const status = PAYOUT_STATUS[payout.status] ?? PAYOUT_STATUS.pending;
+                return (
+                  <div key={payout.payout_uuid} className="flex items-center gap-3 py-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium">{payout.event_title}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {payout.workers_count} чел. · {formatDateTime(payout.created_at)}
+                      </div>
+                    </div>
+                    <span
+                      className={cn(
+                        "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium",
+                        status.className,
+                      )}
+                    >
+                      {status.label}
+                    </span>
+                    <div className="font-mono text-sm font-semibold">{kopToRub(payout.amount_kop)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="mt-6">
         <CardHeader>
