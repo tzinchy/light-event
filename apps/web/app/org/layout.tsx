@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
-import { toast } from "sonner";
+import { useEffect, type ReactNode } from "react";
 import {
   BarChart3,
   CalendarDays,
@@ -16,11 +15,10 @@ import {
   UsersRound,
   Wallet,
 } from "lucide-react";
-import { createCompanyApiV1CompaniesPost } from "@light-event/shared-types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import {
+  CompanyApplicationForm,
+  CompanyApplicationStatus,
+} from "@/components/company-application";
 import { useAuth } from "@/lib/auth-context";
 import { OrgProvider, useOrg } from "@/lib/org-context";
 import { cn } from "@/lib/utils";
@@ -36,55 +34,6 @@ const NAV = [
   { href: "/org/balance", label: "Баланс", icon: Wallet, ready: true },
   { href: "/org/reviews", label: "Отзывы", icon: Star, ready: false },
 ];
-
-function CreateCompanyScreen() {
-  const { reload } = useOrg();
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function create() {
-    setBusy(true);
-    const { error } = await createCompanyApiV1CompaniesPost({ body: { name } });
-    setBusy(false);
-    if (error) {
-      toast.error(String((error as { detail?: string }).detail ?? "Не удалось создать компанию"));
-      return;
-    }
-    await reload();
-  }
-
-  return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4">
-      <Card>
-        <CardContent className="pt-6">
-          <h1 className="text-lg font-semibold">Кабинет организации</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Создайте компанию, чтобы публиковать события и нанимать персонал. Вы станете главным
-            менеджером с полным доступом.
-          </p>
-          <Label htmlFor="company-name" className="mt-4 block">
-            Название организации
-          </Label>
-          <Input
-            id="company-name"
-            className="mt-2"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Гранд Холл «Метрополь»"
-          />
-          <Button
-            className="mt-4 w-full"
-            disabled={name.trim().length < 2 || busy}
-            onClick={() => void create()}
-          >
-            {busy && <Loader2 className="size-4 animate-spin" />}
-            Создать компанию
-          </Button>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 function OrgShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -104,7 +53,8 @@ function OrgShell({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!current) return <CreateCompanyScreen />;
+  if (!current) return <CompanyApplicationForm />;
+  if (current.company.status !== "verified") return <CompanyApplicationStatus membership={current} />;
 
   return (
     <div className="flex min-h-screen">
