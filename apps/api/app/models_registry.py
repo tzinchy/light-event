@@ -8,6 +8,7 @@ import app.application.models  # noqa: F401
 import app.balance.models  # noqa: F401
 import app.candidate_list.models  # noqa: F401
 import app.company.models  # noqa: F401
+import app.complaint.models  # noqa: F401
 import app.document.models  # noqa: F401
 import app.filial.models  # noqa: F401
 import app.invite.models  # noqa: F401

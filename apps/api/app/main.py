@@ -9,6 +9,7 @@ from app.application import router as application_router
 from app.auth import router as auth_router
 from app.balance import router as balance_router
 from app.candidate_list import router as candidate_list_router
+from app.complaint import router as complaint_router
 from app.company import router as company_router
 from app.core import health
 from app.document import router as document_router
@@ -63,6 +64,7 @@ def create_app(
     app.include_router(team_router.router)
     app.include_router(invite_router.router)
     app.include_router(review_router.router)
+    app.include_router(complaint_router.router)
     app.include_router(balance_router.router)
     app.include_router(vacancy_router.router)
     app.include_router(application_router.router)
