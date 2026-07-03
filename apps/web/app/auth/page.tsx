@@ -294,7 +294,17 @@ export default function AuthPage() {
                     onCheckedChange={(v) => setConsentChecked(v === true)}
                     className="mt-0.5"
                   />
-                  {DICT.kycConsent}
+                  <span>
+                    Я подтверждаю{" "}
+                    <Link
+                      href="/legal/personal-data"
+                      target="_blank"
+                      className="text-primary underline underline-offset-2"
+                    >
+                      согласие на обработку персональных данных
+                    </Link>
+                    , включая паспортные данные, для верификации (152-ФЗ).
+                  </span>
                 </label>
                 <Button className="mt-4 w-full" disabled={!kycReady || busy} onClick={() => void finishKyc()}>
                   {busy && <Loader2 className="size-4 animate-spin" />}
