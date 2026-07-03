@@ -16,10 +16,17 @@ export function isValidInn(value: string): boolean {
   );
 }
 
+// остаток от деления длинного числа в строке — без BigInt (target < ES2020)
+function modString(digits: string, m: number): number {
+  let r = 0;
+  for (const d of digits) r = (r * 10 + Number(d)) % m;
+  return r;
+}
+
 export function isValidOgrn(value: string): boolean {
   if (!/^\d{13}$|^\d{15}$/.test(value)) return false;
   if (value.length === 13) {
-    return Number(BigInt(value.slice(0, 12)) % 11n % 10n) === Number(value[12]);
+    return modString(value.slice(0, 12), 11) % 10 === Number(value[12]);
   }
-  return Number(BigInt(value.slice(0, 14)) % 13n % 10n) === Number(value[14]);
+  return modString(value.slice(0, 14), 13) % 10 === Number(value[14]);
 }
