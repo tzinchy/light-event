@@ -1,9 +1,9 @@
 import { execFileSync } from "node:child_process";
 import { expect, type Page } from "@playwright/test";
 
-/** Уникальный телефон на прогон — тесты не зависят друг от друга и от прошлых прогонов. */
+/** Уникальный телефон на прогон — случайный: параллельные worker'ы не коллидируют по Date.now(). */
 export function uniquePhone(): string {
-  return `+7999${String(Date.now()).slice(-7)}`;
+  return `+7999${Math.floor(1_000_000 + Math.random() * 9_000_000)}`;
 }
 
 /** SMS-код достаём из Redis (ConsoleSmsProvider никуда не шлёт — это dev-стенд). */
