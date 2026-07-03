@@ -14,7 +14,9 @@ config = context.config
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    # disable_existing_loggers=False: иначе fileConfig глушит логгеры приложения,
+    # когда миграции гоняются в том же процессе (тесты, entrypoint)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # URL берём из настроек приложения, если не передан явно (напр. из тестов)
 from app.core.config import get_settings

@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 import redis.asyncio as aioredis
@@ -24,6 +25,9 @@ from app.core.storage import build_storage
 
 
 def create_app(settings: Settings | None = None, sms_provider: SmsProvider | None = None) -> FastAPI:
+    # uvicorn настраивает только свои логгеры; без root-хендлера INFO приложения
+    # (в т.ч. OTP-коды ConsoleSmsProvider) не попадает в консоль
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s - %(message)s")
     settings = settings or get_settings()
     sms = sms_provider or ConsoleSmsProvider()
 
