@@ -77,3 +77,45 @@ async def test_files_land_in_local_folder_when_backend_is_local(client, login_us
 
     stored = [p for p in Path(settings.local_storage_path).rglob("*") if p.is_file()]
     assert any(p.read_bytes() == PNG_BYTES for p in stored)
+
+
+async def test_oversized_file_rejected(client, login_user, settings):
+    session = await login_user("+79051230041")
+    too_big = b"\x89PNG\r\n\x1a\n" + b"x" * (settings.document_max_size_mb * 1024 * 1024 + 1)
+
+    resp = await upload(client, session["headers"], content=too_big)
+
+    assert resp.status_code == 413
+
+
+async def test_unknown_kind_rejected(client, login_user):
+    session = await login_user("+79051230042")
+
+    resp = await upload(client, session["headers"], kind="driver_license")
+
+    assert resp.status_code == 422
+
+
+async def test_pdf_upload_accepted(client, login_user):
+    session = await login_user("+79051230043")
+
+    resp = await upload(client, session["headers"], mime="application/pdf", content=b"%PDF-1.7 test")
+
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["mime"] == "application/pdf"
+
+
+async def test_content_of_missing_document_returns_404(client, login_user):
+    session = await login_user("+79051230044")
+    missing = "019f0000-0000-7000-8000-000000000000"
+
+    resp = await client.get(f"/api/v1/documents/{missing}/content", headers=session["headers"])
+
+    assert resp.status_code == 404
+
+
+async def test_documents_require_auth(client):
+    assert (await client.get("/api/v1/documents/my")).status_code == 401
+    assert (
+        await client.post("/api/v1/documents", data={"kind": "passport"}, files={"file": ("a.png", b"x", "image/png")})
+    ).status_code == 401
