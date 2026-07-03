@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     access_token_ttl_sec: int = 900
     refresh_token_ttl_sec: int = 60 * 60 * 24 * 30
 
+    # SMS.ru: ключ с sms.ru; пустой — коды в лог (ConsoleSmsProvider).
+    # На свой подтверждённый номер sms.ru шлёт бесплатно — хватает для разработки.
+    sms_ru_api_key: str = ""
+
     # SMTP для кодов подтверждения почты (Brevo в проде, Mailpit в dev);
     # пустой host — фолбэк в ConsoleEmailProvider
     smtp_host: str = ""

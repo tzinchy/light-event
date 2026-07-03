@@ -22,7 +22,7 @@ from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import DomainError, domain_error_handler
 from app.core.email import EmailProvider, build_email_provider
-from app.core.sms import ConsoleSmsProvider, SmsProvider
+from app.core.sms import SmsProvider, build_sms_provider
 from app.core.storage import build_storage
 
 
@@ -35,7 +35,7 @@ def create_app(
     # (в т.ч. OTP-коды ConsoleSmsProvider) не попадает в консоль
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s - %(message)s")
     settings = settings or get_settings()
-    sms = sms_provider or ConsoleSmsProvider()
+    sms = sms_provider or build_sms_provider(settings)
     email = email_provider or build_email_provider(settings)
 
     @asynccontextmanager
