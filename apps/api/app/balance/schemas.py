@@ -51,6 +51,8 @@ class TopupResolveIn(BaseModel):
 class PayoutOut(BaseModel):
     model_config = {"from_attributes": True}
 
+    event_title: str
+    company_name: str
     payout_uuid: UUID
     vacancy_uuid: UUID
     company_uuid: UUID

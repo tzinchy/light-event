@@ -5,6 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.balance.models import Account, AccountOwnerType, LedgerEntry, Payout, PayoutStatus, TopupRequest
+from app.company.models import Company
+from app.vacancy.models import Vacancy
 
 
 class BalanceRepo:
@@ -99,14 +101,22 @@ class BalanceRepo:
         )
         return result.scalar_one_or_none()
 
-    async def list_payouts_by_company(self, company_uuid: UUID) -> list[Payout]:
-        result = await self.session.execute(
-            select(Payout).where(Payout.company_uuid == company_uuid).order_by(Payout.payout_uuid.desc())
+    def _payout_rows(self):
+        # событие и организация — для экранов баланса и админки
+        return (
+            select(Payout, Vacancy.event_title, Company.name)
+            .join(Vacancy, Vacancy.vacancy_uuid == Payout.vacancy_uuid)
+            .join(Company, Company.company_uuid == Payout.company_uuid)
         )
-        return list(result.scalars())
 
-    async def list_pending_payouts(self) -> list[Payout]:
+    async def list_payouts_by_company(self, company_uuid: UUID) -> list[tuple[Payout, str, str]]:
         result = await self.session.execute(
-            select(Payout).where(Payout.status == PayoutStatus.pending).order_by(Payout.payout_uuid)
+            self._payout_rows().where(Payout.company_uuid == company_uuid).order_by(Payout.payout_uuid.desc())
         )
-        return list(result.scalars())
+        return [tuple(row) for row in result.all()]
+
+    async def list_pending_payouts(self) -> list[tuple[Payout, str, str]]:
+        result = await self.session.execute(
+            self._payout_rows().where(Payout.status == PayoutStatus.pending).order_by(Payout.payout_uuid)
+        )
+        return [tuple(row) for row in result.all()]

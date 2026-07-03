@@ -86,6 +86,9 @@ async def test_confirm_holds_pay_total_and_creates_payout(client, login_user, ma
     assert payouts[0]["status"] == "pending"
     assert payouts[0]["amount_kop"] == PAY_TOTAL_KOP
     assert payouts[0]["workers_count"] == 1
+    # для экранов баланса и админки — событие и организация
+    assert payouts[0]["event_title"] == "Свадебный банкет"
+    assert payouts[0]["company_name"] == "Гранд Холл «Метрополь»"
 
     # второй подтверждённый — резерв и заявка на выплату растут
     worker2 = await apply_to_vacancy(client, login_user, ctx, "+79055550014")
@@ -131,6 +134,7 @@ async def test_execute_payout_pays_workers_and_commission(client, login_user, ma
     resp = await client.get("/api/v1/admin/payouts", headers=ctx["admin"]["headers"])
     assert resp.status_code == 200, resp.text
     payout = next(p for p in resp.json() if p["vacancy_uuid"] == ctx["vacancy_uuid"])
+    assert payout["event_title"] == "Свадебный банкет"
 
     platform_before = await account_row("platform", "00000000-0000-0000-0000-000000000000")
 

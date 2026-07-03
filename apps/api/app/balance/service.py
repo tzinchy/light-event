@@ -15,7 +15,7 @@ from app.balance.models import (
     TopupStatus,
 )
 from app.balance.repo import BalanceRepo
-from app.balance.schemas import OperationOut, TopupCreateIn, TopupResolveIn
+from app.balance.schemas import OperationOut, PayoutOut, TopupCreateIn, TopupResolveIn
 from app.core.config import get_settings
 from app.core.errors import DomainError
 from app.core.permissions import ensure_permission
@@ -164,17 +164,35 @@ class BalanceService:
         await self.session.flush()
         return payout
 
-    async def list_company_payouts(self, actor: User, company_uuid: UUID) -> list[Payout]:
+    @staticmethod
+    def _payout_out(payout: Payout, event_title: str, company_name: str) -> PayoutOut:
+        return PayoutOut(
+            event_title=event_title,
+            company_name=company_name,
+            payout_uuid=payout.payout_uuid,
+            vacancy_uuid=payout.vacancy_uuid,
+            company_uuid=payout.company_uuid,
+            workers_count=payout.workers_count,
+            amount_kop=payout.amount_kop,
+            status=payout.status,
+            created_at=payout.created_at,
+            paid_at=payout.paid_at,
+        )
+
+    async def list_company_payouts(self, actor: User, company_uuid: UUID) -> list[PayoutOut]:
         await ensure_permission(self.session, actor, company_uuid, "finance")
-        return await self.repo.list_payouts_by_company(company_uuid)
+        rows = await self.repo.list_payouts_by_company(company_uuid)
+        return [self._payout_out(*row) for row in rows]
 
-    async def list_pending_payouts(self) -> list[Payout]:
-        return await self.repo.list_pending_payouts()
+    async def list_pending_payouts(self) -> list[PayoutOut]:
+        rows = await self.repo.list_pending_payouts()
+        return [self._payout_out(*row) for row in rows]
 
-    async def execute_payout(self, admin: User, payout_uuid: UUID) -> Payout:
+    async def execute_payout(self, admin: User, payout_uuid: UUID) -> PayoutOut:
         """Проведение выплаты: из резерва компании — соискателям (94%) и платформе (6%)."""
         from app.application.models import ApplicationEvent, ApplicationEventKind
         from app.application.repo import ApplicationRepo
+        from app.company.repo import CompanyRepo
         from app.vacancy.repo import VacancyRepo
 
         payout = await self.repo.get_payout_for_update(payout_uuid)
@@ -224,4 +242,5 @@ class BalanceService:
         payout.status = PayoutStatus.paid
         payout.paid_at = datetime.now(UTC)
         await self.session.flush()
-        return payout
+        company = await CompanyRepo(self.session).get(payout.company_uuid)
+        return self._payout_out(payout, vacancy.event_title, company.name)
