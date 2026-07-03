@@ -19,7 +19,7 @@ class CompanyService:
         self.team = TeamRepo(session)
 
     async def create(self, user: User, data: CompanyCreateIn) -> Company:
-        company = await self.companies.create(name=data.name, description=data.description)
+        company = await self.companies.create(**data.model_dump())
         # создатель кабинета — main_manager с полным доступом (skill rbac-permissions)
         await self.team.add_member(
             company_uuid=company.company_uuid,

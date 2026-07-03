@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.company.models import Company, CompanyStatus
 from app.core.deps import get_current_user, get_session
 from app.core.errors import DomainError
 from app.team.models import CompanyRole, TeamMember
@@ -10,10 +11,18 @@ from app.team.repo import TeamRepo
 from app.user.models import PlatformRole, User
 
 
+async def ensure_company_verified(session: AsyncSession, company_uuid: UUID) -> None:
+    """Кабинет заблокирован, пока админ не подтвердил заявку организации (PLAN §10.4)."""
+    company = await session.get(Company, company_uuid)
+    if company is not None and company.status != CompanyStatus.verified:
+        raise DomainError(403, "Организация на проверке — дождитесь подтверждения администратором")
+
+
 async def ensure_membership(session: AsyncSession, user: User, company_uuid: UUID) -> TeamMember:
     member = await TeamRepo(session).get_membership(user.user_uuid, company_uuid)
     if member is None:
         raise DomainError(403, "Вы не состоите в команде этой компании")
+    await ensure_company_verified(session, company_uuid)
     return member
 
 

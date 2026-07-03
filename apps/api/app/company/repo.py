@@ -23,8 +23,14 @@ class CompanyRepo:
         )
         return [(company, member) for company, member in result.all()]
 
-    async def create(self, name: str, description: str | None = None) -> Company:
-        company = Company(name=name, description=description)
+    async def create(self, **fields) -> Company:
+        company = Company(**fields)
         self.session.add(company)
         await self.session.flush()
         return company
+
+    async def list_by_status(self, status) -> list[Company]:
+        result = await self.session.execute(
+            select(Company).where(Company.status == status).order_by(Company.created_at)
+        )
+        return list(result.scalars())
