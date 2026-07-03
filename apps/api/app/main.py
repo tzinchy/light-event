@@ -21,16 +21,22 @@ from app.vacancy import router as vacancy_router
 from app.core.config import Settings, get_settings
 from app.core.db import create_engine, create_session_factory
 from app.core.errors import DomainError, domain_error_handler
+from app.core.email import EmailProvider, build_email_provider
 from app.core.sms import ConsoleSmsProvider, SmsProvider
 from app.core.storage import build_storage
 
 
-def create_app(settings: Settings | None = None, sms_provider: SmsProvider | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    sms_provider: SmsProvider | None = None,
+    email_provider: EmailProvider | None = None,
+) -> FastAPI:
     # uvicorn настраивает только свои логгеры; без root-хендлера INFO приложения
     # (в т.ч. OTP-коды ConsoleSmsProvider) не попадает в консоль
     logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s - %(message)s")
     settings = settings or get_settings()
     sms = sms_provider or ConsoleSmsProvider()
+    email = email_provider or build_email_provider(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
@@ -39,6 +45,7 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
         app.state.session_factory = create_session_factory(app.state.engine)
         app.state.redis = aioredis.from_url(settings.redis_url, decode_responses=True)
         app.state.sms_provider = sms
+        app.state.email_provider = email
         app.state.storage = await build_storage(settings)
         yield
         await app.state.redis.aclose()

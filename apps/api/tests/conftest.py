@@ -78,8 +78,14 @@ def sms_outbox() -> CapturingSmsProvider:
 
 
 @pytest.fixture
-async def client(settings, apply_migrations, sms_outbox):
-    app = create_app(settings, sms_provider=sms_outbox)
+def email_outbox() -> CapturingSmsProvider:
+    # тот же интерфейс send_otp(destination, code) — переиспользуем капчер
+    return CapturingSmsProvider()
+
+
+@pytest.fixture
+async def client(settings, apply_migrations, sms_outbox, email_outbox):
+    app = create_app(settings, sms_provider=sms_outbox, email_provider=email_outbox)
     async with LifespanManager(app) as manager:
         transport = ASGITransport(app=manager.app)
         async with AsyncClient(transport=transport, base_url="http://test") as c:

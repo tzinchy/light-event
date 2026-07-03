@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserUpdateIn(BaseModel):
@@ -10,11 +10,21 @@ class UserUpdateIn(BaseModel):
     desired_roles: list[str] | None = None
 
 
+class EmailRequestIn(BaseModel):
+    email: EmailStr = Field(max_length=254)
+
+
+class EmailConfirmIn(BaseModel):
+    code: str = Field(min_length=6, max_length=6)
+
+
 class UserOut(BaseModel):
     model_config = {"from_attributes": True}
 
     user_uuid: UUID
     phone: str
+    email: str | None
+    email_verified_at: datetime | None
     name: str | None
     city: str | None
     platform_role: str
