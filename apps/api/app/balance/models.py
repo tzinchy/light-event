@@ -83,3 +83,25 @@ class TopupRequest(TimestampMixin, Base):
     reviewed_by_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("user.user_uuid"))
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     reject_reason: Mapped[str | None] = mapped_column(String(500))
+
+
+class PayoutStatus(str, enum.Enum):
+    pending = "pending"
+    processing = "processing"
+    paid = "paid"
+
+
+class Payout(TimestampMixin, Base):
+    """Заявка на выплату по смене: копится по подтверждённым соискателям, проводится админом."""
+
+    __tablename__ = "payout"
+
+    payout_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
+    vacancy_uuid: Mapped[UUID] = mapped_column(ForeignKey("vacancy.vacancy_uuid"), index=True)
+    company_uuid: Mapped[UUID] = mapped_column(ForeignKey("company.company_uuid"), index=True)
+    workers_count: Mapped[int] = mapped_column(default=0)
+    amount_kop: Mapped[int] = mapped_column(BigInteger, default=0)
+    status: Mapped[PayoutStatus] = mapped_column(
+        Enum(PayoutStatus, native_enum=False, length=20), default=PayoutStatus.pending
+    )
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

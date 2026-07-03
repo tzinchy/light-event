@@ -46,3 +46,16 @@ class TopupRequestOut(BaseModel):
 class TopupResolveIn(BaseModel):
     action: Literal["approve", "reject"]
     reason: str | None = Field(default=None, max_length=500)
+
+
+class PayoutOut(BaseModel):
+    model_config = {"from_attributes": True}
+
+    payout_uuid: UUID
+    vacancy_uuid: UUID
+    company_uuid: UUID
+    workers_count: int
+    amount_kop: int
+    status: str
+    created_at: datetime
+    paid_at: datetime | None

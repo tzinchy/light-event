@@ -4,7 +4,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.balance.models import Account, AccountOwnerType, LedgerEntry, TopupRequest
+from app.balance.models import Account, AccountOwnerType, LedgerEntry, Payout, PayoutStatus, TopupRequest
 
 
 class BalanceRepo:
@@ -75,5 +75,38 @@ class BalanceRepo:
     async def list_topups(self) -> list[TopupRequest]:
         result = await self.session.execute(
             select(TopupRequest).order_by(TopupRequest.topup_request_uuid.desc())
+        )
+        return list(result.scalars())
+
+    # --- payout ---------------------------------------------------------------
+
+    async def get_or_create_pending_payout(self, vacancy_uuid: UUID, company_uuid: UUID) -> Payout:
+        result = await self.session.execute(
+            select(Payout)
+            .where(Payout.vacancy_uuid == vacancy_uuid, Payout.status == PayoutStatus.pending)
+            .with_for_update()
+        )
+        payout = result.scalar_one_or_none()
+        if payout is None:
+            payout = Payout(vacancy_uuid=vacancy_uuid, company_uuid=company_uuid)
+            self.session.add(payout)
+            await self.session.flush()
+        return payout
+
+    async def get_payout_for_update(self, payout_uuid: UUID) -> Payout | None:
+        result = await self.session.execute(
+            select(Payout).where(Payout.payout_uuid == payout_uuid).with_for_update()
+        )
+        return result.scalar_one_or_none()
+
+    async def list_payouts_by_company(self, company_uuid: UUID) -> list[Payout]:
+        result = await self.session.execute(
+            select(Payout).where(Payout.company_uuid == company_uuid).order_by(Payout.payout_uuid.desc())
+        )
+        return list(result.scalars())
+
+    async def list_pending_payouts(self) -> list[Payout]:
+        result = await self.session.execute(
+            select(Payout).where(Payout.status == PayoutStatus.pending).order_by(Payout.payout_uuid)
         )
         return list(result.scalars())

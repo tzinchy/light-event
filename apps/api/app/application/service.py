@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.application.models import Application, ApplicationEvent, ApplicationEventKind, ApplicationStatus
 from app.application.repo import ApplicationRepo
 from app.application.schemas import StatusChangeIn
+from app.balance.service import BalanceService
 from app.core.errors import DomainError
 from app.core.permissions import ensure_permission
 from app.team.repo import TeamRepo
@@ -73,6 +74,8 @@ class ApplicationService:
                 raise DomainError(409, "Заявка уже подтверждена")
             if await self.applications.count_confirmed(vacancy.vacancy_uuid) >= vacancy.slots:
                 raise DomainError(409, "Все места уже набраны")
+            # итог за смену — в резерв компании; нет денег → 409 и откат подтверждения
+            await BalanceService(self.session).reserve_for_shift(vacancy)
             application.status = ApplicationStatus.confirmed
             self.applications.add_event(
                 ApplicationEvent(

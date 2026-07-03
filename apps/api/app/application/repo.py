@@ -114,3 +114,15 @@ class ApplicationRepo:
             )
         )
         return result.scalar_one()
+
+    async def list_confirmed_for_update(self, vacancy_uuid: UUID) -> list[Application]:
+        """Подтверждённые заявки смены под блокировкой — для проведения выплаты."""
+        result = await self.session.execute(
+            select(Application)
+            .where(
+                Application.vacancy_uuid == vacancy_uuid,
+                Application.status == ApplicationStatus.confirmed,
+            )
+            .with_for_update()
+        )
+        return list(result.scalars())

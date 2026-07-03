@@ -22,7 +22,8 @@ async def setup_active_vacancy(client, login_user, make_admin, base_phone: str, 
     )
     resp = await client.post(
         f"/api/v1/companies/{company_uuid}/topup-requests",
-        json={"amount_kop": 200_000, "proof_document_uuid": resp.json()["document_uuid"]},
+        # публикация 990 ₽ + резерв под два подтверждения (2 × 315 000) — confirm теперь держит деньги
+        json={"amount_kop": 800_000, "proof_document_uuid": resp.json()["document_uuid"]},
         headers=owner["headers"],
     )
     await client.post(

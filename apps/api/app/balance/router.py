@@ -3,7 +3,14 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.balance.schemas import AccountOut, OperationOut, TopupCreateIn, TopupRequestOut, TopupResolveIn
+from app.balance.schemas import (
+    AccountOut,
+    OperationOut,
+    PayoutOut,
+    TopupCreateIn,
+    TopupRequestOut,
+    TopupResolveIn,
+)
 from app.balance.service import BalanceService
 from app.core.deps import get_current_user, get_session
 from app.core.permissions import require_admin
@@ -61,3 +68,30 @@ async def admin_resolve_topup(
     service: BalanceService = Depends(get_balance_service),
 ) -> TopupRequestOut:
     return TopupRequestOut.model_validate(await service.resolve_topup(admin, topup_request_uuid, payload))
+
+
+@router.get("/companies/{company_uuid}/payouts", response_model=list[PayoutOut])
+async def company_payouts(
+    company_uuid: UUID,
+    actor: User = Depends(get_current_user),
+    service: BalanceService = Depends(get_balance_service),
+) -> list[PayoutOut]:
+    return [PayoutOut.model_validate(p) for p in await service.list_company_payouts(actor, company_uuid)]
+
+
+@router.get(
+    "/admin/payouts", response_model=list[PayoutOut], dependencies=[Depends(require_admin())]
+)
+async def admin_list_payouts(
+    service: BalanceService = Depends(get_balance_service),
+) -> list[PayoutOut]:
+    return [PayoutOut.model_validate(p) for p in await service.list_pending_payouts()]
+
+
+@router.post("/admin/payouts/{payout_uuid}/execute", response_model=PayoutOut)
+async def admin_execute_payout(
+    payout_uuid: UUID,
+    admin: User = Depends(require_admin()),
+    service: BalanceService = Depends(get_balance_service),
+) -> PayoutOut:
+    return PayoutOut.model_validate(await service.execute_payout(admin, payout_uuid))
