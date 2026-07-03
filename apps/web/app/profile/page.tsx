@@ -78,7 +78,7 @@ function EmailBlock() {
               setEmail(e.target.value.trim());
               setStage("idle");
             }}
-            placeholder="you@example.com"
+            placeholder="mail@example.ru"
           />
           <Button
             variant={verified ? "outline" : "default"}

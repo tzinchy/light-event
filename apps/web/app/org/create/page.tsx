@@ -268,7 +268,7 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <div>
               <Label htmlFor="event-date">Дата</Label>
               <Input
@@ -301,7 +301,7 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label>Мест</Label>
               <div className="mt-1.5 flex items-center gap-2">

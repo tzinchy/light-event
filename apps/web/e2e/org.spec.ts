@@ -63,6 +63,10 @@ test("организация: заявка → верификация админ
   await expect(manager).toHaveURL(/\/org\/events$/);
   await expect(manager.getByText(eventTitle)).toBeVisible();
 
+  // мобильный адаптив: на <md сайдбар скрыт, навигация кабинета — чипсами в main
+  await manager.setViewportSize({ width: 390, height: 844 });
+  await expect(manager.locator("main").getByRole("link", { name: "Баланс" })).toBeVisible();
+
   await managerCtx.close();
   await adminCtx.close();
 });

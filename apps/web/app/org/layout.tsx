@@ -108,6 +108,34 @@ function OrgShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
       <main className="min-w-0 flex-1 bg-background">
+        {/* на <md сайдбар скрыт — навигация кабинета лентой чипсов */}
+        <nav className="sticky top-0 z-10 flex gap-1.5 overflow-x-auto border-b bg-card px-3 py-2 md:hidden">
+          {NAV.filter((item) => item.ready).map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
+                pathname === item.href
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+              )}
+            >
+              <item.icon className="size-3.5" />
+              {item.label}
+            </Link>
+          ))}
+          <button
+            className="flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium text-muted-foreground"
+            onClick={() => {
+              logout();
+              router.replace("/");
+            }}
+          >
+            <LogOut className="size-3.5" />
+            Выйти
+          </button>
+        </nav>
         <div className="mx-auto w-full max-w-4xl px-4 py-8">{children}</div>
       </main>
     </div>
