@@ -42,6 +42,15 @@ class Settings(BaseSettings):
     access_token_ttl_sec: int = 900
     refresh_token_ttl_sec: int = 60 * 60 * 24 * 30
 
+    # SMTP для кодов подтверждения почты (Brevo в проде, Mailpit в dev);
+    # пустой host — фолбэк в ConsoleEmailProvider
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "light-event <no-reply@light-event.local>"
+    smtp_use_tls: bool = False
+
 
 @lru_cache
 def get_settings() -> Settings:
