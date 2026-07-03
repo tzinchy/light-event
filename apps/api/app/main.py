@@ -13,6 +13,7 @@ from app.document import router as document_router
 from app.filial import router as filial_router
 from app.invite import router as invite_router
 from app.team import router as team_router
+from app.test import router as test_router
 from app.user import router as user_router
 from app.vacancy import router as vacancy_router
 from app.core.config import Settings, get_settings
@@ -52,6 +53,7 @@ def create_app(settings: Settings | None = None, sms_provider: SmsProvider | Non
     app.include_router(vacancy_router.router)
     app.include_router(application_router.router)
     app.include_router(candidate_list_router.router)
+    app.include_router(test_router.router)
     return app
 
 

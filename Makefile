@@ -7,7 +7,7 @@ infra:
 infra-down:
 	docker compose --env-file .env -f infra/docker-compose.yml down
 
-api:
+api: migrate
 	cd apps/api && uv run uvicorn app.main:app --reload --port 8000
 
 web:

@@ -40,6 +40,7 @@ class CompanyApplicationOut(ApplicationOut):
 
     user_name: str | None
     vacancy: VacancyOut
+    company_test_passed: bool = False
 
 
 class StatusChangeIn(BaseModel):

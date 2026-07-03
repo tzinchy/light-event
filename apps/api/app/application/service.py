@@ -8,6 +8,7 @@ from app.application.schemas import StatusChangeIn
 from app.core.errors import DomainError
 from app.core.permissions import ensure_permission
 from app.team.repo import TeamRepo
+from app.test.repo import TestRepo
 from app.user.models import User
 from app.vacancy.models import VacancyStatus
 from app.vacancy.repo import VacancyRepo
@@ -90,8 +91,10 @@ class ApplicationService:
         if vacancy is None:
             raise DomainError(404, "Смена не найдена")
         await ensure_permission(self.session, actor, vacancy.company_uuid, "hire")
-        return await self.applications.list_for_vacancy(vacancy_uuid)
+        rows = await self.applications.list_for_vacancy(vacancy_uuid)
+        return rows, await TestRepo(self.session).passed_company_test_users(vacancy.company_uuid)
 
     async def list_for_company(self, actor: User, company_uuid: UUID):
         await ensure_permission(self.session, actor, company_uuid, "hire")
-        return await self.applications.list_for_company(company_uuid)
+        rows = await self.applications.list_for_company(company_uuid)
+        return rows, await TestRepo(self.session).passed_company_test_users(company_uuid)

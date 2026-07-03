@@ -31,7 +31,7 @@ const NAV = [
   { href: "/org/events", label: "События", icon: CalendarDays, ready: true },
   { href: "/org/create", label: "Создать событие", icon: PlusCircle, ready: true },
   { href: "/org/candidates", label: "Отклики", icon: UsersRound, ready: true },
-  { href: "/org/tests", label: "Тесты", icon: MessageSquareText, ready: false },
+  { href: "/org/tests", label: "Тесты", icon: MessageSquareText, ready: true },
   { href: "/org/team", label: "Команда", icon: Users, ready: true },
   { href: "/org/balance", label: "Баланс", icon: Wallet, ready: true },
   { href: "/org/reviews", label: "Отзывы", icon: Star, ready: false },

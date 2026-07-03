@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     company_test_fee_kop: int = 150_000
     platform_commission_pct: int = 6
 
+    # брошенная попытка теста: повтор доступен через (референс «Повтор через 15:00»)
+    test_cooldown_sec: int = 900
+
     # OTP / сессии
     otp_ttl_sec: int = 300
     otp_request_limit: int = 3          # запросов кода на телефон за окно

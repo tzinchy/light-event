@@ -71,12 +71,13 @@ async def change_status(
     return ApplicationOut.model_validate(await service.set_status(user, application_uuid, payload))
 
 
-def _company_rows(rows) -> list[CompanyApplicationOut]:
+def _company_rows(rows, passed_users) -> list[CompanyApplicationOut]:
     return [
         CompanyApplicationOut(
             **ApplicationOut.model_validate(application).model_dump(),
             user_name=candidate.name,
             vacancy=VacancyOut.model_validate(vacancy),
+            company_test_passed=application.user_uuid in passed_users,
         )
         for application, candidate, vacancy in rows
     ]
@@ -88,7 +89,8 @@ async def vacancy_applications(
     user: User = Depends(get_current_user),
     service: ApplicationService = Depends(get_application_service),
 ) -> list[CompanyApplicationOut]:
-    return _company_rows(await service.list_for_vacancy(user, vacancy_uuid))
+    rows, passed_users = await service.list_for_vacancy(user, vacancy_uuid)
+    return _company_rows(rows, passed_users)
 
 
 @router.get("/companies/{company_uuid}/applications", response_model=list[CompanyApplicationOut])
@@ -97,4 +99,5 @@ async def company_applications(
     user: User = Depends(get_current_user),
     service: ApplicationService = Depends(get_application_service),
 ) -> list[CompanyApplicationOut]:
-    return _company_rows(await service.list_for_company(user, company_uuid))
+    rows, passed_users = await service.list_for_company(user, company_uuid)
+    return _company_rows(rows, passed_users)

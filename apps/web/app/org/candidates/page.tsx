@@ -217,6 +217,11 @@ export default function CandidatesPage() {
                             {DICT.best}
                           </span>
                         )}
+                        {app.company_test_passed && (
+                          <span className="status-badge border-status-violet-border bg-status-violet-bg text-status-violet">
+                            {DICT.companyTestPassedBadge}
+                          </span>
+                        )}
                       </div>
                       <div className="mt-0.5 text-sm text-muted-foreground">
                         {app.vacancy.event_title} · {app.vacancy.role_name} ·{" "}

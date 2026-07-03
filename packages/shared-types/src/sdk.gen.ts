@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInviteApiV1InvitesCodeAcceptPostData, AcceptInviteApiV1InvitesCodeAcceptPostErrors, AcceptInviteApiV1InvitesCodeAcceptPostResponses, AdminListTopupRequestsApiV1AdminTopupRequestsGetData, AdminListTopupRequestsApiV1AdminTopupRequestsGetResponses, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostData, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostErrors, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses, ApplicationDetailApiV1ApplicationsApplicationUuidGetData, ApplicationDetailApiV1ApplicationsApplicationUuidGetErrors, ApplicationDetailApiV1ApplicationsApplicationUuidGetResponses, ApplyApiV1VacanciesVacancyUuidApplicationsPostData, ApplyApiV1VacanciesVacancyUuidApplicationsPostErrors, ApplyApiV1VacanciesVacancyUuidApplicationsPostResponses, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostData, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostData, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostErrors, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponses, CompanyAccountApiV1CompaniesCompanyUuidAccountGetData, CompanyAccountApiV1CompaniesCompanyUuidAccountGetErrors, CompanyAccountApiV1CompaniesCompanyUuidAccountGetResponses, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetData, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetErrors, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponses, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetData, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetErrors, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetData, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses, ConsentApiV1AuthConsentPostData, ConsentApiV1AuthConsentPostResponses, CreateCompanyApiV1CompaniesPostData, CreateCompanyApiV1CompaniesPostErrors, CreateCompanyApiV1CompaniesPostResponses, CreateFilialApiV1CompaniesCompanyUuidFilialsPostData, CreateFilialApiV1CompaniesCompanyUuidFilialsPostErrors, CreateFilialApiV1CompaniesCompanyUuidFilialsPostResponses, CreateInviteApiV1CompaniesCompanyUuidInvitesPostData, CreateInviteApiV1CompaniesCompanyUuidInvitesPostErrors, CreateInviteApiV1CompaniesCompanyUuidInvitesPostResponses, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostData, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostErrors, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostResponses, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostData, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteData, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteErrors, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponses, DeleteFilialApiV1FilialsFilialUuidDeleteData, DeleteFilialApiV1FilialsFilialUuidDeleteErrors, DeleteFilialApiV1FilialsFilialUuidDeleteResponses, DocumentContentApiV1DocumentsDocumentUuidContentGetData, DocumentContentApiV1DocumentsDocumentUuidContentGetErrors, DocumentContentApiV1DocumentsDocumentUuidContentGetResponses, FeedApiV1VacanciesGetData, FeedApiV1VacanciesGetErrors, FeedApiV1VacanciesGetResponses, GetCompanyApiV1CompaniesCompanyUuidGetData, GetCompanyApiV1CompaniesCompanyUuidGetErrors, GetCompanyApiV1CompaniesCompanyUuidGetResponses, GetMeApiV1UsersMeGetData, GetMeApiV1UsersMeGetResponses, HealthApiV1HealthGetData, HealthApiV1HealthGetResponses, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetData, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetErrors, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponses, ListFilialsApiV1CompaniesCompanyUuidFilialsGetData, ListFilialsApiV1CompaniesCompanyUuidFilialsGetErrors, ListFilialsApiV1CompaniesCompanyUuidFilialsGetResponses, ListInvitesApiV1CompaniesCompanyUuidInvitesGetData, ListInvitesApiV1CompaniesCompanyUuidInvitesGetErrors, ListInvitesApiV1CompaniesCompanyUuidInvitesGetResponses, ListTeamApiV1CompaniesCompanyUuidTeamGetData, ListTeamApiV1CompaniesCompanyUuidTeamGetErrors, ListTeamApiV1CompaniesCompanyUuidTeamGetResponses, LogoutApiV1AuthLogoutPostData, LogoutApiV1AuthLogoutPostErrors, LogoutApiV1AuthLogoutPostResponses, MeApiV1AuthMeGetData, MeApiV1AuthMeGetResponses, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostData, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses, MyApplicationsApiV1ApplicationsMyGetData, MyApplicationsApiV1ApplicationsMyGetResponses, MyCompaniesApiV1CompaniesMyGetData, MyCompaniesApiV1CompaniesMyGetResponses, MyDocumentsApiV1DocumentsMyGetData, MyDocumentsApiV1DocumentsMyGetResponses, PublishVacancyApiV1VacanciesVacancyUuidPublishPostData, PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors, PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutData, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutErrors, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses, RefreshApiV1AuthRefreshPostData, RefreshApiV1AuthRefreshPostErrors, RefreshApiV1AuthRefreshPostResponses, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteData, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteErrors, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteResponses, RequestOtpApiV1AuthOtpRequestPostData, RequestOtpApiV1AuthOtpRequestPostErrors, RequestOtpApiV1AuthOtpRequestPostResponses, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostData, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostErrors, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses, UpdateCompanyApiV1CompaniesCompanyUuidPatchData, UpdateCompanyApiV1CompaniesCompanyUuidPatchErrors, UpdateCompanyApiV1CompaniesCompanyUuidPatchResponses, UpdateFilialApiV1FilialsFilialUuidPatchData, UpdateFilialApiV1FilialsFilialUuidPatchErrors, UpdateFilialApiV1FilialsFilialUuidPatchResponses, UpdateMeApiV1UsersMePatchData, UpdateMeApiV1UsersMePatchErrors, UpdateMeApiV1UsersMePatchResponses, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchData, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchErrors, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchResponses, UpdateVacancyApiV1VacanciesVacancyUuidPatchData, UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors, UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses, UploadDocumentApiV1DocumentsPostData, UploadDocumentApiV1DocumentsPostErrors, UploadDocumentApiV1DocumentsPostResponses, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetData, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetErrors, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponses, VacancyDetailApiV1VacanciesVacancyUuidGetData, VacancyDetailApiV1VacanciesVacancyUuidGetErrors, VacancyDetailApiV1VacanciesVacancyUuidGetResponses, VerifyOtpApiV1AuthOtpVerifyPostData, VerifyOtpApiV1AuthOtpVerifyPostErrors, VerifyOtpApiV1AuthOtpVerifyPostResponses } from './types.gen';
+import type { AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostData, AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostErrors, AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses, AcceptInviteApiV1InvitesCodeAcceptPostData, AcceptInviteApiV1InvitesCodeAcceptPostErrors, AcceptInviteApiV1InvitesCodeAcceptPostResponses, AdminListTopupRequestsApiV1AdminTopupRequestsGetData, AdminListTopupRequestsApiV1AdminTopupRequestsGetResponses, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostData, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostErrors, AdminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePostResponses, AnswerApiV1AttemptsAttemptUuidAnswersPostData, AnswerApiV1AttemptsAttemptUuidAnswersPostErrors, AnswerApiV1AttemptsAttemptUuidAnswersPostResponses, ApplicationDetailApiV1ApplicationsApplicationUuidGetData, ApplicationDetailApiV1ApplicationsApplicationUuidGetErrors, ApplicationDetailApiV1ApplicationsApplicationUuidGetResponses, ApplyApiV1VacanciesVacancyUuidApplicationsPostData, ApplyApiV1VacanciesVacancyUuidApplicationsPostErrors, ApplyApiV1VacanciesVacancyUuidApplicationsPostResponses, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostData, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostErrors, ArchiveVacancyApiV1VacanciesVacancyUuidArchivePostResponses, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostData, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostErrors, ChangeStatusApiV1ApplicationsApplicationUuidStatusPostResponses, CompanyAccountApiV1CompaniesCompanyUuidAccountGetData, CompanyAccountApiV1CompaniesCompanyUuidAccountGetErrors, CompanyAccountApiV1CompaniesCompanyUuidAccountGetResponses, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetData, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetErrors, CompanyApplicationsApiV1CompaniesCompanyUuidApplicationsGetResponses, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetData, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetErrors, CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses, CompanyTestsApiV1CompaniesCompanyUuidTestsGetData, CompanyTestsApiV1CompaniesCompanyUuidTestsGetErrors, CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponses, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetData, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetErrors, CompanyVacanciesApiV1CompaniesCompanyUuidVacanciesGetResponses, ConsentApiV1AuthConsentPostData, ConsentApiV1AuthConsentPostResponses, CreateCompanyApiV1CompaniesPostData, CreateCompanyApiV1CompaniesPostErrors, CreateCompanyApiV1CompaniesPostResponses, CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostData, CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostErrors, CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses, CreateFilialApiV1CompaniesCompanyUuidFilialsPostData, CreateFilialApiV1CompaniesCompanyUuidFilialsPostErrors, CreateFilialApiV1CompaniesCompanyUuidFilialsPostResponses, CreateInviteApiV1CompaniesCompanyUuidInvitesPostData, CreateInviteApiV1CompaniesCompanyUuidInvitesPostErrors, CreateInviteApiV1CompaniesCompanyUuidInvitesPostResponses, CreatePlatformTestApiV1AdminTestsPostData, CreatePlatformTestApiV1AdminTestsPostErrors, CreatePlatformTestApiV1AdminTestsPostResponses, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostData, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostErrors, CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostResponses, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostData, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostErrors, CreateVacancyApiV1CompaniesCompanyUuidVacanciesPostResponses, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteData, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteErrors, DeleteCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidDeleteResponses, DeleteFilialApiV1FilialsFilialUuidDeleteData, DeleteFilialApiV1FilialsFilialUuidDeleteErrors, DeleteFilialApiV1FilialsFilialUuidDeleteResponses, DocumentContentApiV1DocumentsDocumentUuidContentGetData, DocumentContentApiV1DocumentsDocumentUuidContentGetErrors, DocumentContentApiV1DocumentsDocumentUuidContentGetResponses, FeedApiV1VacanciesGetData, FeedApiV1VacanciesGetErrors, FeedApiV1VacanciesGetResponses, FinishAttemptApiV1AttemptsAttemptUuidFinishPostData, FinishAttemptApiV1AttemptsAttemptUuidFinishPostErrors, FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponses, GetCompanyApiV1CompaniesCompanyUuidGetData, GetCompanyApiV1CompaniesCompanyUuidGetErrors, GetCompanyApiV1CompaniesCompanyUuidGetResponses, GetMeApiV1UsersMeGetData, GetMeApiV1UsersMeGetResponses, HealthApiV1HealthGetData, HealthApiV1HealthGetResponses, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetData, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetErrors, ListCandidatesApiV1CompaniesCompanyUuidCandidatesGetResponses, ListFilialsApiV1CompaniesCompanyUuidFilialsGetData, ListFilialsApiV1CompaniesCompanyUuidFilialsGetErrors, ListFilialsApiV1CompaniesCompanyUuidFilialsGetResponses, ListInvitesApiV1CompaniesCompanyUuidInvitesGetData, ListInvitesApiV1CompaniesCompanyUuidInvitesGetErrors, ListInvitesApiV1CompaniesCompanyUuidInvitesGetResponses, ListTeamApiV1CompaniesCompanyUuidTeamGetData, ListTeamApiV1CompaniesCompanyUuidTeamGetErrors, ListTeamApiV1CompaniesCompanyUuidTeamGetResponses, ListTestsApiV1TestsGetData, ListTestsApiV1TestsGetResponses, LogoutApiV1AuthLogoutPostData, LogoutApiV1AuthLogoutPostErrors, LogoutApiV1AuthLogoutPostResponses, MeApiV1AuthMeGetData, MeApiV1AuthMeGetResponses, ModerateTestApiV1AdminTestsTestUuidModeratePostData, ModerateTestApiV1AdminTestsTestUuidModeratePostErrors, ModerateTestApiV1AdminTestsTestUuidModeratePostResponses, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostData, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostErrors, ModerateVacancyApiV1AdminVacanciesVacancyUuidModeratePostResponses, MyApplicationsApiV1ApplicationsMyGetData, MyApplicationsApiV1ApplicationsMyGetResponses, MyCompaniesApiV1CompaniesMyGetData, MyCompaniesApiV1CompaniesMyGetResponses, MyDocumentsApiV1DocumentsMyGetData, MyDocumentsApiV1DocumentsMyGetResponses, PublishVacancyApiV1VacanciesVacancyUuidPublishPostData, PublishVacancyApiV1VacanciesVacancyUuidPublishPostErrors, PublishVacancyApiV1VacanciesVacancyUuidPublishPostResponses, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutData, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutErrors, PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses, RefreshApiV1AuthRefreshPostData, RefreshApiV1AuthRefreshPostErrors, RefreshApiV1AuthRefreshPostResponses, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteData, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteErrors, RemoveMemberApiV1TeamMembersTeamMemberUuidDeleteResponses, RequestOtpApiV1AuthOtpRequestPostData, RequestOtpApiV1AuthOtpRequestPostErrors, RequestOtpApiV1AuthOtpRequestPostResponses, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostData, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostErrors, RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses, StartAttemptApiV1TestsTestUuidAttemptsPostData, StartAttemptApiV1TestsTestUuidAttemptsPostErrors, StartAttemptApiV1TestsTestUuidAttemptsPostResponses, UpdateCompanyApiV1CompaniesCompanyUuidPatchData, UpdateCompanyApiV1CompaniesCompanyUuidPatchErrors, UpdateCompanyApiV1CompaniesCompanyUuidPatchResponses, UpdateFilialApiV1FilialsFilialUuidPatchData, UpdateFilialApiV1FilialsFilialUuidPatchErrors, UpdateFilialApiV1FilialsFilialUuidPatchResponses, UpdateMeApiV1UsersMePatchData, UpdateMeApiV1UsersMePatchErrors, UpdateMeApiV1UsersMePatchResponses, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchData, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchErrors, UpdatePermissionsApiV1TeamMembersTeamMemberUuidPermissionsPatchResponses, UpdateVacancyApiV1VacanciesVacancyUuidPatchData, UpdateVacancyApiV1VacanciesVacancyUuidPatchErrors, UpdateVacancyApiV1VacanciesVacancyUuidPatchResponses, UploadDocumentApiV1DocumentsPostData, UploadDocumentApiV1DocumentsPostErrors, UploadDocumentApiV1DocumentsPostResponses, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetData, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetErrors, VacancyApplicationsApiV1VacanciesVacancyUuidApplicationsGetResponses, VacancyDetailApiV1VacanciesVacancyUuidGetData, VacancyDetailApiV1VacanciesVacancyUuidGetErrors, VacancyDetailApiV1VacanciesVacancyUuidGetResponses, VerifyOtpApiV1AuthOtpVerifyPostData, VerifyOtpApiV1AuthOtpVerifyPostErrors, VerifyOtpApiV1AuthOtpVerifyPostResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -834,5 +834,165 @@ export const putCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPut = <Throw
             'Content-Type': 'application/json',
             ...options.headers
         }
+    });
+};
+
+/**
+ * List Tests
+ */
+export const listTestsApiV1TestsGet = <ThrowOnError extends boolean = false>(options?: Options<ListTestsApiV1TestsGetData, ThrowOnError>) => {
+    return (options?.client ?? client).get<ListTestsApiV1TestsGetResponses, unknown, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/tests',
+        ...options
+    });
+};
+
+/**
+ * Company Tests
+ */
+export const companyTestsApiV1CompaniesCompanyUuidTestsGet = <ThrowOnError extends boolean = false>(options: Options<CompanyTestsApiV1CompaniesCompanyUuidTestsGetData, ThrowOnError>) => {
+    return (options.client ?? client).get<CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponses, CompanyTestsApiV1CompaniesCompanyUuidTestsGetErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/companies/{company_uuid}/tests',
+        ...options
+    });
+};
+
+/**
+ * Create Company Test
+ */
+export const createCompanyTestApiV1CompaniesCompanyUuidTestsPost = <ThrowOnError extends boolean = false>(options: Options<CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses, CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/companies/{company_uuid}/tests',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Create Platform Test
+ */
+export const createPlatformTestApiV1AdminTestsPost = <ThrowOnError extends boolean = false>(options: Options<CreatePlatformTestApiV1AdminTestsPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreatePlatformTestApiV1AdminTestsPostResponses, CreatePlatformTestApiV1AdminTestsPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/admin/tests',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Moderate Test
+ */
+export const moderateTestApiV1AdminTestsTestUuidModeratePost = <ThrowOnError extends boolean = false>(options: Options<ModerateTestApiV1AdminTestsTestUuidModeratePostData, ThrowOnError>) => {
+    return (options.client ?? client).post<ModerateTestApiV1AdminTestsTestUuidModeratePostResponses, ModerateTestApiV1AdminTestsTestUuidModeratePostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/admin/tests/{test_uuid}/moderate',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Start Attempt
+ */
+export const startAttemptApiV1TestsTestUuidAttemptsPost = <ThrowOnError extends boolean = false>(options: Options<StartAttemptApiV1TestsTestUuidAttemptsPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartAttemptApiV1TestsTestUuidAttemptsPostResponses, StartAttemptApiV1TestsTestUuidAttemptsPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/tests/{test_uuid}/attempts',
+        ...options
+    });
+};
+
+/**
+ * Answer
+ */
+export const answerApiV1AttemptsAttemptUuidAnswersPost = <ThrowOnError extends boolean = false>(options: Options<AnswerApiV1AttemptsAttemptUuidAnswersPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<AnswerApiV1AttemptsAttemptUuidAnswersPostResponses, AnswerApiV1AttemptsAttemptUuidAnswersPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/attempts/{attempt_uuid}/answers',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Finish Attempt
+ */
+export const finishAttemptApiV1AttemptsAttemptUuidFinishPost = <ThrowOnError extends boolean = false>(options: Options<FinishAttemptApiV1AttemptsAttemptUuidFinishPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponses, FinishAttemptApiV1AttemptsAttemptUuidFinishPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/attempts/{attempt_uuid}/finish',
+        ...options
+    });
+};
+
+/**
+ * Abandon Attempt
+ */
+export const abandonAttemptApiV1AttemptsAttemptUuidAbandonPost = <ThrowOnError extends boolean = false>(options: Options<AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostData, ThrowOnError>) => {
+    return (options.client ?? client).post<AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses, AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/attempts/{attempt_uuid}/abandon',
+        ...options
     });
 };

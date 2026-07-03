@@ -27,6 +27,20 @@ export type AccountOut = {
 };
 
 /**
+ * AnswerIn
+ */
+export type AnswerIn = {
+    /**
+     * Test Question Uuid
+     */
+    test_question_uuid: string;
+    /**
+     * Selected Indices
+     */
+    selected_indices: Array<number>;
+};
+
+/**
  * ApplicationDetailOut
  */
 export type ApplicationDetailOut = {
@@ -80,6 +94,78 @@ export type ApplicationOut = {
      * Created At
      */
     created_at: string;
+};
+
+/**
+ * AttemptOut
+ */
+export type AttemptOut = {
+    /**
+     * Test Attempt Uuid
+     */
+    test_attempt_uuid: string;
+    /**
+     * Test Uuid
+     */
+    test_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Correct Count
+     */
+    correct_count: number;
+    /**
+     * Score Pct
+     */
+    score_pct: number;
+    /**
+     * Passed
+     */
+    passed: boolean;
+    /**
+     * Cooldown Until
+     */
+    cooldown_until: string | null;
+};
+
+/**
+ * AttemptWithQuestionsOut
+ */
+export type AttemptWithQuestionsOut = {
+    /**
+     * Test Attempt Uuid
+     */
+    test_attempt_uuid: string;
+    /**
+     * Test Uuid
+     */
+    test_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Correct Count
+     */
+    correct_count: number;
+    /**
+     * Score Pct
+     */
+    score_pct: number;
+    /**
+     * Passed
+     */
+    passed: boolean;
+    /**
+     * Cooldown Until
+     */
+    cooldown_until: string | null;
+    /**
+     * Questions
+     */
+    questions: Array<QuestionOut>;
 };
 
 /**
@@ -167,6 +253,10 @@ export type CompanyApplicationOut = {
      */
     user_name: string | null;
     vacancy: VacancyOut;
+    /**
+     * Company Test Passed
+     */
+    company_test_passed?: boolean;
 };
 
 /**
@@ -207,6 +297,57 @@ export type CompanyOut = {
      * Created At
      */
     created_at: string;
+};
+
+/**
+ * CompanyTestItemOut
+ * Строка списка тестов в кабинете организации.
+ */
+export type CompanyTestItemOut = {
+    /**
+     * Test Uuid
+     */
+    test_uuid: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Topic
+     */
+    topic: string;
+    /**
+     * Min Correct
+     */
+    min_correct: number;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Questions Count
+     */
+    questions_count: number;
+    /**
+     * Passed Count
+     */
+    passed_count: number;
 };
 
 /**
@@ -594,6 +735,20 @@ export type MyCompanyOut = {
 };
 
 /**
+ * MyResultOut
+ */
+export type MyResultOut = {
+    /**
+     * Passed
+     */
+    passed: boolean;
+    /**
+     * Score Pct
+     */
+    score_pct: number;
+};
+
+/**
  * OperationOut
  */
 export type OperationOut = {
@@ -645,6 +800,55 @@ export type OtpVerifyIn = {
      * Code
      */
     code: string;
+};
+
+/**
+ * QuestionIn
+ */
+export type QuestionIn = {
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Multi
+     */
+    multi?: boolean;
+    /**
+     * Options
+     */
+    options: Array<string>;
+    /**
+     * Correct Indices
+     */
+    correct_indices: Array<number>;
+};
+
+/**
+ * QuestionOut
+ * Вопрос для прохождения — без correct_indices (skill real-data-only §ответы).
+ */
+export type QuestionOut = {
+    /**
+     * Test Question Uuid
+     */
+    test_question_uuid: string;
+    /**
+     * Position
+     */
+    position: number;
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Multi
+     */
+    multi: boolean;
+    /**
+     * Options
+     */
+    options: Array<string>;
 };
 
 /**
@@ -729,6 +933,126 @@ export type TeamPermissionsPatchIn = {
      * Perm Invite
      */
     perm_invite?: boolean | null;
+};
+
+/**
+ * TestCreateIn
+ */
+export type TestCreateIn = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Topic
+     */
+    topic: string;
+    /**
+     * Min Correct
+     */
+    min_correct: number;
+    /**
+     * Questions
+     */
+    questions: Array<QuestionIn>;
+};
+
+/**
+ * TestListItemOut
+ * Строка каталога тестов: прогресс пользователя поверх теста.
+ */
+export type TestListItemOut = {
+    /**
+     * Test Uuid
+     */
+    test_uuid: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Topic
+     */
+    topic: string;
+    /**
+     * Min Correct
+     */
+    min_correct: number;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Company Name
+     */
+    company_name?: string | null;
+    /**
+     * Questions Count
+     */
+    questions_count: number;
+    my_result?: MyResultOut | null;
+    /**
+     * Cooldown Until
+     */
+    cooldown_until?: string | null;
+};
+
+/**
+ * TestOut
+ */
+export type TestOut = {
+    /**
+     * Test Uuid
+     */
+    test_uuid: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Topic
+     */
+    topic: string;
+    /**
+     * Min Correct
+     */
+    min_correct: number;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
 };
 
 /**
@@ -2479,3 +2803,256 @@ export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses 
 };
 
 export type PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponse = PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses[keyof PutCandidateApiV1CompaniesCompanyUuidCandidatesUserUuidPutResponses];
+
+export type ListTestsApiV1TestsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/tests';
+};
+
+export type ListTestsApiV1TestsGetResponses = {
+    /**
+     * Response List Tests Api V1 Tests Get
+     * Successful Response
+     */
+    200: Array<TestListItemOut>;
+};
+
+export type ListTestsApiV1TestsGetResponse = ListTestsApiV1TestsGetResponses[keyof ListTestsApiV1TestsGetResponses];
+
+export type CompanyTestsApiV1CompaniesCompanyUuidTestsGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/tests';
+};
+
+export type CompanyTestsApiV1CompaniesCompanyUuidTestsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyTestsApiV1CompaniesCompanyUuidTestsGetError = CompanyTestsApiV1CompaniesCompanyUuidTestsGetErrors[keyof CompanyTestsApiV1CompaniesCompanyUuidTestsGetErrors];
+
+export type CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponses = {
+    /**
+     * Response Company Tests Api V1 Companies  Company Uuid  Tests Get
+     * Successful Response
+     */
+    200: Array<CompanyTestItemOut>;
+};
+
+export type CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponse = CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponses[keyof CompanyTestsApiV1CompaniesCompanyUuidTestsGetResponses];
+
+export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostData = {
+    body: TestCreateIn;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/tests';
+};
+
+export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostError = CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostErrors[keyof CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostErrors];
+
+export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: TestOut;
+};
+
+export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponse = CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses[keyof CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses];
+
+export type CreatePlatformTestApiV1AdminTestsPostData = {
+    body: TestCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/tests';
+};
+
+export type CreatePlatformTestApiV1AdminTestsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreatePlatformTestApiV1AdminTestsPostError = CreatePlatformTestApiV1AdminTestsPostErrors[keyof CreatePlatformTestApiV1AdminTestsPostErrors];
+
+export type CreatePlatformTestApiV1AdminTestsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: TestOut;
+};
+
+export type CreatePlatformTestApiV1AdminTestsPostResponse = CreatePlatformTestApiV1AdminTestsPostResponses[keyof CreatePlatformTestApiV1AdminTestsPostResponses];
+
+export type ModerateTestApiV1AdminTestsTestUuidModeratePostData = {
+    body: ModerateIn;
+    path: {
+        /**
+         * Test Uuid
+         */
+        test_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/tests/{test_uuid}/moderate';
+};
+
+export type ModerateTestApiV1AdminTestsTestUuidModeratePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ModerateTestApiV1AdminTestsTestUuidModeratePostError = ModerateTestApiV1AdminTestsTestUuidModeratePostErrors[keyof ModerateTestApiV1AdminTestsTestUuidModeratePostErrors];
+
+export type ModerateTestApiV1AdminTestsTestUuidModeratePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: TestOut;
+};
+
+export type ModerateTestApiV1AdminTestsTestUuidModeratePostResponse = ModerateTestApiV1AdminTestsTestUuidModeratePostResponses[keyof ModerateTestApiV1AdminTestsTestUuidModeratePostResponses];
+
+export type StartAttemptApiV1TestsTestUuidAttemptsPostData = {
+    body?: never;
+    path: {
+        /**
+         * Test Uuid
+         */
+        test_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/tests/{test_uuid}/attempts';
+};
+
+export type StartAttemptApiV1TestsTestUuidAttemptsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type StartAttemptApiV1TestsTestUuidAttemptsPostError = StartAttemptApiV1TestsTestUuidAttemptsPostErrors[keyof StartAttemptApiV1TestsTestUuidAttemptsPostErrors];
+
+export type StartAttemptApiV1TestsTestUuidAttemptsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: AttemptWithQuestionsOut;
+};
+
+export type StartAttemptApiV1TestsTestUuidAttemptsPostResponse = StartAttemptApiV1TestsTestUuidAttemptsPostResponses[keyof StartAttemptApiV1TestsTestUuidAttemptsPostResponses];
+
+export type AnswerApiV1AttemptsAttemptUuidAnswersPostData = {
+    body: AnswerIn;
+    path: {
+        /**
+         * Attempt Uuid
+         */
+        attempt_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/attempts/{attempt_uuid}/answers';
+};
+
+export type AnswerApiV1AttemptsAttemptUuidAnswersPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AnswerApiV1AttemptsAttemptUuidAnswersPostError = AnswerApiV1AttemptsAttemptUuidAnswersPostErrors[keyof AnswerApiV1AttemptsAttemptUuidAnswersPostErrors];
+
+export type AnswerApiV1AttemptsAttemptUuidAnswersPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AttemptOut;
+};
+
+export type AnswerApiV1AttemptsAttemptUuidAnswersPostResponse = AnswerApiV1AttemptsAttemptUuidAnswersPostResponses[keyof AnswerApiV1AttemptsAttemptUuidAnswersPostResponses];
+
+export type FinishAttemptApiV1AttemptsAttemptUuidFinishPostData = {
+    body?: never;
+    path: {
+        /**
+         * Attempt Uuid
+         */
+        attempt_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/attempts/{attempt_uuid}/finish';
+};
+
+export type FinishAttemptApiV1AttemptsAttemptUuidFinishPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type FinishAttemptApiV1AttemptsAttemptUuidFinishPostError = FinishAttemptApiV1AttemptsAttemptUuidFinishPostErrors[keyof FinishAttemptApiV1AttemptsAttemptUuidFinishPostErrors];
+
+export type FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AttemptOut;
+};
+
+export type FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponse = FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponses[keyof FinishAttemptApiV1AttemptsAttemptUuidFinishPostResponses];
+
+export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostData = {
+    body?: never;
+    path: {
+        /**
+         * Attempt Uuid
+         */
+        attempt_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/attempts/{attempt_uuid}/abandon';
+};
+
+export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostError = AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostErrors[keyof AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostErrors];
+
+export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AttemptOut;
+};
+
+export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponse = AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses[keyof AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses];
