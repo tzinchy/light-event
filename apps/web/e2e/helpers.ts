@@ -17,6 +17,16 @@ export function smsCode(phone: string): string {
   return out;
 }
 
+/** platform_role=admin через операторскую CLI в api-контейнере (нужен полный стенд — make full). */
+export function grantAdmin(phone: string): void {
+  const out = execFileSync(
+    "docker",
+    ["exec", "light-event-api-1", ".venv/bin/python", "-m", "app.cli", "grant-admin", phone],
+    { encoding: "utf8" },
+  );
+  if (!out.includes("администратор")) throw new Error(`grant-admin не сработал: ${out}`);
+}
+
 const MAILPIT_URL = process.env.E2E_MAILPIT_URL ?? "http://localhost:8025";
 
 /** Код подтверждения почты — из Mailpit HTTP API (реальное SMTP-письмо). */
@@ -43,5 +53,7 @@ export async function loginByPhone(page: Page, phone = uniquePhone()): Promise<s
   await page.getByRole("group", { name: "Код из SMS" }).locator("input").first().click();
   await page.keyboard.type(code);
   await page.getByRole("button", { name: "Подтвердить", exact: true }).click();
+  // ждём KYC-шаг: уйти раньше — гонка, токены могут не успеть сохраниться в localStorage
+  await expect(page.getByRole("button", { name: "Завершить верификацию" })).toBeVisible();
   return phone;
 }
