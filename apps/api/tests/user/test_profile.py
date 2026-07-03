@@ -47,3 +47,32 @@ async def test_desired_roles_must_be_from_catalog(client, login_user):
 async def test_patch_requires_auth(client):
     resp = await client.patch("/api/v1/users/me", json={"name": "X"})
     assert resp.status_code == 401
+
+
+async def test_me_requires_auth_and_rejects_garbage_token(client):
+    assert (await client.get("/api/v1/users/me")).status_code == 401
+    resp = await client.get("/api/v1/users/me", headers={"Authorization": "Bearer not-a-jwt"})
+    assert resp.status_code == 401
+
+
+async def test_desired_roles_can_be_cleared(client, login_user):
+    session = await login_user("+79051230031")
+    await client.patch(
+        "/api/v1/users/me", json={"desired_roles": ["Официант"]}, headers=session["headers"]
+    )
+
+    resp = await client.patch("/api/v1/users/me", json={"desired_roles": []}, headers=session["headers"])
+
+    assert resp.status_code == 200, resp.text
+    assert resp.json()["desired_roles"] == []
+
+
+async def test_too_long_name_and_city_rejected(client, login_user):
+    session = await login_user("+79051230032")
+
+    assert (
+        await client.patch("/api/v1/users/me", json={"name": "а" * 121}, headers=session["headers"])
+    ).status_code == 422
+    assert (
+        await client.patch("/api/v1/users/me", json={"city": "г" * 121}, headers=session["headers"])
+    ).status_code == 422
