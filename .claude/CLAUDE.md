@@ -18,7 +18,7 @@ Frontend: React + Next.js (App Router) + TypeScript + shadcn/ui + Tailwind. Mobi
 
 TDD всегда: красный тест → код → рефактор. Нет теста — нет кода. См. skill tdd-workflow.
 Только реальные данные: никаких mock/seed/fake в рантайме и dev/prod БД. Нет данных → пустое состояние. См. skill real-data-only.
-UUIDv7 как PK везде, генерация в приложении. См. skill uuid-v7-keys.
+UUIDv7 как PK везде, генерация в БД — server_default uuidv7() (PostgreSQL 18). См. skill uuid-v7-keys.
 Деньги — целые копейки, атомарный леджер, пополнение через ручное подтверждение админом. См. skill money-ledger.
 RBAC + матрица прав на каждом защищённом эндпоинте. Компания НЕ видит документы KYC. См. skills rbac-permissions, s3-documents-kyc.
 Миграции — только Alembic командами (revision --autogenerate, upgrade head), структуру руками не городить, никакого create_all. См. skill backend-structure.
