@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 
 // пункты будущих модулей показываем выключенными — честно, без мёртвых экранов
 const NAV = [
-  { href: "/org", label: "Аналитика", icon: BarChart3, ready: false },
+  { href: "/org", label: "Аналитика", icon: BarChart3, ready: true },
   { href: "/org/events", label: "События", icon: CalendarDays, ready: true },
   { href: "/org/create", label: "Создать событие", icon: PlusCircle, ready: true },
   { href: "/org/candidates", label: "Отклики", icon: UsersRound, ready: true },
