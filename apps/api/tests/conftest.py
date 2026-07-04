@@ -93,14 +93,24 @@ async def client(settings, apply_migrations, sms_outbox, email_outbox):
 
 
 @pytest.fixture
-def login_user(client, sms_outbox):
-    """Полный вход по OTP через реальное API; возвращает headers/me/tokens."""
+def login_user(client, email_outbox):
+    """Полный вход по e-mail-OTP через реальное API; возвращает headers/me/tokens.
 
-    async def _login(phone: str = "+79051234567") -> dict:
-        resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+    Уникальный ключ актёра можно передать телефоноподобной строкой (легаси-вызовы) —
+    она детерминированно разворачивается в валидный e-mail, чтобы не трогать десятки мест.
+    """
+
+    def _as_email(ident: str) -> str:
+        if "@" in ident:
+            return ident
+        return f"u{''.join(ch for ch in ident if ch.isdigit())}@example.com"
+
+    async def _login(ident: str = "user@example.com") -> dict:
+        email = _as_email(ident)
+        resp = await client.post("/api/v1/auth/otp/request", json={"email": email})
         assert resp.status_code == 202, resp.text
-        code = sms_outbox.sent[-1][1]
-        resp = await client.post("/api/v1/auth/otp/verify", json={"phone": phone, "code": code})
+        code = email_outbox.sent[-1][1]
+        resp = await client.post("/api/v1/auth/otp/verify", json={"email": email, "code": code})
         assert resp.status_code == 200, resp.text
         tokens = resp.json()
         headers = {"Authorization": f"Bearer {tokens['access_token']}"}

@@ -18,8 +18,13 @@ class UserRepo:
         result = await self.session.execute(select(User).where(User.phone == phone))
         return result.scalar_one_or_none()
 
-    async def create(self, phone: str) -> User:
-        user = User(phone=phone)
+    async def get_by_email(self, email: str) -> User | None:
+        result = await self.session.execute(select(User).where(User.email == email))
+        return result.scalar_one_or_none()
+
+    async def create_with_email(self, email: str) -> User:
+        """Регистрация по e-mail-OTP: почта сразу подтверждена самим фактом входа."""
+        user = User(email=email, email_verified_at=datetime.now(timezone.utc))
         self.session.add(user)
         await self.session.flush()
         return user

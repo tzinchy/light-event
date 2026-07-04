@@ -22,7 +22,7 @@ class UserOut(BaseModel):
     model_config = {"from_attributes": True}
 
     user_uuid: UUID
-    phone: str
+    phone: str | None
     email: str | None
     email_verified_at: datetime | None
     name: str | None

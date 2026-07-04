@@ -1,4 +1,8 @@
-"""Подтверждение email кодом. Телефон остаётся логином; почта — поле профиля (PLAN §10.2)."""
+"""Смена/подтверждение почты в профиле кодом (PLAN §10.2/§11.5).
+
+Логин теперь по e-mail-OTP (тот же `email_outbox`), поэтому проверяем последнее письмо,
+а не абсолютный счётчик: первым в outbox лежит код самого входа.
+"""
 
 
 async def request_email_code(client, headers, email="owner@example.com"):
@@ -10,8 +14,7 @@ async def test_email_code_sent_and_confirmed(client, login_user, email_outbox):
 
     resp = await request_email_code(client, session["headers"])
     assert resp.status_code == 202, resp.text
-    assert len(email_outbox.sent) == 1
-    to, code = email_outbox.sent[0]
+    to, code = email_outbox.sent[-1]
     assert to == "owner@example.com"
     assert len(code) == 6
 
@@ -30,7 +33,7 @@ async def test_email_code_sent_and_confirmed(client, login_user, email_outbox):
 async def test_wrong_code_rejected(client, login_user, email_outbox):
     session = await login_user("+79055550002")
     await request_email_code(client, session["headers"])
-    _, code = email_outbox.sent[0]
+    _, code = email_outbox.sent[-1]
     wrong = "000000" if code != "000000" else "111111"
 
     resp = await client.post(
@@ -66,7 +69,7 @@ async def test_email_request_rate_limited(client, login_user, email_outbox):
 async def test_changing_email_resets_verification(client, login_user, email_outbox):
     session = await login_user("+79055550005")
     await request_email_code(client, session["headers"])
-    _, code = email_outbox.sent[0]
+    _, code = email_outbox.sent[-1]
     await client.post("/api/v1/users/me/email/confirm", json={"code": code}, headers=session["headers"])
 
     resp = await request_email_code(client, session["headers"], email="new@example.com")

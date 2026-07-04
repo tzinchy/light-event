@@ -5,10 +5,10 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
+from app.core.email import EmailProvider
 from app.core.errors import DomainError
 from app.core.otp import OtpStore
 from app.core.security import create_access_token
-from app.core.sms import SmsProvider
 from app.user.models import User
 from app.user.repo import UserRepo
 
@@ -18,25 +18,25 @@ def _refresh_key(token: str) -> str:
 
 
 class AuthService:
-    def __init__(self, session: AsyncSession, redis: Redis, sms: SmsProvider, settings: Settings):
+    def __init__(self, session: AsyncSession, redis: Redis, email: EmailProvider, settings: Settings):
         self.session = session
         self.redis = redis
-        self.sms = sms
+        self.email = email
         self.settings = settings
         self.users = UserRepo(session)
         self.otp = OtpStore(redis, settings)
 
-    async def request_otp(self, phone: str) -> None:
-        code = await self.otp.issue("sms", phone)
-        await self.sms.send_otp(phone, code)
+    async def request_otp(self, email: str) -> None:
+        code = await self.otp.issue("email", email)
+        await self.email.send_otp(email, code)
 
-    async def verify_otp(self, phone: str, code: str) -> tuple[dict, User]:
-        await self.otp.verify("sms", phone, code)
+    async def verify_otp(self, email: str, code: str) -> tuple[dict, User]:
+        await self.otp.verify("email", email, code)
 
-        user = await self.users.get_by_phone(phone)
+        user = await self.users.get_by_email(email)
         is_new = user is None
         if user is None:
-            user = await self.users.create(phone)
+            user = await self.users.create_with_email(email)
         tokens = await self._issue_tokens(user.user_uuid)
         return {**tokens, "is_new_user": is_new}, user
 

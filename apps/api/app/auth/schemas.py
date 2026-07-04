@@ -1,17 +1,18 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
+# используется в других модулях для валидации контактных телефонов (не логин)
 PHONE_PATTERN = r"^\+\d{10,15}$"
 
 
 class OtpRequestIn(BaseModel):
-    phone: str = Field(pattern=PHONE_PATTERN)
+    email: EmailStr = Field(max_length=254)
 
 
 class OtpVerifyIn(BaseModel):
-    phone: str = Field(pattern=PHONE_PATTERN)
+    email: EmailStr = Field(max_length=254)
     code: str = Field(min_length=6, max_length=6)
 
 
@@ -30,7 +31,7 @@ class MeOut(BaseModel):
     model_config = {"from_attributes": True}
 
     user_uuid: UUID
-    phone: str
+    phone: str | None
     email: str | None
     email_verified_at: datetime | None
     name: str | None

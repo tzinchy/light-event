@@ -18,8 +18,8 @@ class User(TimestampMixin, Base):
     __tablename__ = "user"
 
     user_uuid: Mapped[UUID] = mapped_column(primary_key=True, server_default=text("uuidv7()"))
-    phone: Mapped[str] = mapped_column(String(16), unique=True, index=True)
-    email: Mapped[str | None] = mapped_column(String(254))
+    phone: Mapped[str | None] = mapped_column(String(16), unique=True, index=True)
+    email: Mapped[str | None] = mapped_column(String(254), unique=True, index=True)
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     name: Mapped[str | None] = mapped_column(String(120))
     city: Mapped[str | None] = mapped_column(String(120))

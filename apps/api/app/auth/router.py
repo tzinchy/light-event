@@ -13,20 +13,20 @@ def get_auth_service(request: Request, session: AsyncSession = Depends(get_sessi
     return AuthService(
         session=session,
         redis=request.app.state.redis,
-        sms=request.app.state.sms_provider,
+        email=request.app.state.email_provider,
         settings=request.app.state.settings,
     )
 
 
 @router.post("/otp/request", status_code=202)
 async def request_otp(payload: OtpRequestIn, service: AuthService = Depends(get_auth_service)) -> dict:
-    await service.request_otp(payload.phone)
+    await service.request_otp(payload.email)
     return {"detail": "Код отправлен"}
 
 
 @router.post("/otp/verify", response_model=TokensOut)
 async def verify_otp(payload: OtpVerifyIn, service: AuthService = Depends(get_auth_service)) -> TokensOut:
-    tokens, _ = await service.verify_otp(payload.phone, payload.code)
+    tokens, _ = await service.verify_otp(payload.email, payload.code)
     return TokensOut(**tokens)
 
 
