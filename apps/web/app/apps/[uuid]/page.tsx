@@ -3,18 +3,22 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowLeft, Check, Loader2, Star } from "lucide-react";
 import {
   applicationDetailApiV1ApplicationsApplicationUuidGet,
+  createReviewApiV1ReviewsPost,
   myApplicationsApiV1ApplicationsMyGet,
   type ApplicationDetailOut,
   type MyApplicationOut,
 } from "@light-event/shared-types";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { APP_STATUS } from "@/app/apps/page";
 import { DICT } from "@/lib/dict";
 import { formatDateTime, formatShiftWindow, kopToRub } from "@/lib/format";
+import { canReview, reviewReady } from "@/lib/review";
 import { cn } from "@/lib/utils";
 
 // 4 шага таймлайна референса: Отклик → Подтверждение → Смена → Выплата
@@ -24,6 +28,89 @@ const TIMELINE_STEPS = [
   { kind: "shift", label: DICT.tlShift },
   { kind: "payout", label: DICT.tlPayout },
 ] as const;
+
+function ReviewCard({ applicationUuid }: { applicationUuid: string }) {
+  const [rating, setRating] = useState(0);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function submit() {
+    setBusy(true);
+    const { error } = await createReviewApiV1ReviewsPost({
+      body: {
+        application_uuid: applicationUuid,
+        rating,
+        text: text.trim() || null,
+        kind: "about_org",
+      },
+    });
+    setBusy(false);
+    if (error) {
+      const detail = String((error as { detail?: string }).detail ?? "");
+      if (detail.includes("уже оставлен")) setSent(true);
+      toast.error(detail || "Не удалось отправить отзыв");
+      return;
+    }
+    setSent(true);
+    toast.success("Спасибо! Отзыв отправлен");
+  }
+
+  if (sent) {
+    return (
+      <Card className="mt-4">
+        <CardContent className="flex items-center gap-2 pt-6 text-sm text-brand-strong">
+          <Check className="size-4" />
+          Отзыв по этой смене отправлен
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="mt-4">
+      <CardHeader>
+        <CardTitle className="text-base">Оставить отзыв об организации</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex gap-1" role="radiogroup" aria-label="Оценка">
+          {[1, 2, 3, 4, 5].map((value) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={rating === value}
+              aria-label={`Оценка ${value}`}
+              className="p-1"
+              onClick={() => setRating(value)}
+            >
+              <Star
+                className={cn(
+                  "size-6",
+                  value <= rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/40",
+                )}
+              />
+            </button>
+          ))}
+        </div>
+        <textarea
+          className="mt-3 min-h-20 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+          placeholder="Как прошла смена? Что понравилось, что улучшить"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <Button
+          className="mt-3"
+          disabled={!reviewReady(rating) || busy}
+          onClick={() => void submit()}
+        >
+          {busy && <Loader2 className="size-4 animate-spin" />}
+          Отправить отзыв
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function ApplicationPage() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -136,6 +223,8 @@ export default function ApplicationPage() {
             </ol>
           </CardContent>
         </Card>
+
+        {canReview(detail.status) && <ReviewCard applicationUuid={detail.application_uuid} />}
       </main>
     </div>
   );
