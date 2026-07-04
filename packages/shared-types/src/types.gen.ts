@@ -923,6 +923,46 @@ export type MeOut = {
 };
 
 /**
+ * MessageOut
+ */
+export type MessageOut = {
+    /**
+     * Chat Message Uuid
+     */
+    chat_message_uuid: string;
+    /**
+     * Chat Thread Uuid
+     */
+    chat_thread_uuid: string;
+    /**
+     * Sender Uuid
+     */
+    sender_uuid: string;
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Sent At
+     */
+    sent_at: string;
+    /**
+     * Read At
+     */
+    read_at: string | null;
+};
+
+/**
+ * MessageSendIn
+ */
+export type MessageSendIn = {
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
  * ModerateIn
  */
 export type ModerateIn = {
@@ -1491,6 +1531,55 @@ export type TestOut = {
      * Created At
      */
     created_at: string;
+};
+
+/**
+ * ThreadOpenIn
+ */
+export type ThreadOpenIn = {
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+};
+
+/**
+ * ThreadOut
+ */
+export type ThreadOut = {
+    /**
+     * Chat Thread Uuid
+     */
+    chat_thread_uuid: string;
+    /**
+     * Application Uuid
+     */
+    application_uuid: string;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string;
+    /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Role Name
+     */
+    role_name: string;
+    /**
+     * Company Name
+     */
+    company_name: string;
+    /**
+     * Counterpart Name
+     */
+    counterpart_name: string | null;
+    /**
+     * Unread Count
+     */
+    unread_count: number;
+    last_message: MessageOut | null;
 };
 
 /**
@@ -2815,6 +2904,145 @@ export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostRes
 };
 
 export type AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponse = AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponses[keyof AdminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePostResponses];
+
+export type MyThreadsApiV1ChatThreadsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/chat/threads';
+};
+
+export type MyThreadsApiV1ChatThreadsGetResponses = {
+    /**
+     * Response My Threads Api V1 Chat Threads Get
+     * Successful Response
+     */
+    200: Array<ThreadOut>;
+};
+
+export type MyThreadsApiV1ChatThreadsGetResponse = MyThreadsApiV1ChatThreadsGetResponses[keyof MyThreadsApiV1ChatThreadsGetResponses];
+
+export type OpenThreadApiV1ChatThreadsPostData = {
+    body: ThreadOpenIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/chat/threads';
+};
+
+export type OpenThreadApiV1ChatThreadsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type OpenThreadApiV1ChatThreadsPostError = OpenThreadApiV1ChatThreadsPostErrors[keyof OpenThreadApiV1ChatThreadsPostErrors];
+
+export type OpenThreadApiV1ChatThreadsPostResponses = {
+    /**
+     * Response Open Thread Api V1 Chat Threads Post
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type OpenThreadApiV1ChatThreadsPostResponse = OpenThreadApiV1ChatThreadsPostResponses[keyof OpenThreadApiV1ChatThreadsPostResponses];
+
+export type ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Chat Thread Uuid
+         */
+        chat_thread_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/threads/{chat_thread_uuid}/messages';
+};
+
+export type ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetError = ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetErrors[keyof ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetErrors];
+
+export type ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetResponses = {
+    /**
+     * Response Thread Messages Api V1 Chat Threads  Chat Thread Uuid  Messages Get
+     * Successful Response
+     */
+    200: Array<MessageOut>;
+};
+
+export type ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetResponse = ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetResponses[keyof ThreadMessagesApiV1ChatThreadsChatThreadUuidMessagesGetResponses];
+
+export type SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostData = {
+    body: MessageSendIn;
+    path: {
+        /**
+         * Chat Thread Uuid
+         */
+        chat_thread_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/threads/{chat_thread_uuid}/messages';
+};
+
+export type SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostError = SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostErrors[keyof SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostErrors];
+
+export type SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: MessageOut;
+};
+
+export type SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostResponse = SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostResponses[keyof SendMessageApiV1ChatThreadsChatThreadUuidMessagesPostResponses];
+
+export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostData = {
+    body?: never;
+    path: {
+        /**
+         * Chat Thread Uuid
+         */
+        chat_thread_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/threads/{chat_thread_uuid}/read';
+};
+
+export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostError = MarkReadApiV1ChatThreadsChatThreadUuidReadPostErrors[keyof MarkReadApiV1ChatThreadsChatThreadUuidReadPostErrors];
+
+export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses = {
+    /**
+     * Response Mark Read Api V1 Chat Threads  Chat Thread Uuid  Read Post
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponse = MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses[keyof MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses];
 
 export type CompanyAccountApiV1CompaniesCompanyUuidAccountGetData = {
     body?: never;
