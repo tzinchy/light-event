@@ -16,6 +16,7 @@ from app.core import health
 from app.document import router as document_router
 from app.filial import router as filial_router
 from app.invite import router as invite_router
+from app.pricing import router as pricing_router
 from app.review import router as review_router
 from app.team import router as team_router
 from app.test import router as test_router
@@ -64,6 +65,7 @@ def create_app(
     app.include_router(filial_router.router)
     app.include_router(team_router.router)
     app.include_router(invite_router.router)
+    app.include_router(pricing_router.router)
     app.include_router(review_router.router)
     app.include_router(complaint_router.router)
     app.include_router(chat_router.router)

@@ -9,6 +9,7 @@ from app.balance.service import BalanceService
 from app.core.config import Settings
 from app.core.errors import DomainError
 from app.core.permissions import ensure_membership, ensure_permission
+from app.pricing.service import PricingService
 from app.test.models import AttemptStatus, Test, TestAttempt, TestKind, TestQuestion, TestStatus
 from app.test.repo import TestRepo
 from app.test.schemas import AnswerIn, ModerateIn, TestCreateIn
@@ -37,13 +38,14 @@ class TestService:
 
     async def create_company_test(self, actor: User, company_uuid: UUID, data: TestCreateIn) -> Test:
         await ensure_permission(self.session, actor, company_uuid, "create")
+        fee_kop = await PricingService(self.session, self.settings).fee("company_test")
         test = Test(
             kind=TestKind.company,
             company_uuid=company_uuid,
             title=data.title,
             topic=data.topic,
             min_correct=data.min_correct,
-            price_kop=self.settings.company_test_fee_kop,
+            price_kop=fee_kop,
             status=TestStatus.pending_moderation,
         )
         self.repo.add(test)
@@ -56,7 +58,7 @@ class TestService:
         await self.balance.transfer(
             debit_account_uuid=company_account.account_uuid,
             credit_account_uuid=platform_account.account_uuid,
-            amount_kop=self.settings.company_test_fee_kop,
+            amount_kop=fee_kop,
             kind=LedgerKind.test_fee,
             ref_type="test",
             ref_uuid=test.test_uuid,

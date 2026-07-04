@@ -10,6 +10,7 @@ from app.core.config import Settings
 from app.core.errors import DomainError
 from app.core.permissions import ensure_membership, ensure_permission
 from app.filial.repo import FilialRepo
+from app.pricing.service import PricingService
 from app.test.repo import TestRepo
 from app.user.models import User
 from app.vacancy.models import Vacancy, VacancyStatus
@@ -83,11 +84,11 @@ class VacancyService:
         repo = BalanceRepo(self.session)
         company_account = await repo.get_or_create_account(AccountOwnerType.company, vacancy.company_uuid)
         platform_account = await repo.get_or_create_account(AccountOwnerType.platform, PLATFORM_OWNER_UUID)
-        # списание 990 ₽ и смена статуса — одна транзакция: при нехватке средств всё откатывается
+        # списание платы за публикацию и смена статуса — одна транзакция: при нехватке средств всё откатывается
         await self.balance.transfer(
             debit_account_uuid=company_account.account_uuid,
             credit_account_uuid=platform_account.account_uuid,
-            amount_kop=self.settings.vacancy_publish_fee_kop,
+            amount_kop=await PricingService(self.session, self.settings).fee("vacancy_publish"),
             kind=LedgerKind.vacancy_fee,
             ref_type="vacancy",
             ref_uuid=vacancy.vacancy_uuid,
