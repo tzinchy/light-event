@@ -8,10 +8,13 @@ import {
   createFilialApiV1CompaniesCompanyUuidFilialsPost,
   createVacancyApiV1CompaniesCompanyUuidVacanciesPost,
   listFilialsApiV1CompaniesCompanyUuidFilialsGet,
+  listTestsApiV1TestsGet,
   publishVacancyApiV1VacanciesVacancyUuidPublishPost,
   type FilialOut,
+  type TestListItemOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -126,6 +129,8 @@ export default function CreateEventPage() {
   const [rate, setRate] = useState("450");
   const [tags, setTags] = useState("");
   const [requirements, setRequirements] = useState("");
+  const [tests, setTests] = useState<TestListItemOut[]>([]);
+  const [requiredTests, setRequiredTests] = useState<string[]>([]);
   const [busy, setBusy] = useState<"draft" | "publish" | null>(null);
 
   const companyUuid = current?.company.company_uuid;
@@ -140,9 +145,20 @@ export default function CreateEventPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyUuid]);
 
+  const loadTests = useCallback(async () => {
+    // требованием можно сделать опубликованный тест компании или платформы
+    const { data } = await listTestsApiV1TestsGet();
+    setTests(
+      (data ?? []).filter(
+        (t) => t.status === "published" && (t.kind === "platform" || t.company_uuid === companyUuid),
+      ),
+    );
+  }, [companyUuid]);
+
   useEffect(() => {
     void loadFilials();
-  }, [loadFilials]);
+    void loadTests();
+  }, [loadFilials, loadTests]);
 
   if (!companyUuid) return null;
 
@@ -178,6 +194,7 @@ export default function CreateEventPage() {
         slots,
         tags: tags.split(",").map((t) => t.trim()).filter(Boolean),
         requirements: requirements.split("\n").map((r) => r.trim()).filter(Boolean),
+        required_test_uuids: requiredTests,
       },
     });
     if (error || !data) {
@@ -361,6 +378,42 @@ export default function CreateEventPage() {
               onChange={(e) => setRequirements(e.target.value)}
               placeholder={"Опыт от 6 мес\nЧёрный верх / низ\nМедкнижка"}
             />
+          </div>
+
+          <div>
+            <Label>Обязательные тесты</Label>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Откликнуться смогут только соискатели, прошедшие выбранные тесты.
+            </p>
+            {tests.length === 0 ? (
+              <p className="mt-2 text-sm text-muted-foreground">
+                Нет опубликованных тестов. Создайте тест в разделе «Тесты».
+              </p>
+            ) : (
+              <div className="mt-2 space-y-1.5">
+                {tests.map((t) => (
+                  <label
+                    key={t.test_uuid}
+                    className="flex cursor-pointer items-center gap-2.5 rounded-lg border px-3 py-2 text-sm"
+                  >
+                    <Checkbox
+                      checked={requiredTests.includes(t.test_uuid)}
+                      onCheckedChange={(v) =>
+                        setRequiredTests((prev) =>
+                          v === true
+                            ? [...prev, t.test_uuid]
+                            : prev.filter((id) => id !== t.test_uuid),
+                        )
+                      }
+                    />
+                    <span className="flex-1">{t.title}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {t.kind === "platform" ? "Платформенный" : "Тест компании"}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

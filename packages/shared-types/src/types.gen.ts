@@ -711,6 +711,10 @@ export type FeedItemOut = {
      */
     requirements: Array<string>;
     /**
+     * Required Test Uuids
+     */
+    required_test_uuids: Array<string>;
+    /**
      * Status
      */
     status: string;
@@ -1808,6 +1812,10 @@ export type VacancyCreateIn = {
      * Requirements
      */
     requirements?: Array<string>;
+    /**
+     * Required Test Uuids
+     */
+    required_test_uuids?: Array<string>;
 };
 
 /**
@@ -1879,6 +1887,10 @@ export type VacancyOut = {
      */
     requirements: Array<string>;
     /**
+     * Required Test Uuids
+     */
+    required_test_uuids: Array<string>;
+    /**
      * Status
      */
     status: string;
@@ -1948,6 +1960,10 @@ export type VacancyUpdateIn = {
      * Requirements
      */
     requirements?: Array<string> | null;
+    /**
+     * Required Test Uuids
+     */
+    required_test_uuids?: Array<string> | null;
 };
 
 /**
