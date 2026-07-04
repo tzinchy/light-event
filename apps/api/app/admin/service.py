@@ -3,7 +3,8 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin.schemas import ModerationRequestOut
+from app.admin.repo import AdminOverviewRepo
+from app.admin.schemas import ModerationRequestOut, OverviewOut
 from app.company.models import Company, CompanyStatus
 from app.company.repo import CompanyRepo
 from app.core.errors import DomainError
@@ -72,3 +73,20 @@ class AdminQueueService:
             for test, company_name in await self.tests.list_pending_moderation()
         ]
         return sorted(items, key=lambda i: i.submitted_at)
+
+
+class AdminOverviewService:
+    def __init__(self, session: AsyncSession):
+        self.repo = AdminOverviewRepo(session)
+
+    async def overview(self) -> OverviewOut:
+        users = await self.repo.users_count()
+        verified = await self.repo.users_with_verified_docs()
+        queues = await self.repo.queue_counts()
+        return OverviewOut(
+            users_count=users,
+            kyc_verified_pct=round(verified * 100 / users, 1) if users else 0.0,
+            turnover_kop=await self.repo.turnover_kop(),
+            open_complaints=queues["complaints"],
+            queues=queues,
+        )

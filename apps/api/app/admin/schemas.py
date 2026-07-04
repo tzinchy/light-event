@@ -37,3 +37,13 @@ class ModerationRequestOut(BaseModel):
     company_uuid: UUID | None
     company_name: str | None
     submitted_at: datetime
+
+
+class OverviewOut(BaseModel):
+    """Сводка админа: 4 стата референса + счётчики очередей модерации."""
+
+    users_count: int
+    kyc_verified_pct: float
+    turnover_kop: int
+    open_complaints: int
+    queues: dict[str, int]

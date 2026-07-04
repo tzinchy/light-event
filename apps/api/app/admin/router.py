@@ -3,8 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.admin.schemas import CompanyModerationOut, CompanyRejectIn, ModerationRequestOut
-from app.admin.service import AdminCompanyService, AdminQueueService
+from app.admin.schemas import CompanyModerationOut, CompanyRejectIn, ModerationRequestOut, OverviewOut
+from app.admin.service import AdminCompanyService, AdminOverviewService, AdminQueueService
 from app.company.models import CompanyStatus
 from app.core.deps import get_session
 from app.core.permissions import require_admin
@@ -16,6 +16,11 @@ router = APIRouter(
 
 def get_admin_company_service(session: AsyncSession = Depends(get_session)) -> AdminCompanyService:
     return AdminCompanyService(session=session)
+
+
+@router.get("/overview", response_model=OverviewOut)
+async def overview(session: AsyncSession = Depends(get_session)) -> OverviewOut:
+    return await AdminOverviewService(session).overview()
 
 
 @router.get("/requests", response_model=list[ModerationRequestOut])
