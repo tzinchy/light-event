@@ -32,7 +32,7 @@ const NAV = [
   { href: "/org/tests", label: "Тесты", icon: MessageSquareText, ready: true },
   { href: "/org/team", label: "Команда", icon: Users, ready: true },
   { href: "/org/balance", label: "Баланс", icon: Wallet, ready: true },
-  { href: "/org/reviews", label: "Отзывы", icon: Star, ready: false },
+  { href: "/org/reviews", label: "Отзывы", icon: Star, ready: true },
 ];
 
 function OrgShell({ children }: { children: ReactNode }) {
