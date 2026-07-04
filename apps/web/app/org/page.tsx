@@ -1,52 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { Users, Wallet } from "lucide-react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useOrg } from "@/lib/org-context";
 
-/** Дашборд появится вместе с vacancy-модулем; пока — входы в готовые разделы. */
+// Макет «Аналитики» из референса. Значения — только реальные (skill real-data-only):
+// пока нет агрегатов по событиям, показываем честные пустые состояния, а не выдуманные цифры.
+const METRICS = [
+  { label: "Заполняемость", caption: "смен закрыто" },
+  { label: "Средний рейтинг", caption: "по отзывам" },
+  { label: "Активные события", caption: "опубликовано" },
+  { label: "Расходы за месяц", caption: "выплаты + комиссия" },
+] as const;
+
+function monthTitle(): string {
+  const s = new Date().toLocaleDateString("ru-RU", { month: "long", year: "numeric" }).replace(" г.", "");
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export default function OrgHomePage() {
   const { current } = useOrg();
 
   return (
     <div>
-      <h1 className="text-xl font-semibold">{current?.company.name}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Аналитика откроется после первых событий. Сейчас доступны команда и баланс.
-      </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Link href="/org/team">
-          <Card className="transition-colors hover:bg-secondary">
-            <CardContent className="flex items-center gap-3 pt-6">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
-                <Users className="size-5" />
-              </div>
-              <div>
-                <div className="font-semibold">Команда и роли</div>
-                <div className="text-sm text-muted-foreground">
-                  Права доступа и пригласительные ссылки
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/org/balance">
-          <Card className="transition-colors hover:bg-secondary">
-            <CardContent className="flex items-center gap-3 pt-6">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
-                <Wallet className="size-5" />
-              </div>
-              <div>
-                <div className="font-semibold">Баланс и счёт</div>
-                <div className="text-sm text-muted-foreground">
-                  Пополнение и операции по счёту
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Аналитика</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{monthTitle()} · обзор</p>
+        </div>
+        <Button asChild>
+          <Link href="/org/create">
+            <Plus className="size-4" />
+            Создать событие
+          </Link>
+        </Button>
       </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {METRICS.map((m) => (
+          <Card key={m.label}>
+            <CardContent className="pt-5">
+              <div className="text-sm text-muted-foreground">{m.label}</div>
+              <div className="mt-2 text-3xl font-bold tracking-tight text-muted-foreground/40">—</div>
+              <div className="mt-2 text-xs text-muted-foreground">{m.caption}</div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_360px]">
+        <Card>
+          <CardContent className="pt-5">
+            <div className="font-semibold">Заполняемость · Требования</div>
+            <p className="text-sm text-muted-foreground">Заполняемость смен за неделю</p>
+            <div className="mt-8 flex h-56 items-center justify-center text-center text-sm text-muted-foreground">
+              Данные появятся после первых опубликованных событий
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-5">
+            <div className="font-semibold">Лучшие по рейтингу</div>
+            <div className="mt-8 flex h-40 items-center justify-center text-center text-sm text-muted-foreground">
+              Пока нет соискателей с отзывами
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      <p className="mt-6 text-xs text-muted-foreground">
+        Показатели «{current?.company.name}» наполняются по мере публикации событий, откликов и выплат.
+      </p>
     </div>
   );
 }
