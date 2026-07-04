@@ -17,6 +17,8 @@ import {
 import {
   adminExecutePayoutApiV1AdminPayoutsPayoutUuidExecutePost,
   adminListPayoutsApiV1AdminPayoutsGet,
+  adminOpenComplaintsApiV1AdminComplaintsGet,
+  adminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePost,
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
   listCompaniesApiV1AdminCompaniesGet,
@@ -26,6 +28,7 @@ import {
   rejectCompanyApiV1AdminCompaniesCompanyUuidRejectPost,
   verifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPost,
   type CompanyModerationOut,
+  type ComplaintOut,
   type ModerationRequestOut,
   type PayoutOut,
   type TopupRequestOut,
@@ -35,7 +38,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth-context";
 import { formatDateTime, kopToRub } from "@/lib/format";
-import { Banknote } from "lucide-react";
+import { Banknote, MessageSquareWarning } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function detailText(error: unknown, fallback: string): string {
@@ -370,6 +373,97 @@ function PayoutCard({ payout, onDone }: { payout: PayoutOut; onDone: () => void 
   );
 }
 
+const SEVERITY: Record<string, { label: string; className: string }> = {
+  low: { label: "Низкая", className: "bg-secondary text-muted-foreground" },
+  medium: { label: "Средняя", className: "bg-amber-50 text-amber-700" },
+  high: { label: "Высокая", className: "bg-red-50 text-red-700" },
+};
+
+function ComplaintCard({ complaint, onDone }: { complaint: ComplaintOut; onDone: () => void }) {
+  const [resolution, setResolution] = useState("");
+  const [busy, setBusy] = useState<"resolved" | "dismissed" | null>(null);
+  const severity = SEVERITY[complaint.severity] ?? SEVERITY.medium;
+
+  async function resolve(action: "resolved" | "dismissed") {
+    setBusy(action);
+    const { error } = await adminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePost({
+      path: { complaint_uuid: complaint.complaint_uuid },
+      body: { action, resolution: resolution.trim() },
+    });
+    setBusy(null);
+    if (error) {
+      toast.error(detailText(error, "Не удалось обработать жалобу"));
+      return;
+    }
+    toast.success(action === "resolved" ? "Жалоба решена" : "Жалоба отклонена");
+    onDone();
+  }
+
+  return (
+    <Card>
+      <CardContent className="pt-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-2 font-semibold">
+              <MessageSquareWarning className="size-4 text-muted-foreground" />
+              {complaint.kind}
+            </h3>
+            <p className="mt-1 text-sm">{complaint.text}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Подана {formatDateTime(complaint.created_at)}
+            </p>
+          </div>
+          <span
+            className={cn(
+              "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium",
+              severity.className,
+            )}
+          >
+            {severity.label}
+          </span>
+        </div>
+
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <Input
+            className="h-8 flex-1"
+            placeholder="Резолюция (обязательна)"
+            value={resolution}
+            onChange={(e) => setResolution(e.target.value)}
+          />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={busy !== null || resolution.trim().length < 3}
+              onClick={() => void resolve("resolved")}
+            >
+              {busy === "resolved" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <BadgeCheck className="size-4" />
+              )}
+              Решена
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-destructive"
+              disabled={busy !== null || resolution.trim().length < 3}
+              onClick={() => void resolve("dismissed")}
+            >
+              {busy === "dismissed" ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <XCircle className="size-4" />
+              )}
+              Отклонить
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function EmptyCard({ text }: { text: string }) {
   return (
     <Card>
@@ -378,7 +472,7 @@ function EmptyCard({ text }: { text: string }) {
   );
 }
 
-type TabKey = "companies" | "requests" | "topups" | "payouts";
+type TabKey = "companies" | "requests" | "topups" | "payouts" | "complaints";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -388,20 +482,24 @@ export default function AdminPage() {
   const [requests, setRequests] = useState<ModerationRequestOut[] | null>(null);
   const [topups, setTopups] = useState<TopupRequestOut[] | null>(null);
   const [payouts, setPayouts] = useState<PayoutOut[] | null>(null);
+  const [complaints, setComplaints] = useState<ComplaintOut[] | null>(null);
 
   const isAdmin = me?.platform_role === "admin";
 
   const reload = useCallback(async () => {
-    const [companiesResp, requestsResp, topupsResp, payoutsResp] = await Promise.all([
-      listCompaniesApiV1AdminCompaniesGet({ query: { status: "pending" } }),
-      listRequestsApiV1AdminRequestsGet(),
-      adminListTopupRequestsApiV1AdminTopupRequestsGet(),
-      adminListPayoutsApiV1AdminPayoutsGet(),
-    ]);
+    const [companiesResp, requestsResp, topupsResp, payoutsResp, complaintsResp] =
+      await Promise.all([
+        listCompaniesApiV1AdminCompaniesGet({ query: { status: "pending" } }),
+        listRequestsApiV1AdminRequestsGet(),
+        adminListTopupRequestsApiV1AdminTopupRequestsGet(),
+        adminListPayoutsApiV1AdminPayoutsGet(),
+        adminOpenComplaintsApiV1AdminComplaintsGet(),
+      ]);
     setCompanies(companiesResp.data ?? []);
     setRequests(requestsResp.data ?? []);
     setTopups((topupsResp.data ?? []).filter((t) => t.status === "pending"));
     setPayouts(payoutsResp.data ?? []);
+    setComplaints(complaintsResp.data ?? []);
   }, []);
 
   useEffect(() => {
@@ -423,7 +521,8 @@ export default function AdminPage() {
     companies === null ||
     requests === null ||
     topups === null ||
-    payouts === null
+    payouts === null ||
+    complaints === null
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
@@ -437,6 +536,7 @@ export default function AdminPage() {
     { key: "requests", label: "Публикации", count: requests.length },
     { key: "topups", label: "Пополнения", count: topups.length },
     { key: "payouts", label: "Выплаты", count: payouts.length },
+    { key: "complaints", label: "Жалобы", count: complaints.length },
   ];
 
   return (
@@ -495,6 +595,14 @@ export default function AdminPage() {
           ) : (
             payouts.map((p) => (
               <PayoutCard key={p.payout_uuid} payout={p} onDone={() => void reload()} />
+            ))
+          ))}
+        {tab === "complaints" &&
+          (complaints.length === 0 ? (
+            <EmptyCard text="Открытых жалоб нет" />
+          ) : (
+            complaints.map((c) => (
+              <ComplaintCard key={c.complaint_uuid} complaint={c} onDone={() => void reload()} />
             ))
           ))}
         {tab === "topups" &&
