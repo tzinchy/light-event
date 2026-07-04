@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Check, Loader2, Star } from "lucide-react";
 import {
   applicationDetailApiV1ApplicationsApplicationUuidGet,
+  createComplaintApiV1ComplaintsPost,
   createReviewApiV1ReviewsPost,
   myApplicationsApiV1ApplicationsMyGet,
   type ApplicationDetailOut,
@@ -14,6 +15,13 @@ import {
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SiteHeader } from "@/components/site-header";
 import { APP_STATUS } from "@/app/apps/page";
 import { DICT } from "@/lib/dict";
@@ -28,6 +36,85 @@ const TIMELINE_STEPS = [
   { kind: "shift", label: DICT.tlShift },
   { kind: "payout", label: DICT.tlPayout },
 ] as const;
+
+const COMPLAINT_KINDS = ["Задержка оплаты", "Условия не совпали с описанием", "Другое"] as const;
+
+function ComplaintDialog({
+  companyUuid,
+  vacancyUuid,
+}: {
+  companyUuid: string;
+  vacancyUuid: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState<string>(COMPLAINT_KINDS[0]);
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    setBusy(true);
+    const { error } = await createComplaintApiV1ComplaintsPost({
+      body: {
+        target_type: "company",
+        target_uuid: companyUuid,
+        vacancy_uuid: vacancyUuid,
+        kind,
+        severity: kind === "Задержка оплаты" ? "high" : "medium",
+        text: text.trim(),
+      },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(String((error as { detail?: string }).detail ?? "Не удалось отправить жалобу"));
+      return;
+    }
+    toast.success("Жалоба отправлена администратору");
+    setOpen(false);
+    setText("");
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button className="mt-3 text-sm text-muted-foreground underline hover:text-foreground">
+          Пожаловаться на организацию
+        </button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Жалоба администратору</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-wrap gap-1.5">
+          {COMPLAINT_KINDS.map((value) => (
+            <button
+              key={value}
+              type="button"
+              className={cn(
+                "rounded-full border px-3 py-1 text-sm font-medium",
+                kind === value
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "hover:bg-secondary",
+              )}
+              onClick={() => setKind(value)}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+        <textarea
+          className="min-h-24 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+          placeholder="Опишите, что произошло"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+        />
+        <Button disabled={text.trim().length < 3 || busy} onClick={() => void submit()}>
+          {busy && <Loader2 className="size-4 animate-spin" />}
+          Отправить жалобу
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 function ReviewCard({ applicationUuid }: { applicationUuid: string }) {
   const [rating, setRating] = useState(0);
@@ -225,6 +312,13 @@ export default function ApplicationPage() {
         </Card>
 
         {canReview(detail.status) && <ReviewCard applicationUuid={detail.application_uuid} />}
+
+        {summary && (
+          <ComplaintDialog
+            companyUuid={summary.vacancy.company_uuid}
+            vacancyUuid={summary.vacancy_uuid}
+          />
+        )}
       </main>
     </div>
   );
