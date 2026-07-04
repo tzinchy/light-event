@@ -895,7 +895,7 @@ export type MeOut = {
     /**
      * Phone
      */
-    phone: string;
+    phone: string | null;
     /**
      * Email
      */
@@ -1099,9 +1099,9 @@ export type OperationOut = {
  */
 export type OtpRequestIn = {
     /**
-     * Phone
+     * Email
      */
-    phone: string;
+    email: string;
 };
 
 /**
@@ -1109,9 +1109,9 @@ export type OtpRequestIn = {
  */
 export type OtpVerifyIn = {
     /**
-     * Phone
+     * Email
      */
-    phone: string;
+    email: string;
     /**
      * Code
      */
@@ -1703,7 +1703,7 @@ export type UserOut = {
     /**
      * Phone
      */
-    phone: string;
+    phone: string | null;
     /**
      * Email
      */

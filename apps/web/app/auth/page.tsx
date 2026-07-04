@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, FileUp, Loader2, Phone } from "lucide-react";
+import { CheckCircle2, FileUp, Loader2, Mail } from "lucide-react";
 import {
   consentApiV1AuthConsentPost,
   myCompaniesApiV1CompaniesMyGet,
@@ -22,7 +22,7 @@ import { DICT } from "@/lib/dict";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
-type Step = "welcome" | "phone" | "otp" | "kyc";
+type Step = "welcome" | "email" | "otp" | "kyc";
 
 const RESEND_SECONDS = 60;
 
@@ -34,7 +34,7 @@ const KYC_DOCS = [
 
 function Stepper({ step }: { step: Step }) {
   const items = [
-    { key: "phone", label: DICT.stPhone },
+    { key: "email", label: DICT.stEmail },
     { key: "otp", label: DICT.stOtp },
     { key: "kyc", label: DICT.stKyc },
   ];
@@ -74,7 +74,7 @@ export default function AuthPage() {
   const router = useRouter();
   const { me, login, refreshMe } = useAuth();
   const [step, setStep] = useState<Step>("welcome");
-  const [phone, setPhone] = useState("+7");
+  const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [resendLeft, setResendLeft] = useState(0);
@@ -89,7 +89,7 @@ export default function AuthPage() {
     return () => clearInterval(t);
   }, [resendLeft]);
 
-  const phoneValid = /^\+\d{10,15}$/.test(phone);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   async function goToOrgOrHome() {
     const { data } = await myCompaniesApiV1CompaniesMyGet();
@@ -99,7 +99,7 @@ export default function AuthPage() {
   async function sendCode() {
     setBusy(true);
     const { error } = await requestOtpApiV1AuthOtpRequestPost({
-      body: { phone },
+      body: { email },
     });
     setBusy(false);
     if (error) {
@@ -114,7 +114,7 @@ export default function AuthPage() {
   async function verify() {
     setBusy(true);
     const { data, error } = await verifyOtpApiV1AuthOtpVerifyPost({
-      body: { phone, code },
+      body: { email, code },
     });
     setBusy(false);
     if (error || !data) {
@@ -177,9 +177,9 @@ export default function AuthPage() {
               <div className="text-center">
                 <h1 className="text-xl font-semibold">{DICT.welcomeTitle}</h1>
                 <p className="mt-2 text-sm text-muted-foreground">{DICT.welcomeSub}</p>
-                <Button className="mt-6 w-full" onClick={() => setStep("phone")}>
-                  <Phone className="size-4" />
-                  {DICT.loginByPhone}
+                <Button className="mt-6 w-full" onClick={() => setStep("email")}>
+                  <Mail className="size-4" />
+                  {DICT.loginByEmail}
                 </Button>
                 <div className="my-4 flex items-center gap-3 text-xs text-muted-foreground">
                   <div className="h-px flex-1 bg-border" />
@@ -193,24 +193,26 @@ export default function AuthPage() {
               </div>
             )}
 
-            {step === "phone" && (
+            {step === "email" && (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (phoneValid) void sendCode();
+                  if (emailValid) void sendCode();
                 }}
               >
-                <Label htmlFor="phone">{DICT.phoneLabel}</Label>
+                <Label htmlFor="email">{DICT.emailLabel}</Label>
                 <Input
-                  id="phone"
-                  type="tel"
+                  id="email"
+                  type="email"
                   autoFocus
-                  className="mt-2 font-mono"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^+\d]/g, ""))}
-                  placeholder="+7 900 000-00-00"
+                  autoComplete="email"
+                  inputMode="email"
+                  className="mt-2"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value.trim())}
+                  placeholder="you@example.com"
                 />
-                <Button type="submit" className="mt-4 w-full" disabled={!phoneValid || busy}>
+                <Button type="submit" className="mt-4 w-full" disabled={!emailValid || busy}>
                   {busy && <Loader2 className="size-4 animate-spin" />}
                   {DICT.getCode}
                 </Button>
@@ -221,7 +223,7 @@ export default function AuthPage() {
             {step === "otp" && (
               <div>
                 <p className="mb-4 text-center text-sm text-muted-foreground">
-                  {DICT.otpSentTo} <span className="font-mono text-foreground">{phone}</span>
+                  {DICT.otpSentTo} <span className="font-medium text-foreground">{email}</span>
                 </p>
                 <OtpInput value={code} onChange={setCode} disabled={busy} />
                 <Button
