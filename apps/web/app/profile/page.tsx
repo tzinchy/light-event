@@ -68,7 +68,7 @@ function EmailBlock() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Label htmlFor="profile-email">Адрес электронной почты</Label>
+        <Label htmlFor="profile-email">Почта — ваш логин</Label>
         <div className="mt-1.5 flex gap-2">
           <Input
             id="profile-email"
@@ -156,13 +156,6 @@ function ProfileFields() {
             onChange={(e) => setCity(e.target.value)}
             placeholder="Москва"
           />
-        </div>
-        <div>
-          <Label>Телефон</Label>
-          <Input className="mt-1.5 font-mono" value={me?.phone ?? ""} disabled />
-          <p className="mt-1 text-xs text-muted-foreground">
-            Телефон — ваш логин, изменить его нельзя
-          </p>
         </div>
         <Button disabled={!dirty || busy} onClick={() => void save()}>
           {busy && <Loader2 className="size-4 animate-spin" />}
