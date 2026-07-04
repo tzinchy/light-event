@@ -19,6 +19,7 @@ class VacancyCreateIn(BaseModel):
     urgent: bool = False
     tags: list[str] = Field(default_factory=list, max_length=10)
     requirements: list[str] = Field(default_factory=list, max_length=20)
+    required_test_uuids: list[UUID] = Field(default_factory=list, max_length=10)
 
     @model_validator(mode="after")
     def ends_after_starts(self):
@@ -40,6 +41,7 @@ class VacancyUpdateIn(BaseModel):
     urgent: bool | None = None
     tags: list[str] | None = Field(default=None, max_length=10)
     requirements: list[str] | None = Field(default=None, max_length=20)
+    required_test_uuids: list[UUID] | None = Field(default=None, max_length=10)
 
 
 class VacancyOut(BaseModel):
@@ -61,6 +63,7 @@ class VacancyOut(BaseModel):
     urgent: bool
     tags: list[str]
     requirements: list[str]
+    required_test_uuids: list[UUID]
     status: str
     reject_reason: str | None
     archived_at: datetime | None

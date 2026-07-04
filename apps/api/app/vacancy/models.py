@@ -3,6 +3,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import ARRAY, BigInteger, DateTime, Enum, Float, ForeignKey, String, text
+from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
@@ -36,6 +37,10 @@ class Vacancy(TimestampMixin, Base):
     urgent: Mapped[bool] = mapped_column(default=False)
     tags: Mapped[list[str]] = mapped_column(ARRAY(String(50)), default=list, server_default="{}")
     requirements: Mapped[list[str]] = mapped_column(ARRAY(String(120)), default=list, server_default="{}")
+    # обязательные тесты: откликнуться может только прошедший все (PLAN §11.6-D); пусто = без ограничений
+    required_test_uuids: Mapped[list[UUID]] = mapped_column(
+        ARRAY(PgUUID(as_uuid=True)), default=list, server_default="{}"
+    )
     status: Mapped[VacancyStatus] = mapped_column(
         Enum(VacancyStatus, native_enum=False, length=20), default=VacancyStatus.draft, index=True
     )

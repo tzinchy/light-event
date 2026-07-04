@@ -29,6 +29,10 @@ class ApplicationService:
             raise DomainError(409, "Смена не открыта для откликов")
         if await self.applications.get_by_vacancy_user(vacancy_uuid, actor.user_uuid) is not None:
             raise DomainError(409, "Вы уже откликнулись на эту смену")
+        if vacancy.required_test_uuids:
+            passed = await TestRepo(self.session).passed_ids(actor.user_uuid, vacancy.required_test_uuids)
+            if set(vacancy.required_test_uuids) - passed:
+                raise DomainError(409, "Сначала пройдите обязательные тесты этой смены")
         application = Application(vacancy_uuid=vacancy_uuid, user_uuid=actor.user_uuid)
         self.applications.add(application)
         await self.session.flush()

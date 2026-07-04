@@ -10,6 +10,7 @@ from app.core.config import Settings
 from app.core.errors import DomainError
 from app.core.permissions import ensure_membership, ensure_permission
 from app.filial.repo import FilialRepo
+from app.test.repo import TestRepo
 from app.user.models import User
 from app.vacancy.models import Vacancy, VacancyStatus
 from app.vacancy.repo import VacancyRepo
@@ -27,13 +28,21 @@ class VacancyService:
         self.settings = settings
         self.vacancies = VacancyRepo(session)
         self.filials = FilialRepo(session)
+        self.tests = TestRepo(session)
         self.balance = BalanceService(session)
+
+    async def _validate_required_tests(self, company_uuid: UUID, uuids: list[UUID]) -> None:
+        assignable = await self.tests.assignable_ids(company_uuid, uuids)
+        unknown = set(uuids) - assignable
+        if unknown:
+            raise DomainError(422, "Обязательным можно сделать только опубликованный тест компании или платформы")
 
     async def create(self, actor: User, company_uuid: UUID, data: VacancyCreateIn) -> Vacancy:
         member = await ensure_permission(self.session, actor, company_uuid, "create")
         filial = await self.filials.get(data.filial_uuid)
         if filial is None or filial.company_uuid != company_uuid:
             raise DomainError(404, "Филиал не найден в этой компании")
+        await self._validate_required_tests(company_uuid, data.required_test_uuids)
         vacancy = Vacancy(
             company_uuid=company_uuid,
             created_by_uuid=member.team_member_uuid,
@@ -55,6 +64,8 @@ class VacancyService:
         await ensure_permission(self.session, actor, vacancy.company_uuid, "create")
         if vacancy.status != VacancyStatus.draft:
             raise DomainError(409, "Редактировать можно только черновик")
+        if data.required_test_uuids is not None:
+            await self._validate_required_tests(vacancy.company_uuid, data.required_test_uuids)
         for field, value in data.model_dump(exclude_none=True).items():
             setattr(vacancy, field, value)
         vacancy.pay_total_kop = compute_total_kop(vacancy.starts_at, vacancy.ends_at, vacancy.pay_hour_kop)

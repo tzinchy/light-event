@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.company.models import Company
@@ -13,6 +13,35 @@ class TestRepo:
 
     def add(self, obj) -> None:
         self.session.add(obj)
+
+    async def assignable_ids(self, company_uuid: UUID, uuids: list[UUID]) -> set[UUID]:
+        """Какие из uuid можно поставить в требования вакансии: опубликованные тесты
+        своей компании или платформенные (PLAN §11.6-D)."""
+        if not uuids:
+            return set()
+        result = await self.session.execute(
+            select(Test.test_uuid).where(
+                Test.test_uuid.in_(uuids),
+                Test.status == TestStatus.published,
+                or_(Test.company_uuid == company_uuid, Test.kind == TestKind.platform),
+            )
+        )
+        return set(result.scalars())
+
+    async def passed_ids(self, user_uuid: UUID, uuids: list[UUID]) -> set[UUID]:
+        """Из заданных тестов — те, что пользователь успешно прошёл."""
+        if not uuids:
+            return set()
+        result = await self.session.execute(
+            select(TestAttempt.test_uuid)
+            .where(
+                TestAttempt.user_uuid == user_uuid,
+                TestAttempt.test_uuid.in_(uuids),
+                TestAttempt.passed.is_(True),
+            )
+            .distinct()
+        )
+        return set(result.scalars())
 
     async def get(self, test_uuid: UUID) -> Test | None:
         return await self.session.get(Test, test_uuid)
