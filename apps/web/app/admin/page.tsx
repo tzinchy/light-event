@@ -23,12 +23,14 @@ import {
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
   listCompaniesApiV1AdminCompaniesGet,
   listRequestsApiV1AdminRequestsGet,
+  overviewApiV1AdminOverviewGet,
   moderateTestApiV1AdminTestsTestUuidModeratePost,
   moderateVacancyApiV1AdminVacanciesVacancyUuidModeratePost,
   rejectCompanyApiV1AdminCompaniesCompanyUuidRejectPost,
   verifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPost,
   type CompanyModerationOut,
   type ComplaintOut,
+  type OverviewOut,
   type ModerationRequestOut,
   type PayoutOut,
   type TopupRequestOut,
@@ -483,23 +485,26 @@ export default function AdminPage() {
   const [topups, setTopups] = useState<TopupRequestOut[] | null>(null);
   const [payouts, setPayouts] = useState<PayoutOut[] | null>(null);
   const [complaints, setComplaints] = useState<ComplaintOut[] | null>(null);
+  const [overview, setOverview] = useState<OverviewOut | null>(null);
 
   const isAdmin = me?.platform_role === "admin";
 
   const reload = useCallback(async () => {
-    const [companiesResp, requestsResp, topupsResp, payoutsResp, complaintsResp] =
+    const [companiesResp, requestsResp, topupsResp, payoutsResp, complaintsResp, overviewResp] =
       await Promise.all([
         listCompaniesApiV1AdminCompaniesGet({ query: { status: "pending" } }),
         listRequestsApiV1AdminRequestsGet(),
         adminListTopupRequestsApiV1AdminTopupRequestsGet(),
         adminListPayoutsApiV1AdminPayoutsGet(),
         adminOpenComplaintsApiV1AdminComplaintsGet(),
+        overviewApiV1AdminOverviewGet(),
       ]);
     setCompanies(companiesResp.data ?? []);
     setRequests(requestsResp.data ?? []);
     setTopups((topupsResp.data ?? []).filter((t) => t.status === "pending"));
     setPayouts(payoutsResp.data ?? []);
     setComplaints(complaintsResp.data ?? []);
+    setOverview(overviewResp.data ?? null);
   }, []);
 
   useEffect(() => {
@@ -541,10 +546,28 @@ export default function AdminPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-xl font-bold">Модерация</h1>
+      <h1 className="text-xl font-bold">Администрирование</h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Заявки организаций, платные публикации и пополнения счетов.
+        Сводка платформы и очереди модерации.
       </p>
+
+      {overview && (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "Пользователи", value: String(overview.users_count) },
+            { label: "KYC", value: `${overview.kyc_verified_pct}%` },
+            { label: "Оборот", value: kopToRub(overview.turnover_kop) },
+            { label: "Споры", value: String(overview.open_complaints) },
+          ].map((stat) => (
+            <Card key={stat.label}>
+              <CardContent className="pt-5">
+                <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
+                <div className="mt-1 font-mono text-xl font-semibold">{stat.value}</div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       <div className="mt-4 flex gap-1.5 overflow-x-auto">
         {tabs.map((t) => (
