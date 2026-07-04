@@ -1079,6 +1079,35 @@ export type OtpVerifyIn = {
 };
 
 /**
+ * OverviewOut
+ * Сводка админа: 4 стата референса + счётчики очередей модерации.
+ */
+export type OverviewOut = {
+    /**
+     * Users Count
+     */
+    users_count: number;
+    /**
+     * Kyc Verified Pct
+     */
+    kyc_verified_pct: number;
+    /**
+     * Turnover Kop
+     */
+    turnover_kop: number;
+    /**
+     * Open Complaints
+     */
+    open_complaints: number;
+    /**
+     * Queues
+     */
+    queues: {
+        [key: string]: number;
+    };
+};
+
+/**
  * PayoutOut
  */
 export type PayoutOut = {
@@ -3778,6 +3807,22 @@ export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses = {
 };
 
 export type AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponse = AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses[keyof AbandonAttemptApiV1AttemptsAttemptUuidAbandonPostResponses];
+
+export type OverviewApiV1AdminOverviewGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/overview';
+};
+
+export type OverviewApiV1AdminOverviewGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: OverviewOut;
+};
+
+export type OverviewApiV1AdminOverviewGetResponse = OverviewApiV1AdminOverviewGetResponses[keyof OverviewApiV1AdminOverviewGetResponses];
 
 export type ListRequestsApiV1AdminRequestsGetData = {
     body?: never;
