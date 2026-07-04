@@ -1198,6 +1198,34 @@ export type PayoutOut = {
 };
 
 /**
+ * PriceOut
+ */
+export type PriceOut = {
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Amount Kop
+     */
+    amount_kop: number;
+};
+
+/**
+ * PriceUpdateIn
+ */
+export type PriceUpdateIn = {
+    /**
+     * Amount Kop
+     */
+    amount_kop: number;
+};
+
+/**
  * QuestionIn
  */
 export type QuestionIn = {
@@ -2746,6 +2774,53 @@ export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses = {
 };
 
 export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponse = RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses[keyof RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses];
+
+export type ListPricesApiV1AdminPricingGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/pricing';
+};
+
+export type ListPricesApiV1AdminPricingGetResponses = {
+    /**
+     * Response List Prices Api V1 Admin Pricing Get
+     * Successful Response
+     */
+    200: Array<PriceOut>;
+};
+
+export type ListPricesApiV1AdminPricingGetResponse = ListPricesApiV1AdminPricingGetResponses[keyof ListPricesApiV1AdminPricingGetResponses];
+
+export type SetPriceApiV1AdminPricingKeyPutData = {
+    body: PriceUpdateIn;
+    path: {
+        /**
+         * Key
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/pricing/{key}';
+};
+
+export type SetPriceApiV1AdminPricingKeyPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SetPriceApiV1AdminPricingKeyPutError = SetPriceApiV1AdminPricingKeyPutErrors[keyof SetPriceApiV1AdminPricingKeyPutErrors];
+
+export type SetPriceApiV1AdminPricingKeyPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: PriceOut;
+};
+
+export type SetPriceApiV1AdminPricingKeyPutResponse = SetPriceApiV1AdminPricingKeyPutResponses[keyof SetPriceApiV1AdminPricingKeyPutResponses];
 
 export type CreateReviewApiV1ReviewsPostData = {
     body: ReviewCreateIn;

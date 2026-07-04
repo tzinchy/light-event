@@ -22,24 +22,27 @@ import {
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
   listCompaniesApiV1AdminCompaniesGet,
+  listPricesApiV1AdminPricingGet,
   listRequestsApiV1AdminRequestsGet,
   overviewApiV1AdminOverviewGet,
   moderateTestApiV1AdminTestsTestUuidModeratePost,
   moderateVacancyApiV1AdminVacanciesVacancyUuidModeratePost,
   rejectCompanyApiV1AdminCompaniesCompanyUuidRejectPost,
+  setPriceApiV1AdminPricingKeyPut,
   verifyCompanyApiV1AdminCompaniesCompanyUuidVerifyPost,
   type CompanyModerationOut,
   type ComplaintOut,
   type OverviewOut,
   type ModerationRequestOut,
   type PayoutOut,
+  type PriceOut,
   type TopupRequestOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth-context";
-import { formatDateTime, kopToRub } from "@/lib/format";
+import { formatDateTime, kopToRub, rubInputToKop } from "@/lib/format";
 import { Banknote, MessageSquareWarning } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -474,7 +477,55 @@ function EmptyCard({ text }: { text: string }) {
   );
 }
 
-type TabKey = "companies" | "requests" | "topups" | "payouts" | "complaints";
+function PriceRow({ price, onSaved }: { price: PriceOut; onSaved: () => void }) {
+  const [rub, setRub] = useState(String(Math.round(price.amount_kop / 100)));
+  const [busy, setBusy] = useState(false);
+  const kop = rubInputToKop(rub);
+  const dirty = kop !== null && kop !== price.amount_kop;
+
+  async function save() {
+    if (kop === null) return;
+    setBusy(true);
+    const { error } = await setPriceApiV1AdminPricingKeyPut({
+      path: { key: price.key },
+      body: { amount_kop: kop },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось сохранить цену"));
+      return;
+    }
+    toast.success(`Тариф «${price.label}» обновлён`);
+    onSaved();
+  }
+
+  return (
+    <Card>
+      <CardContent className="flex items-center gap-3 py-4">
+        <div className="min-w-0 flex-1">
+          <div className="font-medium">{price.label}</div>
+          <div className="text-xs text-muted-foreground">Текущая цена: {kopToRub(price.amount_kop)}</div>
+        </div>
+        <div className="relative">
+          <Input
+            className="w-32 pr-6 text-right font-mono"
+            inputMode="numeric"
+            value={rub}
+            onChange={(e) => setRub(e.target.value.replace(/[^\d]/g, ""))}
+          />
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+            ₽
+          </span>
+        </div>
+        <Button size="sm" disabled={!dirty || busy} onClick={() => void save()}>
+          {busy ? <Loader2 className="size-4 animate-spin" /> : "Сохранить"}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+type TabKey = "companies" | "requests" | "topups" | "payouts" | "complaints" | "pricing";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -486,11 +537,12 @@ export default function AdminPage() {
   const [payouts, setPayouts] = useState<PayoutOut[] | null>(null);
   const [complaints, setComplaints] = useState<ComplaintOut[] | null>(null);
   const [overview, setOverview] = useState<OverviewOut | null>(null);
+  const [prices, setPrices] = useState<PriceOut[] | null>(null);
 
   const isAdmin = me?.platform_role === "admin";
 
   const reload = useCallback(async () => {
-    const [companiesResp, requestsResp, topupsResp, payoutsResp, complaintsResp, overviewResp] =
+    const [companiesResp, requestsResp, topupsResp, payoutsResp, complaintsResp, overviewResp, pricesResp] =
       await Promise.all([
         listCompaniesApiV1AdminCompaniesGet({ query: { status: "pending" } }),
         listRequestsApiV1AdminRequestsGet(),
@@ -498,6 +550,7 @@ export default function AdminPage() {
         adminListPayoutsApiV1AdminPayoutsGet(),
         adminOpenComplaintsApiV1AdminComplaintsGet(),
         overviewApiV1AdminOverviewGet(),
+        listPricesApiV1AdminPricingGet(),
       ]);
     setCompanies(companiesResp.data ?? []);
     setRequests(requestsResp.data ?? []);
@@ -505,6 +558,7 @@ export default function AdminPage() {
     setPayouts(payoutsResp.data ?? []);
     setComplaints(complaintsResp.data ?? []);
     setOverview(overviewResp.data ?? null);
+    setPrices(pricesResp.data ?? []);
   }, []);
 
   useEffect(() => {
@@ -527,7 +581,8 @@ export default function AdminPage() {
     requests === null ||
     topups === null ||
     payouts === null ||
-    complaints === null
+    complaints === null ||
+    prices === null
   ) {
     return (
       <div className="flex min-h-screen items-center justify-center text-muted-foreground">
@@ -542,6 +597,7 @@ export default function AdminPage() {
     { key: "topups", label: "Пополнения", count: topups.length },
     { key: "payouts", label: "Выплаты", count: payouts.length },
     { key: "complaints", label: "Жалобы", count: complaints.length },
+    { key: "pricing", label: "Тарифы", count: prices.length },
   ];
 
   return (
@@ -636,6 +692,8 @@ export default function AdminPage() {
               <TopupCard key={t.topup_request_uuid} topup={t} onDone={() => void reload()} />
             ))
           ))}
+        {tab === "pricing" &&
+          prices.map((p) => <PriceRow key={p.key} price={p} onSaved={() => void reload()} />)}
       </div>
     </div>
   );
