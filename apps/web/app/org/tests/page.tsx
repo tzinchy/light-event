@@ -6,6 +6,7 @@ import { ClipboardList, Loader2, Plus, Trash2 } from "lucide-react";
 import {
   companyTestsApiV1CompaniesCompanyUuidTestsGet,
   createCompanyTestApiV1CompaniesCompanyUuidTestsPost,
+  submitTestApiV1TestsTestUuidSubmitPost,
   type CompanyTestItemOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
@@ -13,12 +14,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { DICT } from "@/lib/dict";
 import { useOrg } from "@/lib/org-context";
 import { cn } from "@/lib/utils";
 
 const TEST_STATUS: Record<string, { label: string; className: string }> = {
+  draft: {
+    label: DICT.evDraft,
+    className: "border-border bg-secondary text-muted-foreground",
+  },
   pending_moderation: {
     label: DICT.evPending,
     className: "border-status-warn-border bg-status-warn-bg text-status-warn",
@@ -35,20 +39,18 @@ const TEST_STATUS: Record<string, { label: string; className: string }> = {
 
 type QuestionDraft = {
   text: string;
-  multi: boolean;
   options: string[];
   correct: number[];
 };
 
-const emptyQuestion = (): QuestionDraft => ({ text: "", multi: false, options: ["", ""], correct: [] });
+const emptyQuestion = (): QuestionDraft => ({ text: "", options: ["", ""], correct: [] });
 
 function questionValid(q: QuestionDraft): boolean {
   return (
     q.text.trim().length >= 5 &&
     q.options.length >= 2 &&
     q.options.every((o) => o.trim().length > 0) &&
-    q.correct.length >= 1 &&
-    (q.multi || q.correct.length === 1)
+    q.correct.length >= 1
   );
 }
 
@@ -63,6 +65,7 @@ function CreateTestForm({
 }) {
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState("");
+  const [description, setDescription] = useState("");
   const [minCorrect, setMinCorrect] = useState(1);
   const [questions, setQuestions] = useState<QuestionDraft[]>([emptyQuestion()]);
   const [busy, setBusy] = useState(false);
@@ -84,10 +87,11 @@ function CreateTestForm({
       body: {
         title: title.trim(),
         topic: topic.trim(),
+        description: description.trim() || null,
         min_correct: minCorrect,
         questions: questions.map((q) => ({
           text: q.text.trim(),
-          multi: q.multi,
+          multi: q.correct.length > 1, // несколько верных → вопрос с мультивыбором
           options: q.options.map((o) => o.trim()),
           correct_indices: q.correct,
         })),
@@ -95,7 +99,7 @@ function CreateTestForm({
     });
     setBusy(false);
     if (data) {
-      toast.success(DICT.testSentToModeration);
+      toast.success("Черновик теста создан — отправьте на модерацию, когда будете готовы");
       onCreated();
     } else {
       const detail = (error as { detail?: unknown } | undefined)?.detail;
@@ -133,6 +137,18 @@ function CreateTestForm({
           </div>
         </div>
 
+        <div className="space-y-1.5">
+          <Label htmlFor="test-desc">Описание</Label>
+          <textarea
+            id="test-desc"
+            className="min-h-20 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Что проверяет тест, для какой роли — необязательно"
+            maxLength={1000}
+          />
+        </div>
+
         {questions.map((q, qi) => (
           <Card key={qi} className="bg-secondary/30">
             <CardContent className="space-y-3 pt-6">
@@ -160,19 +176,9 @@ function CreateTestForm({
                 onChange={(e) => patchQuestion(qi, { text: e.target.value })}
                 placeholder={DICT.questionText}
               />
-              <div className="flex items-center gap-2">
-                <Switch
-                  id={`multi-${qi}`}
-                  checked={q.multi}
-                  onCheckedChange={(multi) =>
-                    patchQuestion(qi, { multi, correct: q.correct.slice(0, multi ? undefined : 1) })
-                  }
-                />
-                <Label htmlFor={`multi-${qi}`} className="font-normal">
-                  {DICT.multiToggle}
-                </Label>
-              </div>
-              <p className="text-xs text-muted-foreground">{DICT.markCorrectHint}</p>
+              <p className="text-xs text-muted-foreground">
+                Отметьте один или несколько верных вариантов галочками.
+              </p>
               {q.options.map((option, oi) => (
                 <div key={oi} className="flex items-center gap-2">
                   <Checkbox
@@ -180,9 +186,7 @@ function CreateTestForm({
                     onCheckedChange={(on) =>
                       patchQuestion(qi, {
                         correct: on
-                          ? q.multi
-                            ? [...q.correct, oi].sort((a, b) => a - b)
-                            : [oi]
+                          ? [...q.correct, oi].sort((a, b) => a - b)
                           : q.correct.filter((i) => i !== oi),
                       })
                     }
@@ -282,6 +286,16 @@ export default function OrgTestsPage() {
     void reload();
   }, [reload]);
 
+  async function submitForModeration(testUuid: string) {
+    const { error } = await submitTestApiV1TestsTestUuidSubmitPost({ path: { test_uuid: testUuid } });
+    if (error) {
+      toast.error(String((error as { detail?: string })?.detail ?? "Не удалось отправить"));
+      return;
+    }
+    toast.success("Тест отправлен на модерацию");
+    void reload();
+  }
+
   if (loading || (current && tests === null)) {
     return (
       <div className="flex justify-center py-16 text-muted-foreground">
@@ -342,11 +356,17 @@ export default function OrgTestsPage() {
                       <div className="mt-1 text-sm text-status-danger">{test.reject_reason}</div>
                     )}
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {test.passed_count > 0
-                      ? `${test.passed_count} ${DICT.passedCountWord}`
-                      : DICT.noTakenYet}
-                  </div>
+                  {test.status === "draft" ? (
+                    <Button size="sm" onClick={() => void submitForModeration(test.test_uuid)}>
+                      На модерацию · {DICT.testCost}
+                    </Button>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      {test.passed_count > 0
+                        ? `${test.passed_count} ${DICT.passedCountWord}`
+                        : DICT.noTakenYet}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             );

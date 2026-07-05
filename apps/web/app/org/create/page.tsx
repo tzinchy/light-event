@@ -1,9 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Minus, Plus } from "lucide-react";
+import type { MapPoint } from "@/components/map-picker";
 import {
   createFilialApiV1CompaniesCompanyUuidFilialsPost,
   createVacancyApiV1CompaniesCompanyUuidVacanciesPost,
@@ -37,6 +39,11 @@ import { useOrg } from "@/lib/org-context";
 import { kopToRub, rubInputToKop } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
+const MapPicker = dynamic(() => import("@/components/map-picker").then((m) => m.MapPicker), {
+  ssr: false,
+  loading: () => <div className="h-56 animate-pulse rounded-xl border bg-secondary" />,
+});
+
 const ROLES = ["Официант", "Бариста", "Хостес", "Бармен", "Повар", "Ресепшн", "Гардероб", "Промоутер"];
 
 function AddFilialDialog({
@@ -49,13 +56,15 @@ function AddFilialDialog({
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [point, setPoint] = useState<MapPoint | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function create() {
+    if (!point) return;
     setBusy(true);
     const { data, error } = await createFilialApiV1CompaniesCompanyUuidFilialsPost({
       path: { company_uuid: companyUuid },
-      body: { name, address },
+      body: { name, address, lat: point.lat, lon: point.lon },
     });
     setBusy(false);
     if (error || !data) {
@@ -66,6 +75,7 @@ function AddFilialDialog({
     setOpen(false);
     setName("");
     setAddress("");
+    setPoint(null);
   }
 
   return (
@@ -101,9 +111,21 @@ function AddFilialDialog({
               placeholder="Тверская, 9"
             />
           </div>
+          <div>
+            <Label>Точка на карте</Label>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Отметьте филиал — координаты подтянутся в события этого филиала.
+            </p>
+            <MapPicker value={point} onChange={setPoint} className="mt-2 h-56" />
+            {point && (
+              <p className="mt-1 font-mono text-xs text-muted-foreground">
+                {point.lat.toFixed(5)}, {point.lon.toFixed(5)}
+              </p>
+            )}
+          </div>
           <Button
             className="w-full"
-            disabled={name.trim().length < 2 || address.trim().length < 2 || busy}
+            disabled={name.trim().length < 2 || address.trim().length < 2 || !point || busy}
             onClick={() => void create()}
           >
             {busy && <Loader2 className="size-4 animate-spin" />}
