@@ -41,6 +41,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { getTokens } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { formatDateTime, kopToRub, rubInputToKop } from "@/lib/format";
 import { Banknote, LogOut, MessageSquareWarning } from "lucide-react";
@@ -260,6 +261,18 @@ function TopupCard({ topup, onDone }: { topup: TopupRequestOut; onDone: () => vo
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState<"approve" | "reject" | null>(null);
 
+  async function viewProof() {
+    const tokens = getTokens();
+    const resp = await fetch(`/api/v1/documents/${topup.proof_document_uuid}/content`, {
+      headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : undefined,
+    });
+    if (!resp.ok) {
+      toast.error("Не удалось открыть подтверждение оплаты");
+      return;
+    }
+    window.open(URL.createObjectURL(await resp.blob()), "_blank");
+  }
+
   async function resolve(action: "approve" | "reject") {
     setBusy(action);
     const { error } = await adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost({
@@ -289,9 +302,12 @@ function TopupCard({ topup, onDone }: { topup: TopupRequestOut; onDone: () => vo
               {topup.payment_details ? ` · ${topup.payment_details}` : ""}
             </p>
           </div>
-          <span className="shrink-0 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-            Ожидает зачисления
-          </span>
+          <button
+            className="shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+            onClick={() => void viewProof()}
+          >
+            Посмотреть чек
+          </button>
         </div>
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
