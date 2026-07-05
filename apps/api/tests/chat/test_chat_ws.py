@@ -32,7 +32,7 @@ async def _serve(settings):
     while not server.started:
         await asyncio.sleep(0.05)
     port = server.servers[0].sockets[0].getsockname()[1]
-    return server, task, f"ws://127.0.0.1:{port}/api/v1/chat/ws"
+    return server, task, f"ws://127.0.0.1:{port}/ws/chat"
 
 
 async def _recv_of_type(ws, wanted: str, timeout: float = 5.0) -> dict:

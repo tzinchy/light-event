@@ -19,6 +19,8 @@ from app.user.repo import UserRepo
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
+# WS вынесен из /api/ на /ws/chat — под него в nginx уже настроен апгрейд соединения (PLAN §6)
+ws_router = APIRouter()
 
 ONLINE_TTL_SEC = 60
 
@@ -90,7 +92,7 @@ async def _publish(redis, user_uuids, payload: dict) -> None:
         await redis.publish(_user_channel(uid), data)
 
 
-@router.websocket("/ws")
+@ws_router.websocket("/ws/chat")
 async def chat_ws(websocket: WebSocket) -> None:
     """Realtime-чат: авторизация по токену (?token=), приём send/read, онлайн-статус.
 

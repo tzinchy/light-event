@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
         source: "/api/:path*",
         destination: `${process.env.API_URL ?? "http://localhost:8000"}/api/:path*`,
       },
+      {
+        // WS-чат: в dev проксируем на uvicorn (в проде — nginx /ws/)
+        source: "/ws/:path*",
+        destination: `${process.env.API_URL ?? "http://localhost:8000"}/ws/:path*`,
+      },
     ];
   },
 };

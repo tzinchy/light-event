@@ -69,6 +69,7 @@ def create_app(
     app.include_router(review_router.router)
     app.include_router(complaint_router.router)
     app.include_router(chat_router.router)
+    app.include_router(chat_router.ws_router)
     app.include_router(balance_router.router)
     app.include_router(vacancy_router.router)
     app.include_router(application_router.router)
