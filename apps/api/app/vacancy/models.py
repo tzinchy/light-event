@@ -26,6 +26,7 @@ class Vacancy(TimestampMixin, Base):
     created_by_uuid: Mapped[UUID] = mapped_column(ForeignKey("team_member.team_member_uuid"))
     role_name: Mapped[str] = mapped_column(String(80))
     event_title: Mapped[str] = mapped_column(String(200))
+    description: Mapped[str | None] = mapped_column(String(2000))  # свободный текст «О событии»
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     venue_address: Mapped[str] = mapped_column(String(300))

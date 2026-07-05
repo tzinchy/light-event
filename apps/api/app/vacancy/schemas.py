@@ -9,6 +9,7 @@ class VacancyCreateIn(BaseModel):
     filial_uuid: UUID
     role_name: str = Field(min_length=2, max_length=80)
     event_title: str = Field(min_length=2, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
     starts_at: datetime
     ends_at: datetime
     venue_address: str = Field(min_length=2, max_length=300)
@@ -31,6 +32,7 @@ class VacancyCreateIn(BaseModel):
 class VacancyUpdateIn(BaseModel):
     role_name: str | None = Field(default=None, min_length=2, max_length=80)
     event_title: str | None = Field(default=None, min_length=2, max_length=200)
+    description: str | None = Field(default=None, max_length=2000)
     starts_at: datetime | None = None
     ends_at: datetime | None = None
     venue_address: str | None = Field(default=None, min_length=2, max_length=300)
@@ -52,6 +54,7 @@ class VacancyOut(BaseModel):
     filial_uuid: UUID
     role_name: str
     event_title: str
+    description: str | None
     starts_at: datetime
     ends_at: datetime
     venue_address: str
