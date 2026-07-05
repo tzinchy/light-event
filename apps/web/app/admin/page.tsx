@@ -43,7 +43,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth-context";
 import { formatDateTime, kopToRub, rubInputToKop } from "@/lib/format";
-import { Banknote, MessageSquareWarning } from "lucide-react";
+import { Banknote, LogOut, MessageSquareWarning } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function detailText(error: unknown, fallback: string): string {
@@ -525,12 +525,21 @@ function PriceRow({ price, onSaved }: { price: PriceOut; onSaved: () => void }) 
   );
 }
 
-type TabKey = "companies" | "requests" | "topups" | "payouts" | "complaints" | "pricing";
+type TabKey = "overview" | "companies" | "requests" | "topups" | "payouts" | "complaints" | "pricing";
+
+function adminInitials(text: string | null | undefined): string {
+  const src = (text ?? "").trim();
+  if (!src) return "AD";
+  const parts = src.split(/\s+/).filter(Boolean);
+  return (parts.length >= 2 ? parts[0][0] + parts[1][0] : src.slice(0, 2)).toUpperCase();
+}
+
+const SEVERITY_LABEL: Record<string, string> = { high: "Высокая", medium: "Средняя", low: "Низкая" };
 
 export default function AdminPage() {
   const router = useRouter();
-  const { me, loading: authLoading } = useAuth();
-  const [tab, setTab] = useState<TabKey>("companies");
+  const { me, loading: authLoading, logout } = useAuth();
+  const [tab, setTab] = useState<TabKey>("overview");
   const [companies, setCompanies] = useState<CompanyModerationOut[] | null>(null);
   const [requests, setRequests] = useState<ModerationRequestOut[] | null>(null);
   const [topups, setTopups] = useState<TopupRequestOut[] | null>(null);
@@ -591,68 +600,191 @@ export default function AdminPage() {
     );
   }
 
-  const tabs: { key: TabKey; label: string; count: number }[] = [
+  const NAV: { key: TabKey; label: string; count: number | null }[] = [
+    { key: "overview", label: "Обзор", count: null },
     { key: "companies", label: "Организации", count: companies.length },
     { key: "requests", label: "Публикации", count: requests.length },
     { key: "topups", label: "Пополнения", count: topups.length },
     { key: "payouts", label: "Выплаты", count: payouts.length },
     { key: "complaints", label: "Жалобы", count: complaints.length },
-    { key: "pricing", label: "Тарифы", count: prices.length },
+    { key: "pricing", label: "Тарифы", count: null },
   ];
+  const TITLES: Record<TabKey, { title: string; subtitle: string }> = {
+    overview: { title: "Обзор", subtitle: "Здоровье платформы · реальное время" },
+    companies: { title: "Организации", subtitle: "Заявки на подтверждение" },
+    requests: { title: "Публикации", subtitle: "Модерация событий и тестов" },
+    topups: { title: "Пополнения", subtitle: "Заявки на зачисление средств" },
+    payouts: { title: "Выплаты", subtitle: "Выплаты соискателям по сменам" },
+    complaints: { title: "Жалобы", subtitle: "Открытые споры" },
+    pricing: { title: "Тарифы", subtitle: "Стоимость услуг платформы" },
+  };
+  const head = TITLES[tab];
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-8">
-      <h1 className="text-xl font-bold">Администрирование</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Сводка платформы и очереди модерации.
-      </p>
+    <div className="min-h-screen bg-[#fafafa]">
+      <div className="mx-auto max-w-[1280px] px-4 py-6">
+        <div className="flex min-h-[calc(100vh-3rem)] overflow-hidden rounded-2xl border bg-card shadow-sm">
+          <aside className="hidden w-64 shrink-0 flex-col border-r md:flex">
+            <div className="flex items-center gap-3 border-b px-4 py-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
+                L
+              </div>
+              <div className="min-w-0">
+                <div className="truncate font-semibold">light-event</div>
+                <div className="truncate text-xs text-muted-foreground">Admin Console</div>
+              </div>
+            </div>
 
-      {overview && (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Пользователи", value: String(overview.users_count) },
-            { label: "KYC", value: `${overview.kyc_verified_pct}%` },
-            { label: "Оборот", value: kopToRub(overview.turnover_kop) },
-            { label: "Споры", value: String(overview.open_complaints) },
-          ].map((stat) => (
-            <Card key={stat.label}>
-              <CardContent className="pt-5">
-                <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
-                <div className="mt-1 font-mono text-xl font-semibold">{stat.value}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+            <nav className="flex-1 space-y-0.5 p-3">
+              {NAV.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTab(item.key)}
+                  className={cn(
+                    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium",
+                    tab === item.key
+                      ? "bg-secondary text-foreground"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  )}
+                >
+                  {item.label}
+                  {item.count ? (
+                    <span className="ml-auto rounded-full bg-primary px-1.5 text-xs text-primary-foreground">
+                      {item.count}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </nav>
 
-      <div className="mt-4 flex gap-1.5 overflow-x-auto">
-        {tabs.map((t) => (
-          <button
-            key={t.key}
-            type="button"
-            className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium",
-              tab === t.key
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
-            )}
-            onClick={() => setTab(t.key)}
-          >
-            {t.label}
-            <span
-              className={cn(
-                "rounded-full px-1.5 text-xs",
-                tab === t.key ? "bg-primary-foreground/20" : "bg-secondary",
+            <div className="border-t p-3">
+              <div className="flex items-center gap-3 rounded-xl border px-3 py-2.5">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  {adminInitials(me?.name ?? me?.email)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-medium">{me?.name ?? me?.email ?? "Админ"}</div>
+                  <div className="truncate text-xs text-muted-foreground">Администратор</div>
+                </div>
+                <button
+                  className="shrink-0 text-muted-foreground hover:text-foreground"
+                  title="Выйти"
+                  onClick={() => {
+                    logout();
+                    router.replace("/");
+                  }}
+                >
+                  <LogOut className="size-4" />
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          <main className="min-w-0 flex-1">
+            <nav className="sticky top-0 z-10 flex gap-1.5 overflow-x-auto border-b bg-card px-3 py-2 md:hidden">
+              {NAV.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTab(item.key)}
+                  className={cn(
+                    "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
+                    tab === item.key
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                  )}
+                >
+                  {item.label}
+                  {item.count ? <span className="rounded-full bg-secondary px-1.5">{item.count}</span> : null}
+                </button>
+              ))}
+            </nav>
+
+            <div className="px-6 py-8 md:px-10">
+              <h1 className="text-2xl font-bold tracking-tight">{head.title}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">{head.subtitle}</p>
+
+              {tab === "overview" && (
+                <>
+                  {overview && (
+                    <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                      {[
+                        { label: "Пользователи", value: String(overview.users_count) },
+                        { label: "KYC пройден", value: `${overview.kyc_verified_pct}%` },
+                        { label: "Оборот", value: kopToRub(overview.turnover_kop) },
+                        { label: "Споры", value: String(overview.open_complaints) },
+                      ].map((stat) => (
+                        <Card key={stat.label}>
+                          <CardContent className="pt-5">
+                            <div className="text-sm text-muted-foreground">{stat.label}</div>
+                            <div className="mt-2 text-3xl font-bold tracking-tight">{stat.value}</div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                    <Card>
+                      <CardContent className="pt-5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">Очередь на модерацию</span>
+                          <button
+                            className="text-sm text-muted-foreground hover:text-foreground"
+                            onClick={() => setTab("companies")}
+                          >
+                            Все →
+                          </button>
+                        </div>
+                        <div className="mt-3 space-y-2">
+                          {companies.length === 0 ? (
+                            <p className="py-6 text-center text-sm text-muted-foreground">Очередь пуста</p>
+                          ) : (
+                            companies.slice(0, 5).map((c) => (
+                              <div key={c.company_uuid} className="flex items-center justify-between gap-2">
+                                <span className="truncate text-sm">{c.name}</span>
+                                <span className="shrink-0 text-xs text-muted-foreground">на проверке</span>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="pt-5">
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">Жалобы</span>
+                          <button
+                            className="text-sm text-muted-foreground hover:text-foreground"
+                            onClick={() => setTab("complaints")}
+                          >
+                            Все →
+                          </button>
+                        </div>
+                        <div className="mt-3 space-y-2">
+                          {complaints.length === 0 ? (
+                            <p className="py-6 text-center text-sm text-muted-foreground">Открытых жалоб нет</p>
+                          ) : (
+                            complaints.slice(0, 5).map((c) => (
+                              <div key={c.complaint_uuid} className="flex items-start justify-between gap-2">
+                                <span className="min-w-0 flex-1 truncate text-sm">{c.text}</span>
+                                <span className="shrink-0 text-xs font-medium text-muted-foreground">
+                                  {SEVERITY_LABEL[c.severity] ?? c.severity}
+                                </span>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
               )}
-            >
-              {t.count}
-            </span>
-          </button>
-        ))}
-      </div>
 
-      <div className="mt-5 space-y-3">
-        {tab === "companies" &&
+              <div className="mt-6 space-y-3">
+                {tab === "companies" &&
           (companies.length === 0 ? (
             <EmptyCard text="Пока нет заявок на проверку" />
           ) : (
@@ -694,6 +826,10 @@ export default function AdminPage() {
           ))}
         {tab === "pricing" &&
           prices.map((p) => <PriceRow key={p.key} price={p} onSaved={() => void reload()} />)}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );
