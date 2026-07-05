@@ -110,10 +110,10 @@ function CreateTestForm({
   return (
     <Card className="mt-4">
       <CardHeader>
-        <CardTitle>
-          {DICT.createTest} — {DICT.testCost}
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">{DICT.feeNote}</p>
+        <CardTitle>Новый тест</CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Создание — бесплатно (черновик). Оплата {DICT.testCost} спишется при отправке на модерацию.
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -258,7 +258,7 @@ function CreateTestForm({
         <div className="flex gap-2 border-t pt-4">
           <Button disabled={!valid || busy} onClick={() => void submit()}>
             {busy && <Loader2 className="size-4 animate-spin" />}
-            {DICT.payAndPublish} · {DICT.testCost}
+            Создать черновик
           </Button>
           <Button variant="ghost" onClick={onCancel}>
             Отмена
@@ -316,7 +316,7 @@ export default function OrgTestsPage() {
         {!creating && (
           <Button onClick={() => setCreating(true)}>
             <Plus className="size-4" />
-            {DICT.createTest} — {DICT.testCost}
+            {DICT.createTest}
           </Button>
         )}
       </div>
