@@ -77,6 +77,8 @@ class TopupRequest(TimestampMixin, Base):
     amount_kop: Mapped[int] = mapped_column(BigInteger)
     proof_document_uuid: Mapped[UUID] = mapped_column(ForeignKey("document.document_uuid"))
     payment_details: Mapped[str | None] = mapped_column(String(500))
+    # счёт-получатель платформы, подобранный при создании (PLAN §11.9); None = свободного не нашлось
+    payment_account_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("payment_account.payment_account_uuid"))
     status: Mapped[TopupStatus] = mapped_column(
         Enum(TopupStatus, native_enum=False, length=20), default=TopupStatus.pending
     )

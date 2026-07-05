@@ -22,6 +22,8 @@ from app.core.permissions import ensure_permission
 from app.document.models import DocumentKind
 from app.document.repo import DocumentRepo
 from app.application.models import ApplicationStatus
+from app.notification.service import NotificationService
+from app.payment_account.service import PaymentAccountService
 from app.user.models import User
 
 
@@ -104,14 +106,25 @@ class BalanceService:
         proof = await self.documents.get(data.proof_document_uuid)
         if proof is None or proof.owner_uuid != actor.user_uuid or proof.kind != DocumentKind.payment_proof:
             raise DomainError(404, "Пруф платежа не найден среди ваших документов")
-        return await self.repo.create_topup(
+        # подбираем счёт-получатель платформы (приоритетный, затем по остатку лимита; PLAN §11.9)
+        payment_account = await PaymentAccountService(self.session).select_for_amount(data.amount_kop)
+        topup = await self.repo.create_topup(
             TopupRequest(
                 account_uuid=account.account_uuid,
                 amount_kop=data.amount_kop,
                 proof_document_uuid=data.proof_document_uuid,
                 payment_details=data.payment_details,
+                payment_account_uuid=payment_account.payment_account_uuid if payment_account else None,
             )
         )
+        if payment_account is None:
+            await NotificationService(self.session).notify_admins(
+                "Пополнение без свободного счёта — превышены месячные лимиты", kind="topup_no_account"
+            )
+        else:
+            # реквизиты показываем пополняющему в ответе (не мэпится в БД — транзитный атрибут)
+            topup.payment_requisites = payment_account.requisites
+        return topup
 
     async def list_topup_requests(self) -> list[TopupRequest]:
         return await self.repo.list_topups()

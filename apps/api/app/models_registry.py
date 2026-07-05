@@ -14,6 +14,7 @@ import app.document.models  # noqa: F401
 import app.favorite.models  # noqa: F401
 import app.filial.models  # noqa: F401
 import app.notification.models  # noqa: F401
+import app.payment_account.models  # noqa: F401
 import app.invite.models  # noqa: F401
 import app.pricing.models  # noqa: F401
 import app.review.models  # noqa: F401

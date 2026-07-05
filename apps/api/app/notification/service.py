@@ -1,10 +1,11 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.favorite.repo import FavoriteRepo
 from app.notification.models import Notification
 from app.notification.repo import NotificationRepo
 from app.notification.schemas import NotificationListOut, NotificationOut
-from app.user.models import User
+from app.user.models import PlatformRole, User
 from app.vacancy.models import Vacancy
 
 
@@ -26,6 +27,15 @@ class NotificationService:
                     vacancy_uuid=vacancy.vacancy_uuid,
                 )
             )
+        await self.session.flush()
+
+    async def notify_admins(self, title: str, kind: str = "admin") -> None:
+        """Уведомить всех платформенных админов (напр. пополнение без свободного счёта)."""
+        result = await self.session.execute(
+            select(User.user_uuid).where(User.platform_role == PlatformRole.admin)
+        )
+        for user_uuid in result.scalars():
+            self.repo.add(Notification(user_uuid=user_uuid, kind=kind, title=title))
         await self.session.flush()
 
     async def list(self, actor: User) -> NotificationListOut:

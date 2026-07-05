@@ -37,6 +37,8 @@ class TopupRequestOut(BaseModel):
     amount_kop: int
     proof_document_uuid: UUID
     payment_details: str | None
+    payment_account_uuid: UUID | None = None
+    payment_requisites: str | None = None  # реквизиты подобранного счёта — показать пополняющему
     status: str
     reject_reason: str | None
     reviewed_at: datetime | None
