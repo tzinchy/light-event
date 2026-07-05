@@ -31,10 +31,12 @@ export function MapPicker({
   value,
   onChange,
   className,
+  readOnly = false,
 }: {
   value: MapPoint | null;
-  onChange: (point: MapPoint) => void;
+  onChange?: (point: MapPoint) => void;
   className?: string;
+  readOnly?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -52,10 +54,12 @@ export function MapPicker({
         { center: [center.lat, center.lon], zoom: value ? 14 : 9, controls: ["zoomControl"] },
         { suppressMapOpenBlock: true },
       );
-      map.events.add("click", (e: any) => {
-        const [lat, lon] = e.get("coords");
-        onChangeRef.current({ lat: +lat.toFixed(6), lon: +lon.toFixed(6) });
-      });
+      if (!readOnly) {
+        map.events.add("click", (e: any) => {
+          const [lat, lon] = e.get("coords");
+          onChangeRef.current?.({ lat: +lat.toFixed(6), lon: +lon.toFixed(6) });
+        });
+      }
       if (value) {
         markerRef.current = new ymaps.Placemark([value.lat, value.lon]);
         map.geoObjects.add(markerRef.current);

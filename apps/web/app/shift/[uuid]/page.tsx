@@ -1,16 +1,24 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle2, Loader2, Lock, MapPin, Zap } from "lucide-react";
+import { ArrowLeft, Building2, CheckCircle2, Loader2, Lock, MapPin, Zap } from "lucide-react";
 import {
   applyApiV1VacanciesVacancyUuidApplicationsPost,
+  getCompanyApiV1CompaniesCompanyUuidGet,
   myApplicationsApiV1ApplicationsMyGet,
   vacancyDetailApiV1VacanciesVacancyUuidGet,
+  type CompanyOut,
   type VacancyOut,
 } from "@light-event/shared-types";
+
+const MapPicker = dynamic(() => import("@/components/map-picker").then((m) => m.MapPicker), {
+  ssr: false,
+  loading: () => <div className="h-56 animate-pulse rounded-xl border bg-secondary" />,
+});
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +31,7 @@ export default function ShiftPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const { me, loading } = useAuth();
   const [shift, setShift] = useState<VacancyOut | null>(null);
+  const [company, setCompany] = useState<CompanyOut | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [myStatus, setMyStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -32,8 +41,15 @@ export default function ShiftPage() {
       const { data, error } = await vacancyDetailApiV1VacanciesVacancyUuidGet({
         path: { vacancy_uuid: uuid },
       });
-      if (error || !data) setNotFound(true);
-      else setShift(data);
+      if (error || !data) {
+        setNotFound(true);
+        return;
+      }
+      setShift(data);
+      const { data: co } = await getCompanyApiV1CompaniesCompanyUuidGet({
+        path: { company_uuid: data.company_uuid },
+      });
+      setCompany(co ?? null);
     })();
   }, [uuid]);
 
@@ -104,12 +120,6 @@ export default function ShiftPage() {
               )}
             </div>
             <p className="mt-1 text-muted-foreground">{shift.event_title}</p>
-            <Link
-              href={`/company/${shift.company_uuid}`}
-              className="mt-1 inline-block text-sm text-brand hover:underline"
-            >
-              Профиль организации →
-            </Link>
           </div>
           <div className="shrink-0 text-right">
             <div className="font-mono text-lg font-semibold">
@@ -139,6 +149,38 @@ export default function ShiftPage() {
                   </Badge>
                 ))}
               </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Организатор — отдельным блоком, только название + переход в профиль */}
+        <Link href={`/company/${shift.company_uuid}`} className="mt-4 block">
+          <Card className="transition-colors hover:bg-secondary">
+            <CardContent className="flex items-center gap-3 py-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
+                <Building2 className="size-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-xs text-muted-foreground">Организатор</div>
+                <div className="truncate font-semibold">{company?.name ?? "Организация"}</div>
+              </div>
+              <span className="text-sm text-brand">Профиль →</span>
+            </CardContent>
+          </Card>
+        </Link>
+
+        {/* Место проведения — адрес + Yandex-карта */}
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle className="text-base">Место проведения</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-start gap-1.5 text-sm">
+              <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <span>{shift.venue_address}</span>
+            </div>
+            {shift.lat != null && shift.lon != null && (
+              <MapPicker value={{ lat: shift.lat, lon: shift.lon }} readOnly className="mt-3 h-56" />
             )}
           </CardContent>
         </Card>
