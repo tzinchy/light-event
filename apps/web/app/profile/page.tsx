@@ -8,9 +8,12 @@ import {
   confirmEmailApiV1UsersMeEmailConfirmPost,
   requestEmailCodeApiV1UsersMeEmailPost,
   updateMeApiV1UsersMePatch,
+  userReviewsApiV1UsersUserUuidReviewsGet,
+  type ReviewListOut,
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ReviewList } from "@/components/review-list";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpInput, OTP_LENGTH } from "@/components/otp-input";
@@ -166,6 +169,38 @@ function ProfileFields() {
   );
 }
 
+function MyReviewsBlock() {
+  const { me } = useAuth();
+  const [reviews, setReviews] = useState<ReviewListOut | null>(null);
+
+  useEffect(() => {
+    if (!me) return;
+    void (async () => {
+      const { data } = await userReviewsApiV1UsersUserUuidReviewsGet({
+        path: { user_uuid: me.user_uuid },
+      });
+      setReviews(data ?? null);
+    })();
+  }, [me]);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Отзывы обо мне</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {reviews === null ? (
+          <div className="flex justify-center py-6 text-muted-foreground">
+            <Loader2 className="size-5 animate-spin" />
+          </div>
+        ) : (
+          <ReviewList data={reviews} emptyText="Пока нет отзывов — они появятся после первых смен" />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function ProfilePage() {
   const router = useRouter();
   const { me, loading } = useAuth();
@@ -189,6 +224,7 @@ export default function ProfilePage() {
         <h1 className="text-xl font-bold">Профиль</h1>
         <ProfileFields />
         <EmailBlock />
+        <MyReviewsBlock />
       </main>
     </>
   );

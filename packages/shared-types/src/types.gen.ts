@@ -3367,6 +3367,10 @@ export type FeedApiV1VacanciesGetData = {
          * Date To
          */
         date_to?: string | null;
+        /**
+         * Company Uuid
+         */
+        company_uuid?: string | null;
     };
     url: '/api/v1/vacancies';
 };

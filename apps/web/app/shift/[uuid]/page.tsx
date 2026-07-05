@@ -104,6 +104,12 @@ export default function ShiftPage() {
               )}
             </div>
             <p className="mt-1 text-muted-foreground">{shift.event_title}</p>
+            <Link
+              href={`/company/${shift.company_uuid}`}
+              className="mt-1 inline-block text-sm text-brand hover:underline"
+            >
+              Профиль организации →
+            </Link>
           </div>
           <div className="shrink-0 text-right">
             <div className="font-mono text-lg font-semibold">
