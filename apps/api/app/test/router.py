@@ -108,6 +108,7 @@ async def start_attempt(
     attempt, questions = await service.start_attempt(user, test_uuid)
     return AttemptWithQuestionsOut(
         **AttemptOut.model_validate(attempt).model_dump(),
+        answers=attempt.answers,
         questions=[QuestionOut.model_validate(q) for q in questions],
     )
 

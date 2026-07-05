@@ -45,6 +45,7 @@ class TestService:
             title=data.title,
             topic=data.topic,
             description=data.description,
+            materials=data.materials,
             min_correct=data.min_correct,
             status=TestStatus.draft,
         )
@@ -87,6 +88,8 @@ class TestService:
             kind=TestKind.platform,
             title=data.title,
             topic=data.topic,
+            description=data.description,
+            materials=data.materials,
             min_correct=data.min_correct,
             status=TestStatus.published,
         )
@@ -141,7 +144,8 @@ class TestService:
         existing = await self.repo.active_or_cooldown_attempt(test_uuid, actor.user_uuid)
         if existing is not None:
             if existing.status == AttemptStatus.in_progress:
-                raise DomainError(409, "У вас уже есть незавершённая попытка")
+                # возобновляем незавершённую попытку — отдаём её с сохранёнными ответами
+                return existing, await self.repo.questions(test_uuid)
             if existing.cooldown_until and existing.cooldown_until > datetime.now(UTC):
                 raise DomainError(409, "Повторная попытка будет доступна позже")
         attempt = TestAttempt(test_uuid=test_uuid, user_uuid=actor.user_uuid)

@@ -36,6 +36,8 @@ class Test(TimestampMixin, Base):
     title: Mapped[str] = mapped_column(String(200))
     topic: Mapped[str] = mapped_column(String(120))
     description: Mapped[str | None] = mapped_column(String(1000))
+    # материалы для подготовки (текст/ссылки), видны до начала прохождения — PLAN §3.3
+    materials: Mapped[str | None] = mapped_column(String(4000))
     min_correct: Mapped[int]
     price_kop: Mapped[int | None] = mapped_column(BigInteger)
     status: Mapped[TestStatus] = mapped_column(

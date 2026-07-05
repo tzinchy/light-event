@@ -24,6 +24,7 @@ class TestCreateIn(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     topic: str = Field(min_length=2, max_length=120)
     description: str | None = Field(default=None, max_length=1000)
+    materials: str | None = Field(default=None, max_length=4000)
     min_correct: int = Field(ge=1)
     questions: list[QuestionIn] = Field(min_length=1, max_length=50)
 
@@ -43,6 +44,7 @@ class TestOut(BaseModel):
     title: str
     topic: str
     description: str | None
+    materials: str | None
     min_correct: int
     status: str
     reject_reason: str | None
@@ -96,6 +98,7 @@ class AttemptOut(BaseModel):
 
 class AttemptWithQuestionsOut(AttemptOut):
     questions: list[QuestionOut]
+    answers: dict = {}  # сохранённые ответы {question_uuid: [индексы]} — для возобновления попытки
 
 
 class AnswerIn(BaseModel):

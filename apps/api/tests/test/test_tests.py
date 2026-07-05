@@ -349,3 +349,33 @@ async def test_company_test_badge_in_applications(client, login_user, make_admin
     ).json()
     by_user = {r["user_uuid"]: r for r in rows}
     assert by_user[other["me"]["user_uuid"]]["company_test_passed"] is False
+
+
+async def test_resume_in_progress_attempt_keeps_answers(client, login_user, make_admin):
+    ctx = await setup_company(client, login_user, make_admin, "+7905129090")
+    test = await create_company_test(client, ctx)
+    worker = await login_user("+79051290903")
+
+    a1 = (await start_attempt(client, worker["headers"], test["test_uuid"])).json()
+    q0 = a1["questions"][0]
+    await client.post(
+        f"/api/v1/attempts/{a1['test_attempt_uuid']}/answers",
+        json={"test_question_uuid": q0["test_question_uuid"], "selected_indices": [0]},
+        headers=worker["headers"],
+    )
+
+    # повторное открытие теста возобновляет ту же попытку с сохранёнными ответами
+    a2 = (await start_attempt(client, worker["headers"], test["test_uuid"])).json()
+    assert a2["test_attempt_uuid"] == a1["test_attempt_uuid"]
+    assert a2["answers"].get(q0["test_question_uuid"]) == [0]
+
+
+async def test_test_carries_materials(client, login_user, make_admin):
+    ctx = await setup_company(client, login_user, make_admin, "+7905129095")
+    resp = await client.post(
+        f"/api/v1/companies/{ctx['company_uuid']}/tests",
+        json=test_payload(materials="Изучите стандарты сервиса: https://example.com/guide"),
+        headers=ctx["owner"]["headers"],
+    )
+    assert resp.status_code == 201, resp.text
+    assert resp.json()["materials"] == "Изучите стандарты сервиса: https://example.com/guide"
