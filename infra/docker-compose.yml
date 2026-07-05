@@ -99,6 +99,8 @@ services:
     build:
       context: ..
       dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_YANDEX_MAPS_KEY: ${NEXT_PUBLIC_YANDEX_MAPS_KEY:-}
     depends_on:
       - api
 

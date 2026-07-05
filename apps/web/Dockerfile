@@ -11,6 +11,9 @@ RUN pnpm install --frozen-lockfile --filter web --filter @light-event/shared-typ
 COPY packages/shared-types packages/shared-types
 COPY apps/web apps/web
 ENV NEXT_TELEMETRY_DISABLED=1
+# NEXT_PUBLIC_* инлайнятся при сборке — ключ Yandex Maps прокидывается build-аргументом
+ARG NEXT_PUBLIC_YANDEX_MAPS_KEY
+ENV NEXT_PUBLIC_YANDEX_MAPS_KEY=$NEXT_PUBLIC_YANDEX_MAPS_KEY
 RUN pnpm --filter web build
 
 FROM node:22-alpine AS runtime
