@@ -255,14 +255,22 @@ function CreateTestForm({
           </div>
         </div>
 
-        <div className="flex gap-2 border-t pt-4">
-          <Button disabled={!valid || busy} onClick={() => void submit()}>
-            {busy && <Loader2 className="size-4 animate-spin" />}
-            Создать черновик
-          </Button>
-          <Button variant="ghost" onClick={onCancel}>
-            Отмена
-          </Button>
+        <div className="border-t pt-4">
+          {!valid && (
+            <p className="mb-2 text-xs text-muted-foreground">
+              Чтобы создать: заполните название и тему, а в каждом вопросе — текст, минимум два варианта
+              и <b>отметьте галочкой верные ответы</b>.
+            </p>
+          )}
+          <div className="flex gap-2">
+            <Button disabled={!valid || busy} onClick={() => void submit()}>
+              {busy && <Loader2 className="size-4 animate-spin" />}
+              Создать черновик
+            </Button>
+            <Button variant="ghost" onClick={onCancel}>
+              Отмена
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -355,10 +363,16 @@ export default function OrgTestsPage() {
                     {test.status === "rejected" && test.reject_reason && (
                       <div className="mt-1 text-sm text-status-danger">{test.reject_reason}</div>
                     )}
+                    {test.status === "draft" && (
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        Черновик сохранён. Отправьте на модерацию — {DICT.testCost} спишутся со счёта,
+                        затем админ проверит и опубликует.
+                      </div>
+                    )}
                   </div>
                   {test.status === "draft" ? (
                     <Button size="sm" onClick={() => void submitForModeration(test.test_uuid)}>
-                      На модерацию · {DICT.testCost}
+                      Отправить на модерацию · {DICT.testCost}
                     </Button>
                   ) : (
                     <div className="text-sm text-muted-foreground">
