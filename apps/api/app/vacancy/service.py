@@ -10,6 +10,7 @@ from app.core.config import Settings
 from app.core.errors import DomainError
 from app.core.permissions import ensure_membership, ensure_permission
 from app.filial.repo import FilialRepo
+from app.notification.service import NotificationService
 from app.pricing.service import PricingService
 from app.test.repo import TestRepo
 from app.user.models import User
@@ -118,6 +119,9 @@ class VacancyService:
             vacancy.status = VacancyStatus.rejected
             vacancy.reject_reason = data.reason
         await self.session.flush()
+        if vacancy.status == VacancyStatus.active:
+            # смена опубликована — уведомляем подписчиков компании (PLAN §11.8)
+            await NotificationService(self.session).notify_new_vacancy(vacancy)
         return vacancy
 
     async def feed(
