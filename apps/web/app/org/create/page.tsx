@@ -122,6 +122,7 @@ export default function CreateEventPage() {
   const [filialUuid, setFilialUuid] = useState<string>("");
   const [role, setRole] = useState<string>(ROLES[0]);
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
   const [timeFrom, setTimeFrom] = useState("16:00");
   const [timeTo, setTimeTo] = useState("23:00");
@@ -185,6 +186,7 @@ export default function CreateEventPage() {
         filial_uuid: filialUuid,
         role_name: role,
         event_title: title.trim(),
+        description: description.trim() || null,
         starts_at: `${date}T${timeFrom}:00+03:00`,
         ends_at: `${date}T${timeTo}:00+03:00`,
         venue_address: filial.address,
@@ -257,6 +259,18 @@ export default function CreateEventPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Свадебный банкет"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="event-desc">О событии</Label>
+            <textarea
+              id="event-desc"
+              className="mt-1.5 min-h-24 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Формат, программа, что делать на смене — свободным текстом"
+              maxLength={2000}
             />
           </div>
 

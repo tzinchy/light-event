@@ -143,6 +143,17 @@ export default function ShiftPage() {
           </CardContent>
         </Card>
 
+        {shift.description && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="text-base">О событии</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="whitespace-pre-line text-sm text-muted-foreground">{shift.description}</p>
+            </CardContent>
+          </Card>
+        )}
+
         {shift.requirements.length > 0 && (
           <Card className="mt-4">
             <CardHeader>

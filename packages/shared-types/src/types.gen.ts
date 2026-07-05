@@ -667,6 +667,10 @@ export type FeedItemOut = {
      */
     event_title: string;
     /**
+     * Description
+     */
+    description: string | null;
+    /**
      * Starts At
      */
     starts_at: string;
@@ -1801,6 +1805,10 @@ export type VacancyCreateIn = {
      */
     event_title: string;
     /**
+     * Description
+     */
+    description?: string | null;
+    /**
      * Starts At
      */
     starts_at: string;
@@ -1870,6 +1878,10 @@ export type VacancyOut = {
      * Event Title
      */
     event_title: string;
+    /**
+     * Description
+     */
+    description: string | null;
     /**
      * Starts At
      */
@@ -1948,6 +1960,10 @@ export type VacancyUpdateIn = {
      * Event Title
      */
     event_title?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
     /**
      * Starts At
      */
