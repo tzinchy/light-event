@@ -56,7 +56,7 @@ export function OtpInput({
   };
 
   return (
-    <div className="flex justify-center gap-2" role="group" aria-label="Код из SMS">
+    <div className="flex justify-center gap-2" role="group" aria-label="Код подтверждения">
       {Array.from({ length: OTP_LENGTH }, (_, i) => (
         <input
           key={i}
