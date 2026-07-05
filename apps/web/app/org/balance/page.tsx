@@ -8,6 +8,7 @@ import {
   companyOperationsApiV1CompaniesCompanyUuidAccountOperationsGet,
   companyPayoutsApiV1CompaniesCompanyUuidPayoutsGet,
   createTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPost,
+  topupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGet,
   uploadDocumentApiV1DocumentsPost,
   type AccountOut,
   type OperationOut,
@@ -57,9 +58,32 @@ function TopupDialog({
   const [amount, setAmount] = useState("");
   const [proof, setProof] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
+  const [requisites, setRequisites] = useState<{ account_name?: string | null; requisites?: string | null } | null>(
+    null,
+  );
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const amountKop = rubInputToKop(amount);
+
+  // как только введена сумма — показываем, на какой счёт переводить (подбирается автоматически)
+  useEffect(() => {
+    if (!amountKop) {
+      setRequisites(null);
+      return;
+    }
+    let active = true;
+    const t = setTimeout(async () => {
+      const { data } = await topupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGet({
+        path: { company_uuid: companyUuid },
+        query: { amount_kop: amountKop },
+      });
+      if (active) setRequisites(data ?? null);
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
+  }, [amountKop, companyUuid]);
 
   async function submit() {
     if (!amountKop || !proof) return;
@@ -115,6 +139,24 @@ function TopupDialog({
             onChange={(e) => setAmount(e.target.value)}
             placeholder="200 000"
           />
+
+          {amountKop && requisites && (
+            <div className="mt-3 rounded-xl border bg-secondary/40 p-3 text-sm">
+              {requisites.requisites ? (
+                <>
+                  <div className="text-xs font-medium text-muted-foreground">
+                    Переведите на счёт{requisites.account_name ? ` «${requisites.account_name}»` : ""}:
+                  </div>
+                  <div className="mt-1 whitespace-pre-line font-medium">{requisites.requisites}</div>
+                </>
+              ) : (
+                <div className="text-muted-foreground">
+                  Реквизиты подберёт администратор — заявку можно отправить, зачислят после проверки.
+                </div>
+              )}
+            </div>
+          )}
+
           <Button
             variant="outline"
             className="mt-3 w-full"

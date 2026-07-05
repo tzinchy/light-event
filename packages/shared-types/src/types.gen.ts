@@ -444,6 +444,10 @@ export type CompanyTestItemOut = {
      */
     topic: string;
     /**
+     * Description
+     */
+    description: string | null;
+    /**
      * Min Correct
      */
     min_correct: number;
@@ -1204,6 +1208,84 @@ export type OverviewOut = {
 };
 
 /**
+ * PaymentAccountCreateIn
+ */
+export type PaymentAccountCreateIn = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Requisites
+     */
+    requisites: string;
+    /**
+     * Monthly Limit Kop
+     */
+    monthly_limit_kop: number;
+    /**
+     * Is Priority
+     */
+    is_priority?: boolean;
+};
+
+/**
+ * PaymentAccountOut
+ */
+export type PaymentAccountOut = {
+    /**
+     * Payment Account Uuid
+     */
+    payment_account_uuid: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Requisites
+     */
+    requisites: string;
+    /**
+     * Monthly Limit Kop
+     */
+    monthly_limit_kop: number;
+    /**
+     * Is Priority
+     */
+    is_priority: boolean;
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Received This Month Kop
+     */
+    received_this_month_kop?: number;
+};
+
+/**
+ * PaymentAccountUpdateIn
+ */
+export type PaymentAccountUpdateIn = {
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Requisites
+     */
+    requisites?: string | null;
+    /**
+     * Monthly Limit Kop
+     */
+    monthly_limit_kop?: number | null;
+    /**
+     * Active
+     */
+    active?: boolean | null;
+};
+
+/**
  * PayoutOut
  */
 export type PayoutOut = {
@@ -1510,6 +1592,10 @@ export type TestCreateIn = {
      */
     topic: string;
     /**
+     * Description
+     */
+    description?: string | null;
+    /**
      * Min Correct
      */
     min_correct: number;
@@ -1544,6 +1630,10 @@ export type TestListItemOut = {
      * Topic
      */
     topic: string;
+    /**
+     * Description
+     */
+    description: string | null;
     /**
      * Min Correct
      */
@@ -1599,6 +1689,10 @@ export type TestOut = {
      * Topic
      */
     topic: string;
+    /**
+     * Description
+     */
+    description: string | null;
     /**
      * Min Correct
      */
@@ -1745,6 +1839,14 @@ export type TopupRequestOut = {
      */
     payment_details: string | null;
     /**
+     * Payment Account Uuid
+     */
+    payment_account_uuid?: string | null;
+    /**
+     * Payment Requisites
+     */
+    payment_requisites?: string | null;
+    /**
      * Status
      */
     status: string;
@@ -1760,6 +1862,21 @@ export type TopupRequestOut = {
      * Created At
      */
     created_at: string;
+};
+
+/**
+ * TopupRequisitesOut
+ * Реквизиты счёта, на который платформа предлагает перевести пополнение (PLAN §11.9).
+ */
+export type TopupRequisitesOut = {
+    /**
+     * Account Name
+     */
+    account_name?: string | null;
+    /**
+     * Requisites
+     */
+    requisites?: string | null;
 };
 
 /**
@@ -2954,6 +3071,108 @@ export type MarkReadApiV1NotificationsReadPostResponses = {
 
 export type MarkReadApiV1NotificationsReadPostResponse = MarkReadApiV1NotificationsReadPostResponses[keyof MarkReadApiV1NotificationsReadPostResponses];
 
+export type ListAccountsApiV1AdminPaymentAccountsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/payment-accounts';
+};
+
+export type ListAccountsApiV1AdminPaymentAccountsGetResponses = {
+    /**
+     * Response List Accounts Api V1 Admin Payment Accounts Get
+     * Successful Response
+     */
+    200: Array<PaymentAccountOut>;
+};
+
+export type ListAccountsApiV1AdminPaymentAccountsGetResponse = ListAccountsApiV1AdminPaymentAccountsGetResponses[keyof ListAccountsApiV1AdminPaymentAccountsGetResponses];
+
+export type CreateAccountApiV1AdminPaymentAccountsPostData = {
+    body: PaymentAccountCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/payment-accounts';
+};
+
+export type CreateAccountApiV1AdminPaymentAccountsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateAccountApiV1AdminPaymentAccountsPostError = CreateAccountApiV1AdminPaymentAccountsPostErrors[keyof CreateAccountApiV1AdminPaymentAccountsPostErrors];
+
+export type CreateAccountApiV1AdminPaymentAccountsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: PaymentAccountOut;
+};
+
+export type CreateAccountApiV1AdminPaymentAccountsPostResponse = CreateAccountApiV1AdminPaymentAccountsPostResponses[keyof CreateAccountApiV1AdminPaymentAccountsPostResponses];
+
+export type UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchData = {
+    body: PaymentAccountUpdateIn;
+    path: {
+        /**
+         * Payment Account Uuid
+         */
+        payment_account_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/payment-accounts/{payment_account_uuid}';
+};
+
+export type UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchError = UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchErrors[keyof UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchErrors];
+
+export type UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: PaymentAccountOut;
+};
+
+export type UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchResponse = UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchResponses[keyof UpdateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatchResponses];
+
+export type SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostData = {
+    body?: never;
+    path: {
+        /**
+         * Payment Account Uuid
+         */
+        payment_account_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/payment-accounts/{payment_account_uuid}/priority';
+};
+
+export type SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostError = SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostErrors[keyof SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostErrors];
+
+export type SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: PaymentAccountOut;
+};
+
+export type SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostResponse = SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostResponses[keyof SetPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPostResponses];
+
 export type ListPricesApiV1AdminPricingGetData = {
     body?: never;
     path?: never;
@@ -3374,6 +3593,41 @@ export type CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetRespon
 };
 
 export type CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponse = CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses[keyof CompanyOperationsApiV1CompaniesCompanyUuidAccountOperationsGetResponses];
+
+export type TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query: {
+        /**
+         * Amount Kop
+         */
+        amount_kop: number;
+    };
+    url: '/api/v1/companies/{company_uuid}/topup-requisites';
+};
+
+export type TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetError = TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetErrors[keyof TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetErrors];
+
+export type TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: TopupRequisitesOut;
+};
+
+export type TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetResponse = TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetResponses[keyof TopupRequisitesApiV1CompaniesCompanyUuidTopupRequisitesGetResponses];
 
 export type CreateTopupRequestApiV1CompaniesCompanyUuidTopupRequestsPostData = {
     body: TopupCreateIn;
@@ -4134,6 +4388,36 @@ export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses = {
 };
 
 export type CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponse = CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses[keyof CreateCompanyTestApiV1CompaniesCompanyUuidTestsPostResponses];
+
+export type SubmitTestApiV1TestsTestUuidSubmitPostData = {
+    body?: never;
+    path: {
+        /**
+         * Test Uuid
+         */
+        test_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/tests/{test_uuid}/submit';
+};
+
+export type SubmitTestApiV1TestsTestUuidSubmitPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SubmitTestApiV1TestsTestUuidSubmitPostError = SubmitTestApiV1TestsTestUuidSubmitPostErrors[keyof SubmitTestApiV1TestsTestUuidSubmitPostErrors];
+
+export type SubmitTestApiV1TestsTestUuidSubmitPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: TestOut;
+};
+
+export type SubmitTestApiV1TestsTestUuidSubmitPostResponse = SubmitTestApiV1TestsTestUuidSubmitPostResponses[keyof SubmitTestApiV1TestsTestUuidSubmitPostResponses];
 
 export type CreatePlatformTestApiV1AdminTestsPostData = {
     body: TestCreateIn;

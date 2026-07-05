@@ -21,6 +21,11 @@ import {
   adminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePost,
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
+  createAccountApiV1AdminPaymentAccountsPost,
+  listAccountsApiV1AdminPaymentAccountsGet,
+  setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost,
+  updateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatch,
+  type PaymentAccountOut,
   listCompaniesApiV1AdminCompaniesGet,
   listPricesApiV1AdminPricingGet,
   listRequestsApiV1AdminRequestsGet,
@@ -541,7 +546,156 @@ function PriceRow({ price, onSaved }: { price: PriceOut; onSaved: () => void }) 
   );
 }
 
-type TabKey = "overview" | "companies" | "requests" | "topups" | "payouts" | "complaints" | "pricing";
+function PaymentAccountsPanel() {
+  const [accounts, setAccounts] = useState<PaymentAccountOut[] | null>(null);
+  const [name, setName] = useState("");
+  const [requisites, setRequisites] = useState("");
+  const [limitRub, setLimitRub] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const reload = useCallback(async () => {
+    const { data } = await listAccountsApiV1AdminPaymentAccountsGet();
+    setAccounts(data ?? []);
+  }, []);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  async function create() {
+    const kop = rubInputToKop(limitRub);
+    if (name.trim().length < 2 || requisites.trim().length < 2 || !kop) return;
+    setBusy(true);
+    const { error } = await createAccountApiV1AdminPaymentAccountsPost({
+      body: {
+        name: name.trim(),
+        requisites: requisites.trim(),
+        monthly_limit_kop: kop,
+        is_priority: (accounts ?? []).length === 0, // первый счёт сразу приоритетный
+      },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось создать счёт"));
+      return;
+    }
+    setName("");
+    setRequisites("");
+    setLimitRub("");
+    void reload();
+  }
+
+  async function makePriority(uuid: string) {
+    await setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost({
+      path: { payment_account_uuid: uuid },
+    });
+    void reload();
+  }
+
+  async function toggleActive(acc: PaymentAccountOut) {
+    await updateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatch({
+      path: { payment_account_uuid: acc.payment_account_uuid },
+      body: { active: !acc.active },
+    });
+    void reload();
+  }
+
+  if (accounts === null) {
+    return (
+      <div className="flex justify-center py-10 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="space-y-3 pt-5">
+          <div className="font-semibold">Новый счёт для приёма пополнений</div>
+          <Input placeholder="Название (напр. «Карта Сбер»)" value={name} onChange={(e) => setName(e.target.value)} />
+          <textarea
+            className="min-h-16 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            placeholder="Реквизиты: банк, номер карты/счёта, получатель"
+            value={requisites}
+            onChange={(e) => setRequisites(e.target.value)}
+          />
+          <div className="flex items-center gap-2">
+            <Input
+              className="w-48"
+              inputMode="numeric"
+              placeholder="Лимit в месяц, ₽"
+              value={limitRub}
+              onChange={(e) => setLimitRub(e.target.value.replace(/[^\d]/g, ""))}
+            />
+            <Button size="sm" disabled={busy} onClick={() => void create()}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : "Добавить счёт"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {accounts.length === 0 ? (
+        <EmptyCard text="Счетов пока нет — добавьте хотя бы один для приёма пополнений" />
+      ) : (
+        accounts.map((acc) => {
+          const received = acc.received_this_month_kop ?? 0;
+          const pct = Math.min(100, Math.round((received / acc.monthly_limit_kop) * 100));
+          return (
+            <Card key={acc.payment_account_uuid} className={cn(!acc.active && "opacity-60")}>
+              <CardContent className="pt-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{acc.name}</span>
+                      {acc.is_priority && (
+                        <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand-strong">
+                          Приоритетный
+                        </span>
+                      )}
+                      {!acc.active && <span className="text-xs text-muted-foreground">выключен</span>}
+                    </div>
+                    <div className="mt-0.5 whitespace-pre-line text-sm text-muted-foreground">{acc.requisites}</div>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    {!acc.is_priority && acc.active && (
+                      <Button variant="outline" size="sm" onClick={() => void makePriority(acc.payment_account_uuid)}>
+                        Сделать основным
+                      </Button>
+                    )}
+                    <Button variant="ghost" size="sm" onClick={() => void toggleActive(acc)}>
+                      {acc.active ? "Выключить" : "Включить"}
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Принято за месяц</span>
+                    <span className="font-mono">
+                      {kopToRub(received)} / {kopToRub(acc.monthly_limit_kop)}
+                    </span>
+                  </div>
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-secondary">
+                    <div className={cn("h-full", pct >= 100 ? "bg-status-danger" : "bg-brand")} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+type TabKey =
+  | "overview"
+  | "companies"
+  | "requests"
+  | "topups"
+  | "payouts"
+  | "complaints"
+  | "pricing"
+  | "accounts";
 
 function adminInitials(text: string | null | undefined): string {
   const src = (text ?? "").trim();
@@ -623,6 +777,7 @@ export default function AdminPage() {
     { key: "topups", label: "Пополнения", count: topups.length },
     { key: "payouts", label: "Выплаты", count: payouts.length },
     { key: "complaints", label: "Жалобы", count: complaints.length },
+    { key: "accounts", label: "Счета", count: null },
     { key: "pricing", label: "Тарифы", count: null },
   ];
   const TITLES: Record<TabKey, { title: string; subtitle: string }> = {
@@ -632,6 +787,7 @@ export default function AdminPage() {
     topups: { title: "Пополнения", subtitle: "Заявки на зачисление средств" },
     payouts: { title: "Выплаты", subtitle: "Выплаты соискателям по сменам" },
     complaints: { title: "Жалобы", subtitle: "Открытые споры" },
+    accounts: { title: "Счета", subtitle: "Приём пополнений · лимиты по месяцам" },
     pricing: { title: "Тарифы", subtitle: "Стоимость услуг платформы" },
   };
   const head = TITLES[tab];
@@ -840,6 +996,7 @@ export default function AdminPage() {
               <TopupCard key={t.topup_request_uuid} topup={t} onDone={() => void reload()} />
             ))
           ))}
+        {tab === "accounts" && <PaymentAccountsPanel />}
         {tab === "pricing" &&
           prices.map((p) => <PriceRow key={p.key} price={p} onSaved={() => void reload()} />)}
               </div>
