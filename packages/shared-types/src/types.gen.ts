@@ -166,6 +166,12 @@ export type AttemptWithQuestionsOut = {
      * Questions
      */
     questions: Array<QuestionOut>;
+    /**
+     * Answers
+     */
+    answers?: {
+        [key: string]: unknown;
+    };
 };
 
 /**
@@ -471,6 +477,10 @@ export type CompanyTestItemOut = {
      * Description
      */
     description: string | null;
+    /**
+     * Materials
+     */
+    materials: string | null;
     /**
      * Min Correct
      */
@@ -1620,6 +1630,10 @@ export type TestCreateIn = {
      */
     description?: string | null;
     /**
+     * Materials
+     */
+    materials?: string | null;
+    /**
      * Min Correct
      */
     min_correct: number;
@@ -1658,6 +1672,10 @@ export type TestListItemOut = {
      * Description
      */
     description: string | null;
+    /**
+     * Materials
+     */
+    materials: string | null;
     /**
      * Min Correct
      */
@@ -1717,6 +1735,10 @@ export type TestOut = {
      * Description
      */
     description: string | null;
+    /**
+     * Materials
+     */
+    materials: string | null;
     /**
      * Min Correct
      */
