@@ -126,6 +126,14 @@ class BalanceService:
             topup.payment_requisites = payment_account.requisites
         return topup
 
+    async def topup_requisites(self, actor: User, company_uuid: UUID, amount_kop: int) -> dict:
+        """Реквизиты счёта под сумму — показать пополняющему до перевода (PLAN §11.9)."""
+        await self.get_company_account(actor, company_uuid)  # проверка членства
+        account = await PaymentAccountService(self.session).select_for_amount(amount_kop)
+        if account is None:
+            return {"account_name": None, "requisites": None}
+        return {"account_name": account.name, "requisites": account.requisites}
+
     async def list_topup_requests(self) -> list[TopupRequest]:
         return await self.repo.list_topups()
 

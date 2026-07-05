@@ -49,6 +49,13 @@ async def test_priority_account_selected_then_fallback_then_notify(client, login
     priority = await _create_account(client, admin, "Карта А", 100_000, priority=True)
     backup = await _create_account(client, admin, "Карта Б", 100_000)
 
+    # превью реквизитов до перевода: под 80 000 — приоритетный счёт
+    prev = await client.get(
+        f"/api/v1/companies/{company_uuid}/topup-requisites?amount_kop=80000", headers=ctx["owner"]["headers"]
+    )
+    assert prev.status_code == 200
+    assert prev.json()["requisites"] == "Реквизиты Карта А"
+
     # влезает в приоритетный → выбран он, реквизиты в ответе
     t1 = await _topup(client, ctx["owner"]["headers"], company_uuid, 80_000)
     assert t1["payment_account_uuid"] == priority["payment_account_uuid"]

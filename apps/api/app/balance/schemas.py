@@ -5,6 +5,13 @@ from uuid import UUID
 from pydantic import BaseModel, Field
 
 
+class TopupRequisitesOut(BaseModel):
+    """Реквизиты счёта, на который платформа предлагает перевести пополнение (PLAN §11.9)."""
+
+    account_name: str | None = None
+    requisites: str | None = None
+
+
 class AccountOut(BaseModel):
     model_config = {"from_attributes": True}
 

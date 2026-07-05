@@ -9,6 +9,7 @@ from app.balance.schemas import (
     PayoutOut,
     TopupCreateIn,
     TopupRequestOut,
+    TopupRequisitesOut,
     TopupResolveIn,
 )
 from app.balance.service import BalanceService
@@ -39,6 +40,16 @@ async def company_operations(
     service: BalanceService = Depends(get_balance_service),
 ) -> list[OperationOut]:
     return await service.list_company_operations(user, company_uuid)
+
+
+@router.get("/companies/{company_uuid}/topup-requisites", response_model=TopupRequisitesOut)
+async def topup_requisites(
+    company_uuid: UUID,
+    amount_kop: int,
+    user: User = Depends(get_current_user),
+    service: BalanceService = Depends(get_balance_service),
+) -> TopupRequisitesOut:
+    return TopupRequisitesOut(**await service.topup_requisites(user, company_uuid, amount_kop))
 
 
 @router.post("/companies/{company_uuid}/topup-requests", response_model=TopupRequestOut, status_code=201)
