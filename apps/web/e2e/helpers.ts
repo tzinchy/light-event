@@ -1,5 +1,17 @@
 import { execFileSync } from "node:child_process";
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
+
+/** Кликнуть точку на Yandex-карте (map-picker), дождавшись готовности API — иначе клик до
+ * инициализации карты не ставит маркер. `scope` — страница или диалог, где искать карту. */
+export async function pickMapPoint(page: Page, scope: Page | Locator = page): Promise<void> {
+  await page.waitForFunction(() => Boolean((window as unknown as { ymaps?: { Map?: unknown } }).ymaps?.Map), null, {
+    timeout: 20000,
+  });
+  const map = scope.locator('[data-testid="map-picker"]');
+  await map.waitFor();
+  await page.waitForTimeout(2000); // дать карте проинициализировать слой событий
+  await map.click({ position: { x: 200, y: 120 } });
+}
 
 const MAILPIT_URL = process.env.E2E_MAILPIT_URL ?? "http://localhost:8025";
 
