@@ -45,6 +45,7 @@ class VacancyRepo:
         role: str | None = None,
         date_from: datetime | None = None,
         date_to: datetime | None = None,
+        company_uuid: UUID | None = None,
     ) -> list[tuple[Vacancy, Company, int]]:
         query = (
             select(Vacancy, Company, _filled_subquery().label("filled"))
@@ -52,6 +53,8 @@ class VacancyRepo:
             .where(Vacancy.status == VacancyStatus.active, Vacancy.archived_at.is_(None))
             .order_by(Vacancy.starts_at)
         )
+        if company_uuid:
+            query = query.where(Vacancy.company_uuid == company_uuid)
         if role:
             query = query.where(Vacancy.role_name == role)
         if date_from:

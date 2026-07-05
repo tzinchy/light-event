@@ -22,9 +22,10 @@ async def feed(
     role: str | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
+    company_uuid: UUID | None = None,
     service: VacancyService = Depends(get_vacancy_service),
 ) -> list[FeedItemOut]:
-    rows = await service.feed(role=role, date_from=date_from, date_to=date_to)
+    rows = await service.feed(role=role, date_from=date_from, date_to=date_to, company_uuid=company_uuid)
     return [
         FeedItemOut(
             **VacancyOut.model_validate(vacancy).model_dump(), company_name=company.name, filled=filled

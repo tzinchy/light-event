@@ -120,8 +120,17 @@ class VacancyService:
         await self.session.flush()
         return vacancy
 
-    async def feed(self, *, role: str | None, date_from: datetime | None, date_to: datetime | None):
-        return await self.vacancies.list_feed(role=role, date_from=date_from, date_to=date_to)
+    async def feed(
+        self,
+        *,
+        role: str | None,
+        date_from: datetime | None,
+        date_to: datetime | None,
+        company_uuid: UUID | None = None,
+    ):
+        return await self.vacancies.list_feed(
+            role=role, date_from=date_from, date_to=date_to, company_uuid=company_uuid
+        )
 
     async def list_by_company(self, actor: User, company_uuid: UUID) -> list[Vacancy]:
         await ensure_membership(self.session, actor, company_uuid)
