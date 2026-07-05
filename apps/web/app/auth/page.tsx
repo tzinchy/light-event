@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { CheckCircle2, FileUp, Loader2, Mail } from "lucide-react";
 import {
   consentApiV1AuthConsentPost,
+  meApiV1AuthMeGet,
   myCompaniesApiV1CompaniesMyGet,
   requestOtpApiV1AuthOtpRequestPost,
   uploadDocumentApiV1DocumentsPost,
@@ -91,9 +92,15 @@ export default function AuthPage() {
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  async function goToOrgOrHome() {
+  async function routeAfterAuth() {
+    // админ → админка; участник компании → кабинет; обычный пользователь → лента
+    const { data: meData } = await meApiV1AuthMeGet();
+    if (meData?.platform_role === "admin") {
+      router.replace("/admin");
+      return;
+    }
     const { data } = await myCompaniesApiV1CompaniesMyGet();
-    router.replace(data && data.length > 0 ? "/org" : "/");
+    router.replace(data && data.length > 0 ? "/org" : "/feed");
   }
 
   async function sendCode() {
@@ -126,7 +133,7 @@ export default function AuthPage() {
     if (data.is_new_user) {
       setStep("kyc");
     } else {
-      await goToOrgOrHome();
+      await routeAfterAuth();
     }
   }
 
@@ -154,7 +161,7 @@ export default function AuthPage() {
     }
     await refreshMe();
     toast.success("Верификация отправлена на проверку");
-    await goToOrgOrHome();
+    await routeAfterAuth();
   }
 
   const kycReady = KYC_DOCS.every((d) => uploaded[d.kind]) && consentChecked;

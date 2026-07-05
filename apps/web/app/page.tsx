@@ -81,7 +81,7 @@ export default function LandingPage() {
               <Link href="/auth">{DICT.ctaWorker}</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link href="/auth">{DICT.ctaOrg}</Link>
+              <Link href="/org">{DICT.ctaOrg}</Link>
             </Button>
           </div>
         </section>
@@ -134,7 +134,7 @@ export default function LandingPage() {
                 <h3 className="text-xl font-semibold">{DICT.orgPitch}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{DICT.orgPitchSub}</p>
                 <Button asChild className="mt-6" variant="outline">
-                  <Link href="/auth">{DICT.openOrgConsole}</Link>
+                  <Link href="/org">{DICT.openOrgConsole}</Link>
                 </Button>
               </CardContent>
             </Card>

@@ -1,12 +1,31 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { myCompaniesApiV1CompaniesMyGet } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { DICT } from "@/lib/dict";
 import { useAuth } from "@/lib/auth-context";
 
 export function SiteHeader() {
   const { me, loading } = useAuth();
+  // кнопка кабинета — только у участников компании; обычному пользователю её не показываем
+  const [isMember, setIsMember] = useState(false);
+
+  useEffect(() => {
+    if (!me) {
+      setIsMember(false);
+      return;
+    }
+    let active = true;
+    void (async () => {
+      const { data } = await myCompaniesApiV1CompaniesMyGet();
+      if (active) setIsMember((data ?? []).length > 0);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [me]);
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
@@ -22,17 +41,30 @@ export function SiteHeader() {
             {me ? (
               <>
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/profile">Профиль</Link>
+                  <Link href="/feed">Лента</Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/apps">{DICT.myApps}</Link>
                 </Button>
                 <Button asChild variant="ghost" size="sm">
+                  <Link href="/chat">Чаты</Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm">
                   <Link href="/tests">{DICT.testsTab}</Link>
                 </Button>
-                <Button asChild size="sm">
-                  <Link href="/org">{DICT.openOrgConsole}</Link>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/profile">Профиль</Link>
                 </Button>
+                {me.platform_role === "admin" && (
+                  <Button asChild size="sm">
+                    <Link href="/admin">Админка</Link>
+                  </Button>
+                )}
+                {isMember && (
+                  <Button asChild size="sm">
+                    <Link href="/org">{DICT.openOrgConsole}</Link>
+                  </Button>
+                )}
               </>
             ) : (
               <>
