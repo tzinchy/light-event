@@ -1073,6 +1073,54 @@ export type MyResultOut = {
 };
 
 /**
+ * NotificationListOut
+ */
+export type NotificationListOut = {
+    /**
+     * Unread
+     */
+    unread: number;
+    /**
+     * Items
+     */
+    items: Array<NotificationOut>;
+};
+
+/**
+ * NotificationOut
+ */
+export type NotificationOut = {
+    /**
+     * Notification Uuid
+     */
+    notification_uuid: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Vacancy Uuid
+     */
+    vacancy_uuid: string | null;
+    /**
+     * Read At
+     */
+    read_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
  * OperationOut
  */
 export type OperationOut = {
@@ -2790,6 +2838,121 @@ export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses = {
 };
 
 export type RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponse = RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses[keyof RevokeInviteApiV1InvitesInviteLinkUuidRevokePostResponses];
+
+export type UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/favorite';
+};
+
+export type UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteError = UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteErrors[keyof UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteErrors];
+
+export type UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteResponse = UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteResponses[keyof UnfollowApiV1CompaniesCompanyUuidFavoriteDeleteResponses];
+
+export type FollowApiV1CompaniesCompanyUuidFavoritePostData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/favorite';
+};
+
+export type FollowApiV1CompaniesCompanyUuidFavoritePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type FollowApiV1CompaniesCompanyUuidFavoritePostError = FollowApiV1CompaniesCompanyUuidFavoritePostErrors[keyof FollowApiV1CompaniesCompanyUuidFavoritePostErrors];
+
+export type FollowApiV1CompaniesCompanyUuidFavoritePostResponses = {
+    /**
+     * Response Follow Api V1 Companies  Company Uuid  Favorite Post
+     * Successful Response
+     */
+    201: {
+        [key: string]: unknown;
+    };
+};
+
+export type FollowApiV1CompaniesCompanyUuidFavoritePostResponse = FollowApiV1CompaniesCompanyUuidFavoritePostResponses[keyof FollowApiV1CompaniesCompanyUuidFavoritePostResponses];
+
+export type MyFavoritesApiV1FavoritesCompaniesGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/favorites/companies';
+};
+
+export type MyFavoritesApiV1FavoritesCompaniesGetResponses = {
+    /**
+     * Response My Favorites Api V1 Favorites Companies Get
+     * Successful Response
+     */
+    200: Array<CompanyOut>;
+};
+
+export type MyFavoritesApiV1FavoritesCompaniesGetResponse = MyFavoritesApiV1FavoritesCompaniesGetResponses[keyof MyFavoritesApiV1FavoritesCompaniesGetResponses];
+
+export type ListNotificationsApiV1NotificationsGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications';
+};
+
+export type ListNotificationsApiV1NotificationsGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: NotificationListOut;
+};
+
+export type ListNotificationsApiV1NotificationsGetResponse = ListNotificationsApiV1NotificationsGetResponses[keyof ListNotificationsApiV1NotificationsGetResponses];
+
+export type MarkReadApiV1NotificationsReadPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/notifications/read';
+};
+
+export type MarkReadApiV1NotificationsReadPostResponses = {
+    /**
+     * Response Mark Read Api V1 Notifications Read Post
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type MarkReadApiV1NotificationsReadPostResponse = MarkReadApiV1NotificationsReadPostResponses[keyof MarkReadApiV1NotificationsReadPostResponses];
 
 export type ListPricesApiV1AdminPricingGetData = {
     body?: never;

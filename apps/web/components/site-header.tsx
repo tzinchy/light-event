@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { myCompaniesApiV1CompaniesMyGet } from "@light-event/shared-types";
+import { Bell } from "lucide-react";
+import {
+  listNotificationsApiV1NotificationsGet,
+  myCompaniesApiV1CompaniesMyGet,
+} from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { DICT } from "@/lib/dict";
 import { useAuth } from "@/lib/auth-context";
@@ -11,16 +15,23 @@ export function SiteHeader() {
   const { me, loading } = useAuth();
   // кнопка кабинета — только у участников компании; обычному пользователю её не показываем
   const [isMember, setIsMember] = useState(false);
+  const [unread, setUnread] = useState(0);
 
   useEffect(() => {
     if (!me) {
       setIsMember(false);
+      setUnread(0);
       return;
     }
     let active = true;
     void (async () => {
-      const { data } = await myCompaniesApiV1CompaniesMyGet();
-      if (active) setIsMember((data ?? []).length > 0);
+      const [companies, notifs] = await Promise.all([
+        myCompaniesApiV1CompaniesMyGet(),
+        listNotificationsApiV1NotificationsGet(),
+      ]);
+      if (!active) return;
+      setIsMember((companies.data ?? []).length > 0);
+      setUnread(notifs.data?.unread ?? 0);
     })();
     return () => {
       active = false;
@@ -54,6 +65,16 @@ export function SiteHeader() {
                 </Button>
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/profile">Профиль</Link>
+                </Button>
+                <Button asChild variant="ghost" size="icon" className="relative">
+                  <Link href="/notifications" aria-label="Уведомления">
+                    <Bell className="size-4" />
+                    {unread > 0 && (
+                      <span className="absolute -right-0.5 -top-0.5 flex min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+                        {unread}
+                      </span>
+                    )}
+                  </Link>
                 </Button>
                 {me.platform_role === "admin" && (
                   <Button asChild size="sm">

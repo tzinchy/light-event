@@ -3,25 +3,33 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CalendarDays, Loader2, MapPin } from "lucide-react";
+import { CalendarDays, Heart, Loader2, MapPin } from "lucide-react";
 import {
   companyReviewsApiV1CompaniesCompanyUuidReviewsGet,
   feedApiV1VacanciesGet,
+  followApiV1CompaniesCompanyUuidFavoritePost,
   getCompanyApiV1CompaniesCompanyUuidGet,
+  myFavoritesApiV1FavoritesCompaniesGet,
+  unfollowApiV1CompaniesCompanyUuidFavoriteDelete,
   type CompanyOut,
   type FeedItemOut,
   type ReviewListOut,
 } from "@light-event/shared-types";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { RatingStars, ReviewList } from "@/components/review-list";
+import { useAuth } from "@/lib/auth-context";
+import { cn } from "@/lib/utils";
 import { formatDateTime, kopToRub } from "@/lib/format";
 
 export default function CompanyProfilePage() {
   const { uuid } = useParams<{ uuid: string }>();
+  const { me } = useAuth();
   const [company, setCompany] = useState<CompanyOut | null>(null);
   const [events, setEvents] = useState<FeedItemOut[] | null>(null);
   const [reviews, setReviews] = useState<ReviewListOut | null>(null);
+  const [isFav, setIsFav] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -35,6 +43,24 @@ export default function CompanyProfilePage() {
       setReviews(rv.data ?? null);
     })();
   }, [uuid]);
+
+  useEffect(() => {
+    if (!me) return;
+    void (async () => {
+      const { data } = await myFavoritesApiV1FavoritesCompaniesGet();
+      setIsFav((data ?? []).some((c) => c.company_uuid === uuid));
+    })();
+  }, [me, uuid]);
+
+  async function toggleFav() {
+    const next = !isFav;
+    setIsFav(next);
+    if (next) {
+      await followApiV1CompaniesCompanyUuidFavoritePost({ path: { company_uuid: uuid } });
+    } else {
+      await unfollowApiV1CompaniesCompanyUuidFavoriteDelete({ path: { company_uuid: uuid } });
+    }
+  }
 
   if (!company || events === null || !reviews) {
     return (
@@ -69,7 +95,23 @@ export default function CompanyProfilePage() {
               {company.address}
             </div>
           </div>
+          {me && (
+            <Button
+              variant={isFav ? "default" : "outline"}
+              size="sm"
+              className="ml-auto shrink-0"
+              onClick={() => void toggleFav()}
+            >
+              <Heart className={cn("size-4", isFav && "fill-current")} />
+              {isFav ? "В избранном" : "В избранное"}
+            </Button>
+          )}
         </div>
+        {me && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Избранные компании присылают уведомление о каждой новой смене.
+          </p>
+        )}
 
         {company.description && <p className="mt-5 text-sm text-muted-foreground">{company.description}</p>}
 
