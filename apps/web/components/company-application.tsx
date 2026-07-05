@@ -30,17 +30,24 @@ export function CompanyApplicationForm() {
   const [ogrn, setOgrn] = useState("");
   const [address, setAddress] = useState("");
   const [contactPhone, setContactPhone] = useState("+7");
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactPosition, setContactPosition] = useState("");
   const [point, setPoint] = useState<MapPoint | null>(null);
   const [busy, setBusy] = useState(false);
 
   const innError = inn.length > 0 && !isValidInn(inn);
   const ogrnError = ogrn.length > 0 && !isValidOgrn(ogrn);
+  const emailError = contactEmail.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail);
   const ready =
     name.trim().length >= 2 &&
     isValidInn(inn) &&
     isValidOgrn(ogrn) &&
     address.trim().length >= 5 &&
     /^\+\d{10,15}$/.test(contactPhone) &&
+    contactName.trim().length >= 2 &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactEmail) &&
+    contactPosition.trim().length >= 2 &&
     point !== null;
 
   async function submit() {
@@ -56,6 +63,9 @@ export function CompanyApplicationForm() {
         lat: point.lat,
         lon: point.lon,
         contact_phone: contactPhone,
+        contact_name: contactName.trim(),
+        contact_email: contactEmail.trim(),
+        contact_position: contactPosition.trim(),
       },
     });
     setBusy(false);
@@ -140,6 +150,43 @@ export function CompanyApplicationForm() {
                 onChange={(e) => setContactPhone(e.target.value.replace(/[^+\d]/g, ""))}
               />
             </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="ca-contact-name">ФИО заявителя</Label>
+                <Input
+                  id="ca-contact-name"
+                  className="mt-1.5"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="Марина Кузнецова"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ca-contact-position">Должность</Label>
+                <Input
+                  id="ca-contact-position"
+                  className="mt-1.5"
+                  value={contactPosition}
+                  onChange={(e) => setContactPosition(e.target.value)}
+                  placeholder="Управляющий"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="ca-contact-email">Почта заявителя</Label>
+              <Input
+                id="ca-contact-email"
+                type="email"
+                className="mt-1.5"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value.trim())}
+                placeholder="manager@example.com"
+                aria-invalid={emailError}
+              />
+              {emailError && <p className="mt-1 text-xs text-destructive">Проверьте адрес почты</p>}
+            </div>
+
             <div>
               <Label htmlFor="ca-address">Адрес</Label>
               <Input

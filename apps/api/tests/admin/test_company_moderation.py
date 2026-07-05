@@ -34,6 +34,10 @@ async def test_admin_sees_pending_applications_with_requisites(client, login_use
     assert apps[company_uuid]["inn"] == VALID_APPLICATION["inn"]
     assert apps[company_uuid]["ogrn"] == VALID_APPLICATION["ogrn"]
     assert apps[company_uuid]["contact_phone"] == VALID_APPLICATION["contact_phone"]
+    # админ видит контакт заявителя (ФИО/почта/должность) — PLAN §3.7
+    assert apps[company_uuid]["contact_name"] == VALID_APPLICATION["contact_name"]
+    assert apps[company_uuid]["contact_email"] == VALID_APPLICATION["contact_email"]
+    assert apps[company_uuid]["contact_position"] == VALID_APPLICATION["contact_position"]
 
 
 async def test_verify_opens_company_cabinet(client, login_user, make_admin):

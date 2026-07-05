@@ -26,6 +26,10 @@ class Company(TimestampMixin, Base):
     lat: Mapped[float] = mapped_column(Float)
     lon: Mapped[float] = mapped_column(Float)
     contact_phone: Mapped[str] = mapped_column(String(16))
+    # данные заполняющего заявку (видит только админ при модерации) — PLAN §3.7
+    contact_name: Mapped[str] = mapped_column(String(200))
+    contact_email: Mapped[str] = mapped_column(String(254))
+    contact_position: Mapped[str] = mapped_column(String(120))
     status: Mapped[CompanyStatus] = mapped_column(
         Enum(CompanyStatus, native_enum=False, length=20), default=CompanyStatus.pending
     )

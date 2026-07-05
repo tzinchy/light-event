@@ -133,6 +133,12 @@ function ApplicationCard({
             <Phone className="size-3.5 shrink-0 text-muted-foreground" />
             <span className="font-mono">{company.contact_phone || "—"}</span>
           </div>
+          <div className="sm:col-span-2">
+            <dt className="text-muted-foreground">Заявитель</dt>
+            <dd>
+              {company.contact_name} · {company.contact_position} · {company.contact_email}
+            </dd>
+          </div>
         </dl>
 
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">

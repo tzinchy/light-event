@@ -20,6 +20,9 @@ VALID_COMPANY_APPLICATION = {
     "lat": 55.7558,
     "lon": 37.6173,
     "contact_phone": "+79051234567",
+    "contact_name": "Марина Кузнецова",
+    "contact_email": "manager@example.com",
+    "contact_position": "Управляющий",
 }
 
 

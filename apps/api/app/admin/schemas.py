@@ -18,6 +18,9 @@ class CompanyModerationOut(BaseModel):
     lat: float
     lon: float
     contact_phone: str
+    contact_name: str
+    contact_email: str
+    contact_position: str
     status: str
     reject_reason: str | None
     verified_at: datetime | None

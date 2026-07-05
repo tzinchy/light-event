@@ -11,9 +11,11 @@ async def test_pk_generated_by_database_is_uuidv7(settings, apply_migrations):
         row = await conn.execute(
             text(
                 "INSERT INTO company "
-                "(name, status, inn, ogrn, address, lat, lon, contact_phone, created_at, updated_at) "
+                "(name, status, inn, ogrn, address, lat, lon, contact_phone, "
+                "contact_name, contact_email, contact_position, created_at, updated_at) "
                 "VALUES ('ООО Тест', 'pending', '7707083893', '1027700132195', 'Москва, Тверская, 1', "
-                "55.75, 37.61, '+79051234567', now(), now()) RETURNING company_uuid"
+                "55.75, 37.61, '+79051234567', 'Тест Тестов', 'test@example.com', 'Директор', now(), now()) "
+                "RETURNING company_uuid"
             )
         )
         pk = row.scalar_one()

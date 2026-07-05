@@ -296,6 +296,18 @@ export type CompanyCreateIn = {
      * Contact Phone
      */
     contact_phone: string;
+    /**
+     * Contact Name
+     */
+    contact_name: string;
+    /**
+     * Contact Email
+     */
+    contact_email: string;
+    /**
+     * Contact Position
+     */
+    contact_position: string;
 };
 
 /**
@@ -339,6 +351,18 @@ export type CompanyModerationOut = {
      * Contact Phone
      */
     contact_phone: string;
+    /**
+     * Contact Name
+     */
+    contact_name: string;
+    /**
+     * Contact Email
+     */
+    contact_email: string;
+    /**
+     * Contact Position
+     */
+    contact_position: string;
     /**
      * Status
      */

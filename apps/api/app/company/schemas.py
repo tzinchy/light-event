@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 from app.auth.schemas import PHONE_PATTERN
 
@@ -47,6 +47,9 @@ class CompanyCreateIn(BaseModel):
     lat: float = Field(ge=-90, le=90)
     lon: float = Field(ge=-180, le=180)
     contact_phone: str = Field(pattern=PHONE_PATTERN)
+    contact_name: str = Field(min_length=2, max_length=200)
+    contact_email: EmailStr = Field(max_length=254)
+    contact_position: str = Field(min_length=2, max_length=120)
 
     _inn = field_validator("inn")(validate_inn)
     _ogrn = field_validator("ogrn")(validate_ogrn)
