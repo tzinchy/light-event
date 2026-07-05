@@ -37,23 +37,35 @@ class TestService:
             )
 
     async def create_company_test(self, actor: User, company_uuid: UUID, data: TestCreateIn) -> Test:
+        # создание — бесплатный черновик (баланс не нужен); плата берётся при отправке на модерацию
         await ensure_permission(self.session, actor, company_uuid, "create")
-        fee_kop = await PricingService(self.session, self.settings).fee("company_test")
         test = Test(
             kind=TestKind.company,
             company_uuid=company_uuid,
             title=data.title,
             topic=data.topic,
+            description=data.description,
             min_correct=data.min_correct,
-            price_kop=fee_kop,
-            status=TestStatus.pending_moderation,
+            status=TestStatus.draft,
         )
         self.repo.add(test)
         await self.session.flush()
         self._add_questions(test.test_uuid, data)
-        # оплата 1 500 ₽ и создание теста — одна транзакция (skill money-ledger)
+        await self.session.flush()
+        return test
+
+    async def submit_for_moderation(self, actor: User, test_uuid: UUID) -> Test:
+        # блокировка строки: параллельная отправка не спишет тариф дважды
+        test = await self.repo.get_for_update(test_uuid)
+        if test is None or test.kind != TestKind.company:
+            raise DomainError(404, "Тест не найден")
+        await ensure_permission(self.session, actor, test.company_uuid, "create")
+        if test.status != TestStatus.draft:
+            raise DomainError(409, "Отправить на модерацию можно только черновик")
+        fee_kop = await PricingService(self.session, self.settings).fee("company_test")
+        # оплата тарифа и отправка — одна транзакция (skill money-ledger)
         repo = BalanceRepo(self.session)
-        company_account = await repo.get_or_create_account(AccountOwnerType.company, company_uuid)
+        company_account = await repo.get_or_create_account(AccountOwnerType.company, test.company_uuid)
         platform_account = await repo.get_or_create_account(AccountOwnerType.platform, PLATFORM_OWNER_UUID)
         await self.balance.transfer(
             debit_account_uuid=company_account.account_uuid,
@@ -62,8 +74,10 @@ class TestService:
             kind=LedgerKind.test_fee,
             ref_type="test",
             ref_uuid=test.test_uuid,
-            comment=f"Создание теста · {test.title}",
+            comment=f"Отправка теста на модерацию · {test.title}",
         )
+        test.price_kop = fee_kop
+        test.status = TestStatus.pending_moderation
         await self.session.flush()
         return test
 

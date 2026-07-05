@@ -23,6 +23,7 @@ class QuestionIn(BaseModel):
 class TestCreateIn(BaseModel):
     title: str = Field(min_length=2, max_length=200)
     topic: str = Field(min_length=2, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
     min_correct: int = Field(ge=1)
     questions: list[QuestionIn] = Field(min_length=1, max_length=50)
 
@@ -41,6 +42,7 @@ class TestOut(BaseModel):
     company_uuid: UUID | None
     title: str
     topic: str
+    description: str | None
     min_correct: int
     status: str
     reject_reason: str | None

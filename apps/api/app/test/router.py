@@ -71,6 +71,15 @@ async def create_company_test(
     return TestOut.model_validate(await service.create_company_test(user, company_uuid, payload))
 
 
+@router.post("/tests/{test_uuid}/submit", response_model=TestOut)
+async def submit_test(
+    test_uuid: UUID,
+    user: User = Depends(get_current_user),
+    service: TestService = Depends(get_test_service),
+) -> TestOut:
+    return TestOut.model_validate(await service.submit_for_moderation(user, test_uuid))
+
+
 @router.post("/admin/tests", response_model=TestOut, status_code=201, dependencies=[Depends(require_admin())])
 async def create_platform_test(
     payload: TestCreateIn,

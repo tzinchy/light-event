@@ -69,6 +69,10 @@ async def create_company_test(client, ctx, approve: bool = True) -> dict:
     )
     assert resp.status_code == 201, resp.text
     test = resp.json()
+    # создание — бесплатный черновик; отправка на модерацию берёт тариф (PLAN §11.8-fix)
+    submit = await client.post(f"/api/v1/tests/{test['test_uuid']}/submit", headers=ctx["owner"]["headers"])
+    assert submit.status_code == 200, submit.text
+    test = submit.json()
     if approve:
         resp = await client.post(
             f"/api/v1/admin/tests/{test['test_uuid']}/moderate",
@@ -113,20 +117,26 @@ async def test_company_test_charges_fee_and_goes_to_moderation(client, login_use
     assert ops[0]["kind"] == "test_fee"
 
 
-async def test_company_test_without_funds_rolls_back(client, login_user, make_admin):
+async def test_company_test_created_free_but_submit_needs_funds(client, login_user, make_admin):
     ctx = await setup_company(client, login_user, make_admin, "+7905129010", fund=False)
 
+    # создание бесплатно — черновик даже без баланса
     resp = await client.post(
         f"/api/v1/companies/{ctx['company_uuid']}/tests",
         json=test_payload(),
         headers=ctx["owner"]["headers"],
     )
-    assert resp.status_code == 409
+    assert resp.status_code == 201, resp.text
+    test = resp.json()
+    assert test["status"] == "draft"
 
-    # тест не создан
+    # отправка на модерацию без средств — 409, тариф не списан, тест остаётся черновиком
+    submit = await client.post(f"/api/v1/tests/{test['test_uuid']}/submit", headers=ctx["owner"]["headers"])
+    assert submit.status_code == 409
+
+    # черновик соискателю не виден
     worker = await login_user("+79051290103")
-    listed = (await client.get("/api/v1/tests", headers=worker["headers"])).json()
-    assert listed == []
+    assert (await client.get("/api/v1/tests", headers=worker["headers"])).json() == []
 
 
 async def test_admin_creates_platform_test_published(client, login_user, make_admin):

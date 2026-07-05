@@ -25,6 +25,9 @@ async def test_pending_items_in_queue_and_leave_after_moderation(client, login_u
     )
     assert resp.status_code == 201, resp.text
     test_uuid = resp.json()["test_uuid"]
+    # черновик попадает в очередь модерации только после отправки (списывается тариф)
+    submit = await client.post(f"/api/v1/tests/{test_uuid}/submit", headers=ctx["owner"]["headers"])
+    assert submit.status_code == 200, submit.text
 
     resp = await client.get("/api/v1/admin/requests", headers=ctx["admin"]["headers"])
     assert resp.status_code == 200, resp.text

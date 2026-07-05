@@ -35,6 +35,7 @@ class Test(TimestampMixin, Base):
     company_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("company.company_uuid"), index=True)
     title: Mapped[str] = mapped_column(String(200))
     topic: Mapped[str] = mapped_column(String(120))
+    description: Mapped[str | None] = mapped_column(String(1000))
     min_correct: Mapped[int]
     price_kop: Mapped[int | None] = mapped_column(BigInteger)
     status: Mapped[TestStatus] = mapped_column(
