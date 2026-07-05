@@ -73,6 +73,35 @@ class ChatRepo:
         )
         return list(result.scalars())
 
+    async def thread_participant_uuids(self, chat_thread_uuid: UUID) -> set[UUID]:
+        """Участники треда: соискатель заявки + вся команда компании смены."""
+        row = (
+            await self.session.execute(
+                select(Application.user_uuid, Vacancy.company_uuid)
+                .select_from(ChatThread)
+                .join(Application, Application.application_uuid == ChatThread.application_uuid)
+                .join(Vacancy, Vacancy.vacancy_uuid == Application.vacancy_uuid)
+                .where(ChatThread.chat_thread_uuid == chat_thread_uuid)
+            )
+        ).first()
+        if row is None:
+            return set()
+        applicant_uuid, company_uuid = row
+        members = (
+            await self.session.execute(
+                select(TeamMember.user_uuid).where(TeamMember.company_uuid == company_uuid)
+            )
+        ).scalars()
+        return {applicant_uuid, *members}
+
+    async def counterpart_uuids(self, user_uuid: UUID) -> set[UUID]:
+        """Собеседники по всем тредам пользователя — для рассылки онлайн-статуса."""
+        result: set[UUID] = set()
+        for thread, *_ in await self.list_threads_for_user(user_uuid):
+            result |= await self.thread_participant_uuids(thread.chat_thread_uuid)
+        result.discard(user_uuid)
+        return result
+
     async def mark_read(self, chat_thread_uuid: UUID, reader_uuid: UUID) -> None:
         await self.session.execute(
             update(ChatMessage)
