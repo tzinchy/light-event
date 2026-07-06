@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewList } from "@/components/review-list";
+import { EXPERIENCE_OPTIONS } from "@/lib/experience";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpInput, OTP_LENGTH } from "@/components/otp-input";
@@ -118,13 +119,17 @@ function ProfileFields() {
   const { me, refreshMe } = useAuth();
   const [name, setName] = useState(me?.name ?? "");
   const [city, setCity] = useState(me?.city ?? "");
+  const [experience, setExperience] = useState(me?.experience ?? "");
   const [busy, setBusy] = useState(false);
 
-  const dirty = name !== (me?.name ?? "") || city !== (me?.city ?? "");
+  const dirty =
+    name !== (me?.name ?? "") || city !== (me?.city ?? "") || experience !== (me?.experience ?? "");
 
   async function save() {
     setBusy(true);
-    const { error } = await updateMeApiV1UsersMePatch({ body: { name, city } });
+    const { error } = await updateMeApiV1UsersMePatch({
+      body: { name, city, experience: experience || null },
+    });
     setBusy(false);
     if (error) {
       toast.error(String((error as { detail?: string }).detail ?? "Не удалось сохранить"));
@@ -159,6 +164,22 @@ function ProfileFields() {
             onChange={(e) => setCity(e.target.value)}
             placeholder="Москва"
           />
+        </div>
+        <div>
+          <Label htmlFor="profile-exp">Опыт работы</Label>
+          <select
+            id="profile-exp"
+            className="mt-1.5 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            value={experience}
+            onChange={(e) => setExperience(e.target.value)}
+          >
+            <option value="">Не указан</option>
+            {EXPERIENCE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
         </div>
         <Button disabled={!dirty || busy} onClick={() => void save()}>
           {busy && <Loader2 className="size-4 animate-spin" />}

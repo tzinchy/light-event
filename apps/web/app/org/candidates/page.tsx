@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Check, Loader2, UserX, UsersRound } from "lucide-react";
@@ -195,11 +196,32 @@ export default function CandidatesPage() {
           <p className="mt-3 text-sm">{DICT.noApplicants}</p>
         </div>
       ) : (
-        <div className="mt-4 space-y-3">
-          {visibleApps.map((app) => {
-            const status = APP_STATUS[app.status] ?? { label: app.status, className: "" };
-            const list = listOf(app.user_uuid);
-            return (
+        <div className="mt-4 space-y-6">
+          {[
+            ...visibleApps
+              .reduce((m, app) => {
+                const key = `${app.vacancy.event_title}|${app.vacancy.starts_at}|${app.vacancy.role_name}`;
+                const g = m.get(key) ?? { vacancy: app.vacancy, apps: [] as typeof visibleApps };
+                g.apps.push(app);
+                m.set(key, g);
+                return m;
+              }, new Map<string, { vacancy: (typeof visibleApps)[number]["vacancy"]; apps: typeof visibleApps }>())
+              .values(),
+          ].map((group) => (
+            <div key={`${group.vacancy.event_title}|${group.vacancy.starts_at}`}>
+              {/* событие → отклики на него */}
+              <div className="mb-2 flex flex-wrap items-baseline gap-2 border-b pb-1.5">
+                <h2 className="font-semibold">{group.vacancy.event_title}</h2>
+                <span className="text-sm text-muted-foreground">
+                  {group.vacancy.role_name} · {formatShiftWindow(group.vacancy.starts_at, group.vacancy.ends_at)} ·{" "}
+                  {group.apps.length} откл.
+                </span>
+              </div>
+              <div className="space-y-3">
+                {group.apps.map((app) => {
+                  const status = APP_STATUS[app.status] ?? { label: app.status, className: "" };
+                  const list = listOf(app.user_uuid);
+                  return (
               <Card key={app.application_uuid}>
                 <CardContent className="pt-6">
                   <div className="flex flex-wrap items-center gap-3">
@@ -208,9 +230,12 @@ export default function CandidatesPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-medium">
+                        <Link
+                          href={`/w/${app.user_uuid}`}
+                          className="font-medium hover:underline"
+                        >
                           {app.user_name ?? `${app.user_uuid.slice(0, 8)}…`}
-                        </span>
+                        </Link>
                         <span className={cn("status-badge", status.className)}>{status.label}</span>
                         {list === "shortlist" && (
                           <span className="status-badge border-brand-border bg-brand-soft text-brand-strong">
@@ -222,10 +247,6 @@ export default function CandidatesPage() {
                             {DICT.companyTestPassedBadge}
                           </span>
                         )}
-                      </div>
-                      <div className="mt-0.5 text-sm text-muted-foreground">
-                        {app.vacancy.event_title} · {app.vacancy.role_name} ·{" "}
-                        {formatShiftWindow(app.vacancy.starts_at, app.vacancy.ends_at)}
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -276,8 +297,11 @@ export default function CandidatesPage() {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
