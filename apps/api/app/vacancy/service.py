@@ -89,7 +89,9 @@ class VacancyService:
         await self.balance.transfer(
             debit_account_uuid=company_account.account_uuid,
             credit_account_uuid=platform_account.account_uuid,
-            amount_kop=await PricingService(self.session, self.settings).fee("vacancy_publish"),
+            amount_kop=await PricingService(self.session, self.settings).fee(
+                "vacancy_publish", vacancy.company_uuid
+            ),
             kind=LedgerKind.vacancy_fee,
             ref_type="vacancy",
             ref_uuid=vacancy.vacancy_uuid,

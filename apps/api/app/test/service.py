@@ -63,7 +63,7 @@ class TestService:
         await ensure_permission(self.session, actor, test.company_uuid, "create")
         if test.status != TestStatus.draft:
             raise DomainError(409, "Отправить на модерацию можно только черновик")
-        fee_kop = await PricingService(self.session, self.settings).fee("company_test")
+        fee_kop = await PricingService(self.session, self.settings).fee("company_test", test.company_uuid)
         # оплата тарифа и отправка — одна транзакция (skill money-ledger)
         repo = BalanceRepo(self.session)
         company_account = await repo.get_or_create_account(AccountOwnerType.company, test.company_uuid)

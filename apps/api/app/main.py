@@ -72,6 +72,7 @@ def create_app(
     app.include_router(notification_router.router)
     app.include_router(payment_account_router.router)
     app.include_router(pricing_router.router)
+    app.include_router(pricing_router.company_router)
     app.include_router(review_router.router)
     app.include_router(complaint_router.router)
     app.include_router(chat_router.router)

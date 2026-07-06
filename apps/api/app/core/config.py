@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # тарифы — целые копейки (skill money-ledger)
     vacancy_publish_fee_kop: int = 99_000
     company_test_fee_kop: int = 150_000
+    worker_completion_fee_kop: int = 0  # плата за сотрудника после смены; включается тарифом (§11.10-B)
     platform_commission_pct: int = 6
 
     # брошенная попытка теста: повтор доступен через (референс «Повтор через 15:00»)

@@ -24,6 +24,7 @@ from app.document.repo import DocumentRepo
 from app.application.models import ApplicationStatus
 from app.notification.service import NotificationService
 from app.payment_account.service import PaymentAccountService
+from app.pricing.service import PricingService
 from app.user.models import User
 
 
@@ -258,6 +259,21 @@ class BalanceService:
                     kind=ApplicationEventKind.payout,
                     actor_uuid=admin.user_uuid,
                 )
+            )
+
+        # фикс-плата за каждого сотрудника после мероприятия (§11.10-B); 0 = выключено
+        completion_fee_kop = await PricingService(self.session, get_settings()).fee(
+            "worker_completion", payout.company_uuid
+        )
+        if completion_fee_kop > 0 and applications:
+            await self.transfer(
+                debit_account_uuid=company_account.account_uuid,
+                credit_account_uuid=platform_account.account_uuid,
+                amount_kop=completion_fee_kop * len(applications),
+                kind=LedgerKind.completion_fee,
+                ref_type="payout",
+                ref_uuid=payout.payout_uuid,
+                comment=f"Плата за сотрудников после смены · {len(applications)} чел.",
             )
 
         payout.status = PayoutStatus.paid

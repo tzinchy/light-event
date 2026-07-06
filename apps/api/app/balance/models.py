@@ -25,6 +25,7 @@ class LedgerKind(str, enum.Enum):
     release = "release"
     payout = "payout"
     commission = "commission"
+    completion_fee = "completion_fee"  # фикс-плата за сотрудника после смены (§11.10-B)
 
 
 class TopupStatus(str, enum.Enum):
