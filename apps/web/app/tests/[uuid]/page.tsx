@@ -88,6 +88,14 @@ export default function TestAttemptPage() {
     })();
   }, [uuid]);
 
+  // при возобновлении/навигации — восстановить сохранённый ответ для текущего вопроса
+  useEffect(() => {
+    if (!attempt) return;
+    const q = attempt.questions[qIndex];
+    const saved = q ? (attempt.answers as Record<string, number[]>)[q.test_question_uuid] : undefined;
+    setChosen(saved ?? []);
+  }, [attempt, qIndex]);
+
   if (startError) {
     return (
       <div className="flex min-h-screen flex-col">

@@ -66,6 +66,7 @@ function CreateTestForm({
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState("");
   const [description, setDescription] = useState("");
+  const [materials, setMaterials] = useState("");
   const [minCorrect, setMinCorrect] = useState(1);
   const [questions, setQuestions] = useState<QuestionDraft[]>([emptyQuestion()]);
   const [busy, setBusy] = useState(false);
@@ -88,6 +89,7 @@ function CreateTestForm({
         title: title.trim(),
         topic: topic.trim(),
         description: description.trim() || null,
+        materials: materials.trim() || null,
         min_correct: minCorrect,
         questions: questions.map((q) => ({
           text: q.text.trim(),
@@ -146,6 +148,18 @@ function CreateTestForm({
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Что проверяет тест, для какой роли — необязательно"
             maxLength={1000}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="test-materials">Материалы для подготовки</Label>
+          <textarea
+            id="test-materials"
+            className="min-h-20 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            value={materials}
+            onChange={(e) => setMaterials(e.target.value)}
+            placeholder="Ссылки и текст, по которым соискатель подготовится к тесту — необязательно"
+            maxLength={4000}
           />
         </div>
 

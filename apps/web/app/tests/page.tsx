@@ -48,6 +48,15 @@ function TestRow({ test }: { test: TestListItemOut }) {
           {test.company_name ? ` · ${test.company_name}` : ""} · {test.questions_count}{" "}
           {DICT.questionsShort}
         </div>
+        {test.description && <p className="mt-2 text-sm text-muted-foreground">{test.description}</p>}
+        {test.materials && (
+          <details className="mt-2 rounded-lg border bg-secondary/30 px-3 py-2">
+            <summary className="cursor-pointer text-sm font-medium text-brand-strong">
+              Материалы для подготовки
+            </summary>
+            <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">{test.materials}</p>
+          </details>
+        )}
         {result && (
           <div
             className={cn(
