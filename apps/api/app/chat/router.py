@@ -4,14 +4,24 @@ import logging
 from uuid import UUID
 
 import jwt
-from fastapi import APIRouter, Depends, Response, WebSocket, WebSocketDisconnect, status
+from fastapi import APIRouter, Depends, Request, Response, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.chat.repo import ChatRepo
-from app.chat.schemas import MessageOut, MessageSendIn, ThreadOpenIn, ThreadOut
+from app.chat.schemas import (
+    AdminMessageOut,
+    MessageEditIn,
+    MessageOut,
+    MessageRevisionOut,
+    MessageSendIn,
+    ThreadOpenIn,
+    ThreadOut,
+    message_out,
+)
 from app.chat.service import ChatService
 from app.core.deps import get_current_user, get_session
 from app.core.errors import DomainError
+from app.core.permissions import require_admin
 from app.core.security import decode_access_token
 from app.user.models import User
 from app.user.repo import UserRepo
@@ -63,7 +73,7 @@ async def thread_messages(
     actor: User = Depends(get_current_user),
     service: ChatService = Depends(get_chat_service),
 ) -> list[MessageOut]:
-    return [MessageOut.model_validate(m) for m in await service.list_messages(actor, chat_thread_uuid)]
+    return [message_out(m) for m in await service.list_messages(actor, chat_thread_uuid)]
 
 
 @router.post("/threads/{chat_thread_uuid}/messages", response_model=MessageOut, status_code=201)
@@ -84,6 +94,70 @@ async def mark_read(
 ) -> dict:
     await service.mark_read(actor, chat_thread_uuid)
     return {"ok": True}
+
+
+async def _broadcast_message_event(request: Request, session: AsyncSession, kind: str, message) -> None:
+    """Разослать участникам треда событие правки/удаления — открытые чаты обновятся по WS."""
+    participants = await ChatRepo(session).thread_participant_uuids(message.chat_thread_uuid)
+    await _publish(
+        request.app.state.redis,
+        participants,
+        {"type": kind, **message_out(message).model_dump(mode="json")},
+    )
+
+
+@router.patch("/messages/{chat_message_uuid}", response_model=MessageOut)
+async def edit_message(
+    chat_message_uuid: UUID,
+    payload: MessageEditIn,
+    request: Request,
+    actor: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> MessageOut:
+    message = await ChatService(session).edit(actor, chat_message_uuid, payload)
+    await _broadcast_message_event(request, session, "message_edited", message)
+    return message_out(message)
+
+
+@router.delete("/messages/{chat_message_uuid}", response_model=MessageOut)
+async def delete_message(
+    chat_message_uuid: UUID,
+    request: Request,
+    actor: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> MessageOut:
+    message = await ChatService(session).delete(actor, chat_message_uuid)
+    await _broadcast_message_event(request, session, "message_deleted", message)
+    return message_out(message)
+
+
+@router.get(
+    "/admin/moderated-messages",
+    response_model=list[AdminMessageOut],
+    dependencies=[Depends(require_admin())],
+)
+async def admin_moderated_messages(session: AsyncSession = Depends(get_session)) -> list[AdminMessageOut]:
+    """Админ: отредактированные/удалённые сообщения с оригиналами и версиями (§11.11)."""
+    repo = ChatRepo(session)
+    out: list[AdminMessageOut] = []
+    for message, event_title in await repo.moderated_messages():
+        out.append(
+            AdminMessageOut(
+                chat_message_uuid=message.chat_message_uuid,
+                chat_thread_uuid=message.chat_thread_uuid,
+                sender_uuid=message.sender_uuid,
+                event_title=event_title,
+                text=message.text,  # админ видит текст даже удалённого
+                sent_at=message.sent_at,
+                edited_at=message.edited_at,
+                deleted_at=message.deleted_at,
+                revisions=[
+                    MessageRevisionOut.model_validate(r)
+                    for r in await repo.revisions(message.chat_message_uuid)
+                ],
+            )
+        )
+    return out
 
 
 async def _publish(redis, user_uuids, payload: dict) -> None:

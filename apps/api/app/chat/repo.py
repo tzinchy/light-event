@@ -5,7 +5,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.models import Application
-from app.chat.models import ChatMessage, ChatThread
+from app.chat.models import ChatMessage, ChatMessageRevision, ChatThread
 from app.company.models import Company
 from app.team.models import TeamMember
 from app.user.models import User
@@ -101,6 +101,30 @@ class ChatRepo:
             result |= await self.thread_participant_uuids(thread.chat_thread_uuid)
         result.discard(user_uuid)
         return result
+
+    async def get_message(self, chat_message_uuid: UUID) -> ChatMessage | None:
+        return await self.session.get(ChatMessage, chat_message_uuid)
+
+    async def revisions(self, chat_message_uuid: UUID) -> list[ChatMessageRevision]:
+        result = await self.session.execute(
+            select(ChatMessageRevision)
+            .where(ChatMessageRevision.chat_message_uuid == chat_message_uuid)
+            .order_by(ChatMessageRevision.chat_message_revision_uuid)
+        )
+        return list(result.scalars())
+
+    async def moderated_messages(self, limit: int = 100) -> list[tuple[ChatMessage, str]]:
+        """Для админа: отредактированные/удалённые сообщения с названием события (§11.11)."""
+        result = await self.session.execute(
+            select(ChatMessage, Vacancy.event_title)
+            .join(ChatThread, ChatThread.chat_thread_uuid == ChatMessage.chat_thread_uuid)
+            .join(Application, Application.application_uuid == ChatThread.application_uuid)
+            .join(Vacancy, Vacancy.vacancy_uuid == Application.vacancy_uuid)
+            .where((ChatMessage.edited_at.isnot(None)) | (ChatMessage.deleted_at.isnot(None)))
+            .order_by(ChatMessage.chat_message_uuid.desc())
+            .limit(limit)
+        )
+        return [(m, title) for m, title in result.all()]
 
     async def mark_read(self, chat_thread_uuid: UUID, reader_uuid: UUID) -> None:
         await self.session.execute(

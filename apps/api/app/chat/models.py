@@ -18,7 +18,11 @@ class ChatThread(TimestampMixin, Base):
 
 
 class ChatMessage(Base):
-    """Сообщение — факт: sent_at вместо created/updated, read_at по прочтении получателем."""
+    """Сообщение — факт: sent_at вместо created/updated, read_at по прочтении получателем.
+
+    Редактирование ставит edited_at и сохраняет прежний текст в ChatMessageRevision (§11.11);
+    удаление — только флаг deleted_at, текст остаётся для админа.
+    """
 
     __tablename__ = "chat_message"
 
@@ -28,3 +32,20 @@ class ChatMessage(Base):
     text: Mapped[str] = mapped_column(String(2000))
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ChatMessageRevision(Base):
+    """Прежняя версия отредактированного сообщения — видна только админу (§11.11)."""
+
+    __tablename__ = "chat_message_revision"
+
+    chat_message_revision_uuid: Mapped[UUID] = mapped_column(
+        primary_key=True, server_default=text("uuidv7()")
+    )
+    chat_message_uuid: Mapped[UUID] = mapped_column(
+        ForeignKey("chat_message.chat_message_uuid"), index=True
+    )
+    text: Mapped[str] = mapped_column(String(2000))
+    replaced_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
