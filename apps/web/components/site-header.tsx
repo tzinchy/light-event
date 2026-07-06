@@ -51,21 +51,24 @@ export function SiteHeader() {
           <nav className="flex items-center gap-2">
             {me ? (
               <>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/feed">Лента</Link>
-                </Button>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/apps">{DICT.myApps}</Link>
-                </Button>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/chat">Чаты</Link>
-                </Button>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/tests">{DICT.testsTab}</Link>
-                </Button>
-                <Button asChild variant="ghost" size="sm">
-                  <Link href="/profile">Профиль</Link>
-                </Button>
+                {/* на <md текстовые пункты заменяет нижний таб-бар */}
+                <div className="hidden items-center gap-2 md:flex">
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/feed">Лента</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/apps">{DICT.myApps}</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/chat">Чаты</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/tests">{DICT.testsTab}</Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link href="/profile">Профиль</Link>
+                  </Button>
+                </div>
                 <Button asChild variant="ghost" size="icon" className="relative">
                   <Link href="/notifications" aria-label="Уведомления">
                     <Bell className="size-4" />
