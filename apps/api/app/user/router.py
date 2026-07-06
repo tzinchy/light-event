@@ -1,12 +1,29 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from uuid import UUID
+
 from app.core.deps import get_current_user, get_session
+from app.core.errors import DomainError
 from app.user.models import User
-from app.user.schemas import EmailConfirmIn, EmailRequestIn, UserOut, UserUpdateIn
+from app.user.repo import UserRepo
+from app.user.schemas import EmailConfirmIn, EmailRequestIn, UserOut, UserUpdateIn, WorkerPublicOut
 from app.user.service import UserService
 
 router = APIRouter(prefix="/api/v1/users", tags=["users"])
+
+
+@router.get("/{user_uuid}/public", response_model=WorkerPublicOut)
+async def worker_public_profile(
+    user_uuid: UUID,
+    _viewer: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> WorkerPublicOut:
+    """Публичный профиль соискателя (для организаций) — без контактов."""
+    user = await UserRepo(session).get(user_uuid)
+    if user is None:
+        raise DomainError(404, "Пользователь не найден")
+    return WorkerPublicOut.model_validate(user)
 
 
 def get_user_service(request: Request, session: AsyncSession = Depends(get_session)) -> UserService:

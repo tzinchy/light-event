@@ -52,5 +52,7 @@ class UserService:
             user.name = data.name
         if data.city is not None:
             user.city = data.city
+        if data.experience is not None:
+            user.experience = data.experience
         await self.session.flush()
         return user

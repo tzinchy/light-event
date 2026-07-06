@@ -37,4 +37,5 @@ class MeOut(BaseModel):
     name: str | None
     city: str | None
     platform_role: str
+    experience: str | None = None
     pd_consent_at: datetime | None
