@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { ReviewList } from "@/components/review-list";
-import { EXPERIENCE_LABEL } from "@/lib/experience";
+import { EDUCATION_LABEL, ENGLISH_LABEL, EXPERIENCE_LABEL } from "@/lib/experience";
 
 export default function WorkerProfilePage() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -68,6 +68,32 @@ export default function WorkerProfilePage() {
             </div>
           </div>
         </div>
+
+        {worker.about && (
+          <Card className="mt-5">
+            <CardContent className="pt-5">
+              <div className="text-sm font-medium">О себе</div>
+              <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{worker.about}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {(worker.english_level || worker.education) && (
+          <div className="mt-4 flex flex-wrap gap-4 text-sm">
+            {worker.english_level && (
+              <div>
+                <span className="text-muted-foreground">Английский: </span>
+                {ENGLISH_LABEL[worker.english_level] ?? worker.english_level}
+              </div>
+            )}
+            {worker.education && (
+              <div>
+                <span className="text-muted-foreground">Образование: </span>
+                {EDUCATION_LABEL[worker.education] ?? worker.education}
+              </div>
+            )}
+          </div>
+        )}
 
         {worker.desired_roles.length > 0 && (
           <div className="mt-5">

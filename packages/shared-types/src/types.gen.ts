@@ -27,6 +27,49 @@ export type AccountOut = {
 };
 
 /**
+ * AdminMessageOut
+ * Для админа: текущий текст (в т.ч. удалённый) + все прежние версии (§11.11).
+ */
+export type AdminMessageOut = {
+    /**
+     * Chat Message Uuid
+     */
+    chat_message_uuid: string;
+    /**
+     * Chat Thread Uuid
+     */
+    chat_thread_uuid: string;
+    /**
+     * Sender Uuid
+     */
+    sender_uuid: string;
+    /**
+     * Event Title
+     */
+    event_title: string;
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Sent At
+     */
+    sent_at: string;
+    /**
+     * Edited At
+     */
+    edited_at: string | null;
+    /**
+     * Deleted At
+     */
+    deleted_at: string | null;
+    /**
+     * Revisions
+     */
+    revisions: Array<MessageRevisionOut>;
+};
+
+/**
  * AnswerIn
  */
 export type AnswerIn = {
@@ -967,9 +1010,31 @@ export type MeOut = {
      */
     experience?: string | null;
     /**
+     * About
+     */
+    about?: string | null;
+    /**
+     * English Level
+     */
+    english_level?: string | null;
+    /**
+     * Education
+     */
+    education?: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
+};
+
+/**
+ * MessageEditIn
+ */
+export type MessageEditIn = {
+    /**
+     * Text
+     */
+    text: string;
 };
 
 /**
@@ -1000,6 +1065,28 @@ export type MessageOut = {
      * Read At
      */
     read_at: string | null;
+    /**
+     * Edited At
+     */
+    edited_at?: string | null;
+    /**
+     * Deleted At
+     */
+    deleted_at?: string | null;
+};
+
+/**
+ * MessageRevisionOut
+ */
+export type MessageRevisionOut = {
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Replaced At
+     */
+    replaced_at: string;
 };
 
 /**
@@ -1988,6 +2075,18 @@ export type UserOut = {
      */
     experience: string | null;
     /**
+     * About
+     */
+    about: string | null;
+    /**
+     * English Level
+     */
+    english_level: string | null;
+    /**
+     * Education
+     */
+    education: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
@@ -2013,6 +2112,18 @@ export type UserUpdateIn = {
      * Experience
      */
     experience?: string | null;
+    /**
+     * About
+     */
+    about?: string | null;
+    /**
+     * English Level
+     */
+    english_level?: string | null;
+    /**
+     * Education
+     */
+    education?: string | null;
 };
 
 /**
@@ -2290,6 +2401,18 @@ export type WorkerPublicOut = {
      * Experience
      */
     experience: string | null;
+    /**
+     * About
+     */
+    about: string | null;
+    /**
+     * English Level
+     */
+    english_level: string | null;
+    /**
+     * Education
+     */
+    education: string | null;
 };
 
 export type HealthApiV1HealthGetData = {
@@ -3747,6 +3870,83 @@ export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses = {
 };
 
 export type MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponse = MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses[keyof MarkReadApiV1ChatThreadsChatThreadUuidReadPostResponses];
+
+export type DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteData = {
+    body?: never;
+    path: {
+        /**
+         * Chat Message Uuid
+         */
+        chat_message_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/messages/{chat_message_uuid}';
+};
+
+export type DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteError = DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteErrors[keyof DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteErrors];
+
+export type DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteResponses = {
+    /**
+     * Successful Response
+     */
+    200: MessageOut;
+};
+
+export type DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteResponse = DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteResponses[keyof DeleteMessageApiV1ChatMessagesChatMessageUuidDeleteResponses];
+
+export type EditMessageApiV1ChatMessagesChatMessageUuidPatchData = {
+    body: MessageEditIn;
+    path: {
+        /**
+         * Chat Message Uuid
+         */
+        chat_message_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/chat/messages/{chat_message_uuid}';
+};
+
+export type EditMessageApiV1ChatMessagesChatMessageUuidPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type EditMessageApiV1ChatMessagesChatMessageUuidPatchError = EditMessageApiV1ChatMessagesChatMessageUuidPatchErrors[keyof EditMessageApiV1ChatMessagesChatMessageUuidPatchErrors];
+
+export type EditMessageApiV1ChatMessagesChatMessageUuidPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: MessageOut;
+};
+
+export type EditMessageApiV1ChatMessagesChatMessageUuidPatchResponse = EditMessageApiV1ChatMessagesChatMessageUuidPatchResponses[keyof EditMessageApiV1ChatMessagesChatMessageUuidPatchResponses];
+
+export type AdminModeratedMessagesApiV1ChatAdminModeratedMessagesGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/chat/admin/moderated-messages';
+};
+
+export type AdminModeratedMessagesApiV1ChatAdminModeratedMessagesGetResponses = {
+    /**
+     * Response Admin Moderated Messages Api V1 Chat Admin Moderated Messages Get
+     * Successful Response
+     */
+    200: Array<AdminMessageOut>;
+};
+
+export type AdminModeratedMessagesApiV1ChatAdminModeratedMessagesGetResponse = AdminModeratedMessagesApiV1ChatAdminModeratedMessagesGetResponses[keyof AdminModeratedMessagesApiV1ChatAdminModeratedMessagesGetResponses];
 
 export type CompanyAccountApiV1CompaniesCompanyUuidAccountGetData = {
     body?: never;

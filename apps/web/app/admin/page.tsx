@@ -21,6 +21,8 @@ import {
   adminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePost,
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
+  adminModeratedMessagesApiV1ChatAdminModeratedMessagesGet,
+  type AdminMessageOut,
   companyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGet,
   setCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPut,
   createAccountApiV1AdminPaymentAccountsPost,
@@ -668,6 +670,60 @@ function CompanyPricingPanel() {
   );
 }
 
+function ModeratedChatsPanel() {
+  const [items, setItems] = useState<AdminMessageOut[] | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const { data } = await adminModeratedMessagesApiV1ChatAdminModeratedMessagesGet();
+      setItems(data ?? []);
+    })();
+  }, []);
+
+  if (items === null) {
+    return (
+      <div className="flex justify-center py-10 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+  if (items.length === 0) {
+    return <EmptyCard text="Отредактированных или удалённых сообщений нет" />;
+  }
+  return (
+    <div className="space-y-3">
+      {items.map((m) => (
+        <Card key={m.chat_message_uuid}>
+          <CardContent className="pt-5">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">{m.event_title}</span>
+              <span>отправлено {formatDateTime(m.sent_at)}</span>
+              {m.edited_at && <span className="text-amber-700">изменено {formatDateTime(m.edited_at)}</span>}
+              {m.deleted_at && (
+                <span className="text-status-danger">удалено {formatDateTime(m.deleted_at)}</span>
+              )}
+            </div>
+            <p className={cn("mt-2 text-sm", m.deleted_at && "line-through opacity-70")}>{m.text}</p>
+            {m.revisions.length > 0 && (
+              <div className="mt-2 rounded-lg border bg-secondary/30 p-2.5">
+                <div className="text-xs font-medium text-muted-foreground">Прежние версии</div>
+                <ol className="mt-1 space-y-1">
+                  {m.revisions.map((r, i) => (
+                    <li key={i} className="text-sm">
+                      <span className="text-xs text-muted-foreground">{formatDateTime(r.replaced_at)} · </span>
+                      {r.text}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 function PaymentAccountsPanel() {
   const [accounts, setAccounts] = useState<PaymentAccountOut[] | null>(null);
   const [name, setName] = useState("");
@@ -816,6 +872,7 @@ type TabKey =
   | "topups"
   | "payouts"
   | "complaints"
+  | "chats"
   | "pricing"
   | "accounts";
 
@@ -899,6 +956,7 @@ export default function AdminPage() {
     { key: "topups", label: "Пополнения", count: topups.length },
     { key: "payouts", label: "Выплаты", count: payouts.length },
     { key: "complaints", label: "Жалобы", count: complaints.length },
+    { key: "chats", label: "Чаты", count: null },
     { key: "accounts", label: "Счета", count: null },
     { key: "pricing", label: "Тарифы", count: null },
   ];
@@ -909,6 +967,7 @@ export default function AdminPage() {
     topups: { title: "Пополнения", subtitle: "Заявки на зачисление средств" },
     payouts: { title: "Выплаты", subtitle: "Выплаты соискателям по сменам" },
     complaints: { title: "Жалобы", subtitle: "Открытые споры" },
+    chats: { title: "Чаты", subtitle: "Отредактированные и удалённые сообщения · версии" },
     accounts: { title: "Счета", subtitle: "Приём пополнений · лимиты по месяцам" },
     pricing: { title: "Тарифы", subtitle: "Стоимость услуг платформы" },
   };
@@ -1118,6 +1177,7 @@ export default function AdminPage() {
               <TopupCard key={t.topup_request_uuid} topup={t} onDone={() => void reload()} />
             ))
           ))}
+        {tab === "chats" && <ModeratedChatsPanel />}
         {tab === "accounts" && <PaymentAccountsPanel />}
         {tab === "pricing" && (
           <>

@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, Loader2, SendHorizonal } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, SendHorizonal, Trash2, X } from "lucide-react";
 import {
+  deleteMessageApiV1ChatMessagesChatMessageUuidDelete,
+  editMessageApiV1ChatMessagesChatMessageUuidPatch,
   markReadApiV1ChatThreadsChatThreadUuidReadPost,
   myThreadsApiV1ChatThreadsGet,
   sendMessageApiV1ChatThreadsChatThreadUuidMessagesPost,
@@ -18,6 +20,10 @@ import { getTokens } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
 import { cn } from "@/lib/utils";
 
+function timeOf(iso: string): string {
+  return new Date(iso).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+}
+
 export default function ChatThreadPage() {
   const { uuid } = useParams<{ uuid: string }>();
   const { me } = useAuth();
@@ -25,6 +31,7 @@ export default function ChatThreadPage() {
   const [messages, setMessages] = useState<MessageOut[] | null>(null);
   const [online, setOnline] = useState(false);
   const [text, setText] = useState("");
+  const [editing, setEditing] = useState<MessageOut | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -42,12 +49,17 @@ export default function ChatThreadPage() {
     void load();
   }, [load]);
 
-  // realtime: WebSocket с онлайн-статусом и живой доставкой (переподключение при обрыве)
+  // realtime: WebSocket — доставка, правки, удаления, онлайн-статус (переподключение при обрыве)
   useEffect(() => {
     const tokens = getTokens();
     if (!tokens || !me) return;
     let closedByUs = false;
     let ws: WebSocket;
+
+    const applyUpdate = (updated: MessageOut) =>
+      setMessages((prev) =>
+        prev?.map((m) => (m.chat_message_uuid === updated.chat_message_uuid ? updated : m)) ?? prev,
+      );
 
     const connect = () => {
       const proto = window.location.protocol === "https:" ? "wss" : "ws";
@@ -55,7 +67,7 @@ export default function ChatThreadPage() {
       wsRef.current = ws;
       ws.onmessage = (event) => {
         const data = JSON.parse(event.data) as
-          | ({ type: "message" } & MessageOut)
+          | ({ type: "message" | "message_edited" | "message_deleted" } & MessageOut)
           | { type: "presence"; user_uuid: string; online: boolean }
           | { type: "read"; chat_thread_uuid: string; reader_uuid: string };
         if (data.type === "message" && data.chat_thread_uuid === uuid) {
@@ -67,6 +79,11 @@ export default function ChatThreadPage() {
           if (data.sender_uuid !== me.user_uuid) {
             ws.send(JSON.stringify({ type: "read", chat_thread_uuid: uuid }));
           }
+        } else if (
+          (data.type === "message_edited" || data.type === "message_deleted") &&
+          data.chat_thread_uuid === uuid
+        ) {
+          applyUpdate(data);
         } else if (data.type === "presence" && data.user_uuid !== me.user_uuid) {
           setOnline(data.online);
         }
@@ -90,12 +107,25 @@ export default function ChatThreadPage() {
   async function send() {
     const body = text.trim();
     if (!body) return;
+    if (editing) {
+      const { data } = await editMessageApiV1ChatMessagesChatMessageUuidPatch({
+        path: { chat_message_uuid: editing.chat_message_uuid },
+        body: { text: body },
+      });
+      if (data) {
+        setMessages((prev) =>
+          prev?.map((m) => (m.chat_message_uuid === data.chat_message_uuid ? data : m)) ?? prev,
+        );
+      }
+      setEditing(null);
+      setText("");
+      return;
+    }
     const ws = wsRef.current;
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: "send", chat_thread_uuid: uuid, text: body }));
       setText("");
     } else {
-      // фолбэк, если сокет недоступен — обычный REST
       const { error } = await sendMessageApiV1ChatThreadsChatThreadUuidMessagesPost({
         path: { chat_thread_uuid: uuid },
         body: { text: body },
@@ -104,6 +134,17 @@ export default function ChatThreadPage() {
         setText("");
         await load();
       }
+    }
+  }
+
+  async function remove(message: MessageOut) {
+    const { data } = await deleteMessageApiV1ChatMessagesChatMessageUuidDelete({
+      path: { chat_message_uuid: message.chat_message_uuid },
+    });
+    if (data) {
+      setMessages((prev) =>
+        prev?.map((m) => (m.chat_message_uuid === data.chat_message_uuid ? data : m)) ?? prev,
+      );
     }
   }
 
@@ -126,9 +167,12 @@ export default function ChatThreadPage() {
               )}
             </div>
             {thread && (
-              <div className="truncate text-xs text-muted-foreground">
-                {thread.role_name} · {thread.event_title}
-              </div>
+              <Link
+                href={`/shift/${thread.vacancy_uuid}`}
+                className="block truncate text-xs text-muted-foreground hover:text-foreground hover:underline"
+              >
+                Событие: {thread.event_title} · {thread.role_name} →
+              </Link>
             )}
           </div>
         </div>
@@ -145,15 +189,53 @@ export default function ChatThreadPage() {
           ) : (
             messages.map((message) => {
               const mine = message.sender_uuid === me?.user_uuid;
+              const deleted = message.deleted_at != null;
               return (
-                <div key={message.chat_message_uuid} className={cn("flex", mine && "justify-end")}>
-                  <div
-                    className={cn(
-                      "max-w-[80%] rounded-2xl px-3.5 py-2 text-sm",
-                      mine ? "rounded-br-md bg-primary text-primary-foreground" : "rounded-bl-md bg-secondary",
+                <div key={message.chat_message_uuid} className={cn("group flex", mine && "justify-end")}>
+                  <div className={cn("flex max-w-[80%] items-end gap-1.5", mine && "flex-row-reverse")}>
+                    <div
+                      className={cn(
+                        "rounded-2xl px-3.5 py-2 text-sm",
+                        mine
+                          ? "rounded-br-md bg-primary text-primary-foreground"
+                          : "rounded-bl-md bg-secondary",
+                        deleted && "italic opacity-60",
+                      )}
+                    >
+                      {deleted ? "Сообщение удалено" : message.text}
+                      <div
+                        className={cn(
+                          "mt-0.5 text-right text-[10px]",
+                          mine ? "text-primary-foreground/70" : "text-muted-foreground",
+                        )}
+                      >
+                        {timeOf(message.sent_at)}
+                        {message.edited_at && !deleted && (
+                          <span title={`Изменено в ${timeOf(message.edited_at)}`}> · изменено</span>
+                        )}
+                      </div>
+                    </div>
+                    {mine && !deleted && (
+                      <div className="mb-1 hidden shrink-0 gap-1 group-hover:flex">
+                        <button
+                          className="text-muted-foreground hover:text-foreground"
+                          title="Изменить"
+                          onClick={() => {
+                            setEditing(message);
+                            setText(message.text);
+                          }}
+                        >
+                          <Pencil className="size-3.5" />
+                        </button>
+                        <button
+                          className="text-muted-foreground hover:text-status-danger"
+                          title="Удалить"
+                          onClick={() => void remove(message)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
                     )}
-                  >
-                    {message.text}
                   </div>
                 </div>
               );
@@ -162,8 +244,22 @@ export default function ChatThreadPage() {
           <div ref={bottomRef} />
         </div>
 
+        {editing && (
+          <div className="flex items-center justify-between rounded-t-lg border border-b-0 bg-secondary/50 px-3 py-1.5 text-xs">
+            <span className="text-muted-foreground">Редактирование сообщения</span>
+            <button
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => {
+                setEditing(null);
+                setText("");
+              }}
+            >
+              <X className="size-3.5" />
+            </button>
+          </div>
+        )}
         <form
-          className="flex gap-2 border-t pt-3"
+          className={cn("flex gap-2 pt-3", editing ? "border-t-0" : "border-t")}
           onSubmit={(e) => {
             e.preventDefault();
             void send();
@@ -171,7 +267,7 @@ export default function ChatThreadPage() {
         >
           <input
             className="h-10 flex-1 rounded-full border bg-transparent px-4 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
-            placeholder="Сообщение"
+            placeholder={editing ? "Новый текст сообщения" : "Сообщение"}
             aria-label="Сообщение"
             value={text}
             onChange={(e) => setText(e.target.value)}

@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewList } from "@/components/review-list";
-import { EXPERIENCE_OPTIONS } from "@/lib/experience";
+import { EDUCATION_OPTIONS, ENGLISH_OPTIONS, EXPERIENCE_OPTIONS } from "@/lib/experience";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpInput, OTP_LENGTH } from "@/components/otp-input";
@@ -120,15 +120,30 @@ function ProfileFields() {
   const [name, setName] = useState(me?.name ?? "");
   const [city, setCity] = useState(me?.city ?? "");
   const [experience, setExperience] = useState(me?.experience ?? "");
+  const [about, setAbout] = useState(me?.about ?? "");
+  const [english, setEnglish] = useState(me?.english_level ?? "");
+  const [education, setEducation] = useState(me?.education ?? "");
   const [busy, setBusy] = useState(false);
 
   const dirty =
-    name !== (me?.name ?? "") || city !== (me?.city ?? "") || experience !== (me?.experience ?? "");
+    name !== (me?.name ?? "") ||
+    city !== (me?.city ?? "") ||
+    experience !== (me?.experience ?? "") ||
+    about !== (me?.about ?? "") ||
+    english !== (me?.english_level ?? "") ||
+    education !== (me?.education ?? "");
 
   async function save() {
     setBusy(true);
     const { error } = await updateMeApiV1UsersMePatch({
-      body: { name, city, experience: experience || null },
+      body: {
+        name,
+        city,
+        experience: experience || null,
+        about: about || null,
+        english_level: english || null,
+        education: education || null,
+      },
     });
     setBusy(false);
     if (error) {
@@ -180,6 +195,51 @@ function ProfileFields() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="profile-english">Английский язык</Label>
+            <select
+              id="profile-english"
+              className="mt-1.5 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              value={english}
+              onChange={(e) => setEnglish(e.target.value)}
+            >
+              <option value="">Не указан</option>
+              {ENGLISH_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <Label htmlFor="profile-education">Образование</Label>
+            <select
+              id="profile-education"
+              className="mt-1.5 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              value={education}
+              onChange={(e) => setEducation(e.target.value)}
+            >
+              <option value="">Не указано</option>
+              {EDUCATION_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="profile-about">О себе</Label>
+          <textarea
+            id="profile-about"
+            className="mt-1.5 min-h-24 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+            placeholder="Кратко о вашем опыте, сильных сторонах, любимых форматах смен"
+            maxLength={2000}
+          />
         </div>
         <Button disabled={!dirty || busy} onClick={() => void save()}>
           {busy && <Loader2 className="size-4 animate-spin" />}
