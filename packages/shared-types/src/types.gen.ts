@@ -963,6 +963,10 @@ export type MeOut = {
      */
     platform_role: string;
     /**
+     * Experience
+     */
+    experience?: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
@@ -1381,6 +1385,10 @@ export type PriceOut = {
      * Amount Kop
      */
     amount_kop: number;
+    /**
+     * Company Override
+     */
+    company_override?: boolean;
 };
 
 /**
@@ -1976,6 +1984,10 @@ export type UserOut = {
      */
     desired_roles: Array<string>;
     /**
+     * Experience
+     */
+    experience: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
@@ -1997,6 +2009,10 @@ export type UserUpdateIn = {
      * Desired Roles
      */
     desired_roles?: Array<string> | null;
+    /**
+     * Experience
+     */
+    experience?: string | null;
 };
 
 /**
@@ -2249,6 +2265,33 @@ export type ValidationError = {
     };
 };
 
+/**
+ * WorkerPublicOut
+ * Публичный профиль соискателя для организации — БЕЗ контактов (телефон/почта не отдаём).
+ */
+export type WorkerPublicOut = {
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * City
+     */
+    city: string | null;
+    /**
+     * Desired Roles
+     */
+    desired_roles: Array<string>;
+    /**
+     * Experience
+     */
+    experience: string | null;
+};
+
 export type HealthApiV1HealthGetData = {
     body?: never;
     path?: never;
@@ -2402,6 +2445,36 @@ export type ConsentApiV1AuthConsentPostResponses = {
 };
 
 export type ConsentApiV1AuthConsentPostResponse = ConsentApiV1AuthConsentPostResponses[keyof ConsentApiV1AuthConsentPostResponses];
+
+export type WorkerPublicProfileApiV1UsersUserUuidPublicGetData = {
+    body?: never;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_uuid}/public';
+};
+
+export type WorkerPublicProfileApiV1UsersUserUuidPublicGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type WorkerPublicProfileApiV1UsersUserUuidPublicGetError = WorkerPublicProfileApiV1UsersUserUuidPublicGetErrors[keyof WorkerPublicProfileApiV1UsersUserUuidPublicGetErrors];
+
+export type WorkerPublicProfileApiV1UsersUserUuidPublicGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: WorkerPublicOut;
+};
+
+export type WorkerPublicProfileApiV1UsersUserUuidPublicGetResponse = WorkerPublicProfileApiV1UsersUserUuidPublicGetResponses[keyof WorkerPublicProfileApiV1UsersUserUuidPublicGetResponses];
 
 export type GetMeApiV1UsersMeGetData = {
     body?: never;
@@ -3265,6 +3338,102 @@ export type SetPriceApiV1AdminPricingKeyPutResponses = {
 };
 
 export type SetPriceApiV1AdminPricingKeyPutResponse = SetPriceApiV1AdminPricingKeyPutResponses[keyof SetPriceApiV1AdminPricingKeyPutResponses];
+
+export type CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/companies/{company_uuid}/pricing';
+};
+
+export type CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetError = CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetErrors[keyof CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetErrors];
+
+export type CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetResponses = {
+    /**
+     * Response Company Prices Admin Api V1 Admin Companies  Company Uuid  Pricing Get
+     * Successful Response
+     */
+    200: Array<PriceOut>;
+};
+
+export type CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetResponse = CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetResponses[keyof CompanyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGetResponses];
+
+export type SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutData = {
+    body: PriceUpdateIn;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+        /**
+         * Key
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/companies/{company_uuid}/pricing/{key}';
+};
+
+export type SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutError = SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutErrors[keyof SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutErrors];
+
+export type SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutResponses = {
+    /**
+     * Successful Response
+     */
+    200: PriceOut;
+};
+
+export type SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutResponse = SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutResponses[keyof SetCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPutResponses];
+
+export type CompanyPricesApiV1CompaniesCompanyUuidPricingGetData = {
+    body?: never;
+    path: {
+        /**
+         * Company Uuid
+         */
+        company_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/companies/{company_uuid}/pricing';
+};
+
+export type CompanyPricesApiV1CompaniesCompanyUuidPricingGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompanyPricesApiV1CompaniesCompanyUuidPricingGetError = CompanyPricesApiV1CompaniesCompanyUuidPricingGetErrors[keyof CompanyPricesApiV1CompaniesCompanyUuidPricingGetErrors];
+
+export type CompanyPricesApiV1CompaniesCompanyUuidPricingGetResponses = {
+    /**
+     * Response Company Prices Api V1 Companies  Company Uuid  Pricing Get
+     * Successful Response
+     */
+    200: Array<PriceOut>;
+};
+
+export type CompanyPricesApiV1CompaniesCompanyUuidPricingGetResponse = CompanyPricesApiV1CompaniesCompanyUuidPricingGetResponses[keyof CompanyPricesApiV1CompaniesCompanyUuidPricingGetResponses];
 
 export type CreateReviewApiV1ReviewsPostData = {
     body: ReviewCreateIn;

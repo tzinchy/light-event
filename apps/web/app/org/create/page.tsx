@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader2, Minus, Plus } from "lucide-react";
 import type { MapPoint } from "@/components/map-picker";
 import {
+  companyPricesApiV1CompaniesCompanyUuidPricingGet,
   createFilialApiV1CompaniesCompanyUuidFilialsPost,
   createVacancyApiV1CompaniesCompanyUuidVacanciesPost,
   listFilialsApiV1CompaniesCompanyUuidFilialsGet,
@@ -154,6 +155,7 @@ export default function CreateEventPage() {
   const [requirements, setRequirements] = useState("");
   const [tests, setTests] = useState<TestListItemOut[]>([]);
   const [requiredTests, setRequiredTests] = useState<string[]>([]);
+  const [publishFeeKop, setPublishFeeKop] = useState<number | null>(null);
   const [busy, setBusy] = useState<"draft" | "publish" | null>(null);
 
   const companyUuid = current?.company.company_uuid;
@@ -182,6 +184,18 @@ export default function CreateEventPage() {
     void loadFilials();
     void loadTests();
   }, [loadFilials, loadTests]);
+
+  // реальный тариф публикации для этой компании (может отличаться от общего — §11.10-A)
+  useEffect(() => {
+    if (!companyUuid) return;
+    void (async () => {
+      const { data } = await companyPricesApiV1CompaniesCompanyUuidPricingGet({
+        path: { company_uuid: companyUuid },
+      });
+      const fee = (data ?? []).find((p) => p.key === "vacancy_publish");
+      setPublishFeeKop(fee?.amount_kop ?? null);
+    })();
+  }, [companyUuid]);
 
   if (!companyUuid) return null;
 
@@ -461,7 +475,9 @@ export default function CreateEventPage() {
         <CardContent>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">{DICT.feeNote}</span>
-            <span className="font-mono text-lg font-semibold">{DICT.vacancyCost}</span>
+            <span className="font-mono text-lg font-semibold">
+              {publishFeeKop !== null ? kopToRub(publishFeeKop) : "…"}
+            </span>
           </div>
           <p className="mt-2 text-xs text-muted-foreground">{DICT.publishNote}</p>
           <div className="mt-4 flex gap-2">

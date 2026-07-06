@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ChatButton } from "@/components/chat-button";
 import { SiteHeader } from "@/components/site-header";
 import { APP_STATUS } from "@/app/apps/page";
 import { DICT } from "@/lib/dict";
@@ -261,12 +262,12 @@ export default function ApplicationPage() {
                   {kopToRub(summary.vacancy.pay_total_kop)}
                 </span>
               </div>
-              <Link
-                href={`/shift/${summary.vacancy_uuid}`}
-                className="mt-2 inline-block text-sm underline"
-              >
-                Открыть смену
-              </Link>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <Link href={`/shift/${summary.vacancy_uuid}`} className="text-sm underline">
+                  Открыть смену
+                </Link>
+                <ChatButton applicationUuid={summary.application_uuid} label="Чат с организатором" />
+              </div>
             </CardContent>
           </Card>
         )}

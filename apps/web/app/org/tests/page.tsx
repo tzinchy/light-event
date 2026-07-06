@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ClipboardList, Loader2, Plus, Trash2 } from "lucide-react";
 import {
+  companyPricesApiV1CompaniesCompanyUuidPricingGet,
   companyTestsApiV1CompaniesCompanyUuidTestsGet,
   createCompanyTestApiV1CompaniesCompanyUuidTestsPost,
   submitTestApiV1TestsTestUuidSubmitPost,
@@ -16,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DICT } from "@/lib/dict";
 import { useOrg } from "@/lib/org-context";
+import { kopToRub } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const TEST_STATUS: Record<string, { label: string; className: string }> = {
@@ -56,10 +58,12 @@ function questionValid(q: QuestionDraft): boolean {
 
 function CreateTestForm({
   companyUuid,
+  feeLabel,
   onCreated,
   onCancel,
 }: {
   companyUuid: string;
+  feeLabel: string;
   onCreated: () => void;
   onCancel: () => void;
 }) {
@@ -114,7 +118,7 @@ function CreateTestForm({
       <CardHeader>
         <CardTitle>Новый тест</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Создание — бесплатно (черновик). Оплата {DICT.testCost} спишется при отправке на модерацию.
+          Создание — бесплатно (черновик). Оплата {feeLabel} спишется при отправке на модерацию.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -295,6 +299,7 @@ export default function OrgTestsPage() {
   const { current, loading } = useOrg();
   const [tests, setTests] = useState<CompanyTestItemOut[] | null>(null);
   const [creating, setCreating] = useState(false);
+  const [testFee, setTestFee] = useState<string>(DICT.testCost);
 
   const reload = useCallback(async () => {
     if (!current) return;
@@ -302,6 +307,18 @@ export default function OrgTestsPage() {
       path: { company_uuid: current.company.company_uuid },
     });
     setTests(data ?? []);
+  }, [current]);
+
+  // реальный тариф теста для этой компании (§11.10-A)
+  useEffect(() => {
+    if (!current) return;
+    void (async () => {
+      const { data } = await companyPricesApiV1CompaniesCompanyUuidPricingGet({
+        path: { company_uuid: current.company.company_uuid },
+      });
+      const fee = (data ?? []).find((p) => p.key === "company_test");
+      if (fee) setTestFee(kopToRub(fee.amount_kop));
+    })();
   }, [current]);
 
   useEffect(() => {
@@ -346,6 +363,7 @@ export default function OrgTestsPage() {
       {creating && (
         <CreateTestForm
           companyUuid={current.company.company_uuid}
+          feeLabel={testFee}
           onCreated={() => {
             setCreating(false);
             void reload();
@@ -379,14 +397,14 @@ export default function OrgTestsPage() {
                     )}
                     {test.status === "draft" && (
                       <div className="mt-1 text-xs text-muted-foreground">
-                        Черновик сохранён. Отправьте на модерацию — {DICT.testCost} спишутся со счёта,
+                        Черновик сохранён. Отправьте на модерацию — {testFee} спишутся со счёта,
                         затем админ проверит и опубликует.
                       </div>
                     )}
                   </div>
                   {test.status === "draft" ? (
                     <Button size="sm" onClick={() => void submitForModeration(test.test_uuid)}>
-                      Отправить на модерацию · {DICT.testCost}
+                      Отправить на модерацию · {testFee}
                     </Button>
                   ) : (
                     <div className="text-sm text-muted-foreground">

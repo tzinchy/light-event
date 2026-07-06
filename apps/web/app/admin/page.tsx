@@ -21,6 +21,8 @@ import {
   adminResolveComplaintApiV1AdminComplaintsComplaintUuidResolvePost,
   adminListTopupRequestsApiV1AdminTopupRequestsGet,
   adminResolveTopupApiV1AdminTopupRequestsTopupRequestUuidResolvePost,
+  companyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGet,
+  setCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPut,
   createAccountApiV1AdminPaymentAccountsPost,
   listAccountsApiV1AdminPaymentAccountsGet,
   setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost,
@@ -552,6 +554,120 @@ function PriceRow({ price, onSaved }: { price: PriceOut; onSaved: () => void }) 
   );
 }
 
+function CompanyPriceRow({
+  companyUuid,
+  price,
+  onSaved,
+}: {
+  companyUuid: string;
+  price: PriceOut;
+  onSaved: () => void;
+}) {
+  const [rub, setRub] = useState(String(Math.round(price.amount_kop / 100)));
+  const [busy, setBusy] = useState(false);
+  const kop = rubInputToKop(rub);
+  const dirty = kop !== null && kop !== price.amount_kop;
+
+  async function save() {
+    if (kop === null) return;
+    setBusy(true);
+    const { error } = await setCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPut({
+      path: { company_uuid: companyUuid, key: price.key },
+      body: { amount_kop: kop },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось сохранить цену"));
+      return;
+    }
+    toast.success(`Тариф «${price.label}» для компании обновлён`);
+    onSaved();
+  }
+
+  return (
+    <div className="flex items-center gap-3 border-b py-3 last:border-b-0">
+      <div className="min-w-0 flex-1">
+        <div className="text-sm font-medium">{price.label}</div>
+        <div className="text-xs text-muted-foreground">
+          {price.company_override ? "Свой тариф компании" : "Общий тариф"} · {kopToRub(price.amount_kop)}
+        </div>
+      </div>
+      <div className="relative">
+        <Input
+          className="w-32 pr-6 text-right font-mono"
+          inputMode="numeric"
+          value={rub}
+          onChange={(e) => setRub(e.target.value.replace(/[^\d]/g, ""))}
+        />
+        <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          ₽
+        </span>
+      </div>
+      <Button size="sm" disabled={!dirty || busy} onClick={() => void save()}>
+        {busy ? <Loader2 className="size-4 animate-spin" /> : "Сохранить"}
+      </Button>
+    </div>
+  );
+}
+
+function CompanyPricingPanel() {
+  const [companies, setCompanies] = useState<CompanyModerationOut[]>([]);
+  const [selected, setSelected] = useState<string>("");
+  const [prices, setPrices] = useState<PriceOut[] | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const { data } = await listCompaniesApiV1AdminCompaniesGet({ query: { status: "verified" } });
+      setCompanies(data ?? []);
+    })();
+  }, []);
+
+  const loadPrices = useCallback(async () => {
+    if (!selected) {
+      setPrices(null);
+      return;
+    }
+    const { data } = await companyPricesAdminApiV1AdminCompaniesCompanyUuidPricingGet({
+      path: { company_uuid: selected },
+    });
+    setPrices(data ?? []);
+  }, [selected]);
+
+  useEffect(() => {
+    void loadPrices();
+  }, [loadPrices]);
+
+  return (
+    <Card>
+      <CardContent className="pt-5">
+        <div className="font-semibold">Тарифы конкретной компании</div>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Свой тариф компании имеет приоритет над общим.
+        </p>
+        <select
+          className="mt-3 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+        >
+          <option value="">Выберите компанию…</option>
+          {companies.map((c) => (
+            <option key={c.company_uuid} value={c.company_uuid}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        {selected && prices && (
+          <div className="mt-2">
+            {prices.map((p) => (
+              <CompanyPriceRow key={p.key} companyUuid={selected} price={p} onSaved={() => void loadPrices()} />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function PaymentAccountsPanel() {
   const [accounts, setAccounts] = useState<PaymentAccountOut[] | null>(null);
   const [name, setName] = useState("");
@@ -1003,8 +1119,14 @@ export default function AdminPage() {
             ))
           ))}
         {tab === "accounts" && <PaymentAccountsPanel />}
-        {tab === "pricing" &&
-          prices.map((p) => <PriceRow key={p.key} price={p} onSaved={() => void reload()} />)}
+        {tab === "pricing" && (
+          <>
+            {prices.map((p) => (
+              <PriceRow key={p.key} price={p} onSaved={() => void reload()} />
+            ))}
+            <CompanyPricingPanel />
+          </>
+        )}
               </div>
             </div>
           </main>

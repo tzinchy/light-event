@@ -15,6 +15,7 @@ import {
 } from "@light-event/shared-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ChatButton } from "@/components/chat-button";
 import { DICT } from "@/lib/dict";
 import { useOrg } from "@/lib/org-context";
 import { formatShiftWindow } from "@/lib/format";
@@ -274,6 +275,7 @@ export default function CandidatesPage() {
                           {DICT.toReserve}
                         </Button>
                       )}
+                      <ChatButton applicationUuid={app.application_uuid} />
                       {list !== "shortlist" && (
                         <Button
                           size="sm"
