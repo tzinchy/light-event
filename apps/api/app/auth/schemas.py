@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
@@ -41,4 +41,8 @@ class MeOut(BaseModel):
     about: str | None = None
     english_level: str | None = None
     education: str | None = None
+    telegram: str | None = None
+    birth_date: date | None = None
+    citizenship: str | None = None
+    gender: str | None = None
     pd_consent_at: datetime | None

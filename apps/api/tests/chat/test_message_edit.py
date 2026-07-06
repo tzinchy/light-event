@@ -103,10 +103,9 @@ async def test_profile_extra_fields(client, login_user):
         )
     ).status_code == 422
 
-    # публичный профиль отдаёт новые поля (по-прежнему без контактов)
-    viewer = await login_user("+79058530002")
+    # профиль отдаёт новые поля (по-прежнему без контактов); свой профиль виден себе (§11.12)
     pub = (
-        await client.get(f"/api/v1/users/{session['me']['user_uuid']}/public", headers=viewer["headers"])
+        await client.get(f"/api/v1/users/{session['me']['user_uuid']}/public", headers=session["headers"])
     ).json()
     assert pub["about"] == "Официант с опытом банкетов"
     assert pub["english_level"] == "intermediate"

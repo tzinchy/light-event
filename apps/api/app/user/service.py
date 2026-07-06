@@ -60,5 +60,13 @@ class UserService:
             user.english_level = data.english_level
         if data.education is not None:
             user.education = data.education
+        if data.telegram is not None:
+            user.telegram = data.telegram or None  # пустая строка = отвязать
+        if data.birth_date is not None:
+            user.birth_date = data.birth_date
+        if data.citizenship is not None:
+            user.citizenship = data.citizenship
+        if data.gender is not None:
+            user.gender = data.gender
         await self.session.flush()
         return user

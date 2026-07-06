@@ -1,8 +1,8 @@
 import enum
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, DateTime, Enum, String, text
+from sqlalchemy import ARRAY, Date, DateTime, Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
@@ -34,5 +34,9 @@ class User(TimestampMixin, Base):
     english_level: Mapped[str | None] = mapped_column(String(20))
     # образование: secondary | vocational | higher
     education: Mapped[str | None] = mapped_column(String(20))
+    telegram: Mapped[str | None] = mapped_column(String(64))  # тег без @; контакт — наружу не отдаём
+    birth_date: Mapped[date | None] = mapped_column(Date)
+    citizenship: Mapped[str | None] = mapped_column(String(100))
+    gender: Mapped[str | None] = mapped_column(String(10))  # male | female
     pd_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_active: Mapped[bool] = mapped_column(default=True)
