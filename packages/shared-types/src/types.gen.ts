@@ -1022,6 +1022,22 @@ export type MeOut = {
      */
     education?: string | null;
     /**
+     * Telegram
+     */
+    telegram?: string | null;
+    /**
+     * Birth Date
+     */
+    birth_date?: string | null;
+    /**
+     * Citizenship
+     */
+    citizenship?: string | null;
+    /**
+     * Gender
+     */
+    gender?: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
@@ -2087,6 +2103,22 @@ export type UserOut = {
      */
     education: string | null;
     /**
+     * Telegram
+     */
+    telegram: string | null;
+    /**
+     * Birth Date
+     */
+    birth_date: string | null;
+    /**
+     * Citizenship
+     */
+    citizenship: string | null;
+    /**
+     * Gender
+     */
+    gender: string | null;
+    /**
      * Pd Consent At
      */
     pd_consent_at: string | null;
@@ -2124,6 +2156,22 @@ export type UserUpdateIn = {
      * Education
      */
     education?: string | null;
+    /**
+     * Telegram
+     */
+    telegram?: string | null;
+    /**
+     * Birth Date
+     */
+    birth_date?: string | null;
+    /**
+     * Citizenship
+     */
+    citizenship?: string | null;
+    /**
+     * Gender
+     */
+    gender?: string | null;
 };
 
 /**
@@ -2378,7 +2426,9 @@ export type ValidationError = {
 
 /**
  * WorkerPublicOut
- * Публичный профиль соискателя для организации — БЕЗ контактов (телефон/почта не отдаём).
+ * Профиль соискателя для организации — БЕЗ контактов (телефон/почта/телеграм не отдаём).
+ *
+ * Виден только админу, самому пользователю и командам компаний, куда он откликнулся (§11.12).
  */
 export type WorkerPublicOut = {
     /**
@@ -2413,6 +2463,18 @@ export type WorkerPublicOut = {
      * Education
      */
     education: string | null;
+    /**
+     * Birth Date
+     */
+    birth_date: string | null;
+    /**
+     * Citizenship
+     */
+    citizenship: string | null;
+    /**
+     * Gender
+     */
+    gender: string | null;
 };
 
 export type HealthApiV1HealthGetData = {

@@ -13,7 +13,17 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";
 import { ReviewList } from "@/components/review-list";
-import { EDUCATION_LABEL, ENGLISH_LABEL, EXPERIENCE_LABEL } from "@/lib/experience";
+import { EDUCATION_LABEL, ENGLISH_LABEL, EXPERIENCE_LABEL, GENDER_LABEL } from "@/lib/experience";
+
+function age(birthDate: string): number {
+  const b = new Date(birthDate);
+  const now = new Date();
+  let years = now.getFullYear() - b.getFullYear();
+  if (now.getMonth() < b.getMonth() || (now.getMonth() === b.getMonth() && now.getDate() < b.getDate())) {
+    years -= 1;
+  }
+  return years;
+}
 
 export default function WorkerProfilePage() {
   const { uuid } = useParams<{ uuid: string }>();
@@ -38,7 +48,7 @@ export default function WorkerProfilePage() {
       <div className="flex min-h-screen flex-col">
         <SiteHeader />
         <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-16 text-center text-muted-foreground">
-          Профиль не найден
+          Профиль недоступен — он виден организациям только после отклика соискателя.
         </main>
       </div>
     );
@@ -63,9 +73,20 @@ export default function WorkerProfilePage() {
           <div className="min-w-0">
             <h1 className="truncate text-xl font-bold">{worker.name ?? "Соискатель"}</h1>
             <div className="mt-0.5 text-sm text-muted-foreground">
-              {worker.city ?? "Город не указан"}
-              {worker.experience ? ` · Опыт: ${EXPERIENCE_LABEL[worker.experience] ?? worker.experience}` : ""}
+              {[
+                worker.city ?? "Город не указан",
+                worker.birth_date ? `${age(worker.birth_date)} лет` : null,
+                worker.gender ? GENDER_LABEL[worker.gender] : null,
+                worker.citizenship ? `Гражданство: ${worker.citizenship}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </div>
+            {worker.experience && (
+              <div className="mt-0.5 text-sm text-muted-foreground">
+                Опыт: {EXPERIENCE_LABEL[worker.experience] ?? worker.experience}
+              </div>
+            )}
           </div>
         </div>
 

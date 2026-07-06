@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ReviewList } from "@/components/review-list";
-import { EDUCATION_OPTIONS, ENGLISH_OPTIONS, EXPERIENCE_OPTIONS } from "@/lib/experience";
+import { EDUCATION_OPTIONS, ENGLISH_OPTIONS, EXPERIENCE_OPTIONS, GENDER_OPTIONS } from "@/lib/experience";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OtpInput, OTP_LENGTH } from "@/components/otp-input";
@@ -123,6 +123,10 @@ function ProfileFields() {
   const [about, setAbout] = useState(me?.about ?? "");
   const [english, setEnglish] = useState(me?.english_level ?? "");
   const [education, setEducation] = useState(me?.education ?? "");
+  const [telegram, setTelegram] = useState(me?.telegram ?? "");
+  const [birthDate, setBirthDate] = useState(me?.birth_date ?? "");
+  const [citizenship, setCitizenship] = useState(me?.citizenship ?? "");
+  const [gender, setGender] = useState(me?.gender ?? "");
   const [busy, setBusy] = useState(false);
 
   const dirty =
@@ -131,7 +135,11 @@ function ProfileFields() {
     experience !== (me?.experience ?? "") ||
     about !== (me?.about ?? "") ||
     english !== (me?.english_level ?? "") ||
-    education !== (me?.education ?? "");
+    education !== (me?.education ?? "") ||
+    telegram !== (me?.telegram ?? "") ||
+    birthDate !== (me?.birth_date ?? "") ||
+    citizenship !== (me?.citizenship ?? "") ||
+    gender !== (me?.gender ?? "");
 
   async function save() {
     setBusy(true);
@@ -143,6 +151,10 @@ function ProfileFields() {
         about: about || null,
         english_level: english || null,
         education: education || null,
+        telegram,
+        birth_date: birthDate || null,
+        citizenship: citizenship || null,
+        gender: gender || null,
       },
     });
     setBusy(false);
@@ -228,6 +240,59 @@ function ProfileFields() {
                 </option>
               ))}
             </select>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="profile-birth">Дата рождения</Label>
+            <Input
+              id="profile-birth"
+              type="date"
+              className="mt-1.5"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="profile-gender">Пол</Label>
+            <select
+              id="profile-gender"
+              className="mt-1.5 h-9 w-full rounded-lg border bg-transparent px-3 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="">Не указан</option>
+              {GENDER_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="profile-citizenship">Гражданство</Label>
+            <Input
+              id="profile-citizenship"
+              className="mt-1.5"
+              value={citizenship}
+              onChange={(e) => setCitizenship(e.target.value)}
+              placeholder="РФ"
+            />
+          </div>
+          <div>
+            <Label htmlFor="profile-telegram">Телеграм</Label>
+            <Input
+              id="profile-telegram"
+              className="mt-1.5 font-mono"
+              value={telegram}
+              onChange={(e) => setTelegram(e.target.value.trim())}
+              placeholder="@username"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Виден только вам и платформе — организациям не показывается.
+            </p>
           </div>
         </div>
         <div>

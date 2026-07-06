@@ -31,3 +31,12 @@ export const EDUCATION_OPTIONS = [
 export const EDUCATION_LABEL: Record<string, string> = Object.fromEntries(
   EDUCATION_OPTIONS.map((o) => [o.value, o.label]),
 );
+
+export const GENDER_OPTIONS = [
+  { value: "male", label: "Мужской" },
+  { value: "female", label: "Женский" },
+] as const;
+
+export const GENDER_LABEL: Record<string, string> = Object.fromEntries(
+  GENDER_OPTIONS.map((o) => [o.value, o.label]),
+);

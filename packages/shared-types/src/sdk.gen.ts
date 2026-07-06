@@ -124,7 +124,7 @@ export const consentApiV1AuthConsentPost = <ThrowOnError extends boolean = false
 
 /**
  * Worker Public Profile
- * Публичный профиль соискателя (для организаций) — без контактов.
+ * Профиль соискателя — без контактов; доступ только по отклику (§11.12).
  */
 export const workerPublicProfileApiV1UsersUserUuidPublicGet = <ThrowOnError extends boolean = false>(options: Options<WorkerPublicProfileApiV1UsersUserUuidPublicGetData, ThrowOnError>) => {
     return (options.client ?? client).get<WorkerPublicProfileApiV1UsersUserUuidPublicGetResponses, WorkerPublicProfileApiV1UsersUserUuidPublicGetErrors, ThrowOnError>({
