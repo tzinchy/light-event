@@ -412,3 +412,10 @@ on_hold при подтверждении смены, `POST /admin/payouts/{uuid
 - **Профиль:** `about` («О себе»), `english_level` (none|basic|intermediate|advanced|fluent), `education` (secondary|vocational|higher) — валидация, отображение в `/profile` и публичном `/w/[uuid]` (по-прежнему без контактов).
 
 **Статус (2026-07-06, выполнено):** pytest 167, Vitest 32, tsc чисто.
+
+### 11.12 Приватность профиля + телеграм, дата рождения, гражданство, пол (заказчик 2026-07-06)
+
+- Профиль соискателя **не публичный**: `GET /users/{uuid}/public` — только сам, админ, команда компании, куда человек **откликнулся** (EXISTS по application→vacancy→team_member); иначе 403.
+- `User.telegram` — тег (нормализация без @, редактируемый); **контакт → наружу не отдаётся** (нет в WorkerPublicOut). `birth_date` (валидация), `citizenship`, `gender` (male|female) — видны организации после отклика (возраст/пол/гражданство в шапке /w).
+
+**Статус (2026-07-06, выполнено):** pytest 168, Vitest 32, tsc чисто.
