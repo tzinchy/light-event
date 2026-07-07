@@ -801,7 +801,7 @@ function PaymentAccountsPanel() {
             <Input
               className="w-48"
               inputMode="numeric"
-              placeholder="Лимit в месяц, ₽"
+              placeholder="Лимит в месяц, ₽"
               value={limitRub}
               onChange={(e) => setLimitRub(e.target.value.replace(/[^\d]/g, ""))}
             />
