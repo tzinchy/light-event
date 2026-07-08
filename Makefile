@@ -1,4 +1,4 @@
-.PHONY: infra infra-down full full-rebuild api web test-api test-web migrate revision openapi-client e2e
+.PHONY: infra infra-down full full-rebuild prod api web test-api test-web migrate revision openapi-client e2e
 
 # postgres + redis + minio для локальной разработки
 infra:
@@ -10,6 +10,10 @@ infra-down:
 # полный стенд: db + redis + minio + api + web + nginx (http://localhost:8080)
 full:
 	docker compose --env-file .env -f infra/docker-compose.yml --profile full up -d --build
+
+# прод: полный стенд + Caddy с HTTPS (адрес — SITE_ADDRESS из .env, порты 80/443)
+prod:
+	docker compose --env-file .env -f infra/docker-compose.yml --profile full --profile prod up -d --build
 
 # форс: образы без кэша + пересоздание контейнеров (данные в томах не трогает)
 full-rebuild:

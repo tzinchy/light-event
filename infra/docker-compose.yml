@@ -107,6 +107,24 @@ services:
       - api
       - web
 
+  # прод: HTTPS-терминатор перед nginx; SITE_ADDRESS — домен или <ip>.sslip.io
+  caddy:
+    profiles: ["prod"]
+    image: caddy:alpine
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?set SITE_ADDRESS in .env (домен или 1-2-3-4.sslip.io)}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - nginx
+
 volumes:
   postgres_data:
   minio_data:
+  caddy_data:
+  caddy_config:

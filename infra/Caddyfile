@@ -1,0 +1,6 @@
+# TLS-терминатор перед контейнерным nginx (профиль prod).
+# SITE_ADDRESS — домен или <ip-через-дефисы>.sslip.io; сертификат Caddy получает
+# и продлевает сам (Let's Encrypt, при рейт-лимите — ZeroSSL).
+{$SITE_ADDRESS} {
+	reverse_proxy nginx:80
+}
