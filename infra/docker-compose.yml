@@ -27,19 +27,6 @@ services:
       timeout: 3s
       retries: 10
 
-  mailpit:
-    # нужен только полному стенду (make full) и e2e; в dev письма идут через реальный SMTP из .env
-    profiles: ["full"]
-    image: axllent/mailpit:latest
-    ports:
-      - "1025:1025"   # SMTP — сюда шлёт API в dev
-      - "8025:8025"   # веб-просмотр писем
-    healthcheck:
-      test: ["CMD", "/mailpit", "readyz"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
   minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
@@ -85,18 +72,18 @@ services:
       S3_BUCKET: ${S3_BUCKET:-light-event}
       APP_SECRET_KEY: ${APP_SECRET_KEY}
       SMS_RU_API_KEY: ${SMS_RU_API_KEY:-}
-      SMTP_HOST: ${DOCKER_SMTP_HOST:-mailpit}
-      SMTP_PORT: ${DOCKER_SMTP_PORT:-1025}
+      # SMTP как в .env: реальный провайдер; пустой SMTP_HOST — письма в лог (Console),
+      # коды в любом случае видны в журнале админки («Письма»)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_USE_TLS: ${DOCKER_SMTP_USE_TLS:-false}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-false}
       SMTP_FROM: ${SMTP_FROM:-light-event <no-reply@light-event.local>}
     depends_on:
       db:
         condition: service_healthy
       redis:
-        condition: service_healthy
-      mailpit:
         condition: service_healthy
 
   web:

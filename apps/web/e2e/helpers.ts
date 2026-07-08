@@ -13,23 +13,37 @@ export async function pickMapPoint(page: Page, scope: Page | Locator = page): Pr
   await map.click({ position: { x: 200, y: 120 } });
 }
 
-const MAILPIT_URL = process.env.E2E_MAILPIT_URL ?? "http://localhost:8025";
-
 /** Уникальная почта на прогон — случайная: параллельные worker'ы не коллидируют. */
 export function uniqueEmail(): string {
   return `e2e-${Date.now()}-${Math.floor(Math.random() * 1_000_000)}@example.com`;
 }
 
-/** Код подтверждения — из Mailpit HTTP API (реальное SMTP-письмо в dev-стенде). */
+/** Код подтверждения — из журнала email_message (§11.14), тема письма содержит код.
+ * Для e2e стенд поднимают без реального SMTP (SMTP_HOST= make full) — письма уходят в лог,
+ * а журнал заполняется в любом случае. */
 export async function emailCode(email: string): Promise<string> {
   for (let attempt = 0; attempt < 10; attempt++) {
-    const resp = await fetch(`${MAILPIT_URL}/api/v1/search?query=to:${encodeURIComponent(email)}`);
-    const data = (await resp.json()) as { messages: { Subject: string }[] };
-    const match = data.messages?.[0]?.Subject.match(/(\d{6})/);
+    const out = execFileSync(
+      "docker",
+      [
+        "exec",
+        "light-event-db-1",
+        "psql",
+        "-U",
+        "light_event",
+        "-d",
+        "light_event",
+        "-tA",
+        "-c",
+        `SELECT subject FROM email_message WHERE to_email = '${email}' ORDER BY email_message_uuid DESC LIMIT 1`,
+      ],
+      { encoding: "utf8" },
+    );
+    const match = out.match(/(\d{6})/);
     if (match) return match[1];
     await new Promise((r) => setTimeout(r, 500));
   }
-  throw new Error(`Письмо для ${email} не пришло в Mailpit`);
+  throw new Error(`Письмо для ${email} не появилось в журнале email_message`);
 }
 
 /** platform_role=admin через операторскую CLI в api-контейнере (нужен полный стенд — make full). */

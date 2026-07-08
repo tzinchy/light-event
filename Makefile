@@ -7,7 +7,7 @@ infra:
 infra-down:
 	docker compose --env-file .env -f infra/docker-compose.yml down
 
-# полный стенд: db + redis + minio + mailpit + api + web + nginx (http://localhost:8080)
+# полный стенд: db + redis + minio + api + web + nginx (http://localhost:8080)
 full:
 	docker compose --env-file .env -f infra/docker-compose.yml --profile full up -d --build
 
