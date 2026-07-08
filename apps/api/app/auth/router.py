@@ -4,17 +4,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.schemas import MeOut, OtpRequestIn, OtpVerifyIn, RefreshIn, TokensOut
 from app.auth.service import AuthService
 from app.core.deps import get_current_user, get_session
+from app.mailing.service import MailingService
 from app.user.models import User
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
 def get_auth_service(request: Request, session: AsyncSession = Depends(get_session)) -> AuthService:
+    state = request.app.state
     return AuthService(
         session=session,
-        redis=request.app.state.redis,
-        email=request.app.state.email_provider,
-        settings=request.app.state.settings,
+        redis=state.redis,
+        mailing=MailingService(state.session_factory, state.email_provider),
+        settings=state.settings,
     )
 
 

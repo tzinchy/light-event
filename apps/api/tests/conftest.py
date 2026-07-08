@@ -77,10 +77,24 @@ def sms_outbox() -> CapturingSmsProvider:
     return CapturingSmsProvider()
 
 
+class CapturingEmailProvider(CapturingSmsProvider):
+    """Капчер писем: OTP — в .sent (to, code), произвольные — в .messages (to, subject, body)."""
+
+    def __init__(self):
+        super().__init__()
+        self.messages: list[tuple[str, str, str]] = []
+        self.fail_next = False
+
+    async def send(self, email: str, subject: str, body: str) -> None:
+        if self.fail_next:
+            self.fail_next = False
+            raise RuntimeError("SMTP недоступен (тестовый сбой)")
+        self.messages.append((email, subject, body))
+
+
 @pytest.fixture
-def email_outbox() -> CapturingSmsProvider:
-    # тот же интерфейс send_otp(destination, code) — переиспользуем капчер
-    return CapturingSmsProvider()
+def email_outbox() -> CapturingEmailProvider:
+    return CapturingEmailProvider()
 
 
 @pytest.fixture

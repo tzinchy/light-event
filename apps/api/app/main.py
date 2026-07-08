@@ -17,6 +17,7 @@ from app.document import router as document_router
 from app.favorite import router as favorite_router
 from app.filial import router as filial_router
 from app.invite import router as invite_router
+from app.mailing import router as mailing_router
 from app.notification import router as notification_router
 from app.payment_account import router as payment_account_router
 from app.pricing import router as pricing_router
@@ -70,6 +71,7 @@ def create_app(
     app.include_router(invite_router.router)
     app.include_router(favorite_router.router)
     app.include_router(notification_router.router)
+    app.include_router(mailing_router.router)
     app.include_router(payment_account_router.router)
     app.include_router(pricing_router.router)
     app.include_router(pricing_router.company_router)

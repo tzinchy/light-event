@@ -424,3 +424,13 @@ on_hold при подтверждении смены, `POST /admin/payouts/{uuid
 
 - **PWA:** `app/manifest.ts` (standalone, `start_url /feed`, тема #16a34a), иконки 192/512/maskable из бренд-плитки «le» (сгенерированы headless-рендером), `apple-touch-icon` + `appleWebApp`-мета — «Добавить на главный экран» ставит значок light-event на Android (Chrome: меню → Установить) и iOS (Safari: Поделиться → На экран «Домой»). Для установки в проде нужен HTTPS (localhost — ок).
 - **Мобильная навигация:** нижний таб-бар <md по PLAN §5 (Лента/Заявки/Чат/Тесты/Профиль), safe-area iPhone; скрыт в /org, /admin, /auth и в треде чата. В шапке на мобильном текстовые пункты скрыты.
+
+### 11.14 Журнал исходящих писем + отправка писем админом (заказчик 2026-07-08)
+
+- **Контекст:** dev перешёл на реальный SMTP (Яндекс, пароль приложения); Mailpit переведён под профиль `full` (нужен только докер-стенду и e2e). Заказчик: «выкинуть этот блок в отдельную таблицу и админку + дать возможность админу отправлять ещё и так сообщения» — т.е. журнал всех исходящих писем в БД вместо просмотра в Mailpit + ручная отправка из админки.
+- **Модуль `app/mailing`:** таблица `email_message` (UUIDv7 PK `email_message_uuid`, `to_email`, `subject`, `body`, `kind` otp|admin, `status` sent|failed, `error`, `created_by` → user, timestamps). `MailingService.send_logged()` — отправка через `EmailProvider.send(to, subject, body)` (новый генерик-метод протокола; композиция OTP-письма вынесена в `otp_email(code)`), запись в журнал при любом исходе (failed — с текстом ошибки, исключение пробрасывается).
+- **Интеграция:** `AuthService.request_otp` и `UserService.request_email_code` шлют через `MailingService` → каждый OTP виден в журнале.
+- **Админ-API:** `GET /api/v1/admin/emails` (журнал, новые сверху, limit/offset), `POST /api/v1/admin/emails/send` (`to_email`, `subject`, `body`; kind=admin, created_by=админ; ошибка SMTP → 502, попытка тоже в журнале). Только admin.
+- **Фронт:** вкладка «Письма» в админке — журнал (статус/kind/адресат/тема/время) + форма «Отправить письмо».
+
+**Статус §11.14 (2026-07-08, выполнено):** модуль `app/mailing` (модель+миграция, MailingService с журналом в отдельной транзакции, admin-эндпоинты GET/POST), OTP-потоки auth/user логируются, вкладка «Письма» в админке (журнал + форма отправки). pytest 174, Vitest 32, tsc чисто.

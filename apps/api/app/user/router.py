@@ -5,6 +5,7 @@ from uuid import UUID
 
 from app.core.deps import get_current_user, get_session
 from app.core.errors import DomainError
+from app.mailing.service import MailingService
 from app.user.models import User
 from app.user.repo import UserRepo
 from app.user.schemas import EmailConfirmIn, EmailRequestIn, UserOut, UserUpdateIn, WorkerPublicOut
@@ -53,7 +54,10 @@ async def worker_public_profile(
 def get_user_service(request: Request, session: AsyncSession = Depends(get_session)) -> UserService:
     state = request.app.state
     return UserService(
-        session=session, settings=state.settings, redis=state.redis, email=state.email_provider
+        session=session,
+        settings=state.settings,
+        redis=state.redis,
+        mailing=MailingService(state.session_factory, state.email_provider),
     )
 
 

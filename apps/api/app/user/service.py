@@ -4,9 +4,9 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
-from app.core.email import EmailProvider
 from app.core.errors import DomainError
 from app.core.otp import OtpStore
+from app.mailing.service import MailingService
 from app.user.models import User
 from app.user.repo import UserRepo
 from app.user.schemas import UserUpdateIn
@@ -18,13 +18,13 @@ class UserService:
         session: AsyncSession,
         settings: Settings,
         redis: Redis | None = None,
-        email: EmailProvider | None = None,
+        mailing: MailingService | None = None,
     ):
         self.session = session
         self.settings = settings
         self.users = UserRepo(session)
         self.otp = OtpStore(redis, settings) if redis is not None else None
-        self.email = email
+        self.mailing = mailing
 
     async def request_email_code(self, user: User, email: str) -> None:
         if user.email != email:
@@ -32,7 +32,7 @@ class UserService:
             user.email_verified_at = None
             await self.session.flush()
         code = await self.otp.issue("email", email)
-        await self.email.send_otp(email, code)
+        await self.mailing.send_otp(email, code)
 
     async def confirm_email(self, user: User, code: str) -> User:
         if user.email is None:

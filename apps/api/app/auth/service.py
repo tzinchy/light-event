@@ -5,10 +5,10 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
-from app.core.email import EmailProvider
 from app.core.errors import DomainError
 from app.core.otp import OtpStore
 from app.core.security import create_access_token
+from app.mailing.service import MailingService
 from app.user.models import User
 from app.user.repo import UserRepo
 
@@ -18,17 +18,17 @@ def _refresh_key(token: str) -> str:
 
 
 class AuthService:
-    def __init__(self, session: AsyncSession, redis: Redis, email: EmailProvider, settings: Settings):
+    def __init__(self, session: AsyncSession, redis: Redis, mailing: MailingService, settings: Settings):
         self.session = session
         self.redis = redis
-        self.email = email
+        self.mailing = mailing
         self.settings = settings
         self.users = UserRepo(session)
         self.otp = OtpStore(redis, settings)
 
     async def request_otp(self, email: str) -> None:
         code = await self.otp.issue("email", email)
-        await self.email.send_otp(email, code)
+        await self.mailing.send_otp(email, code)
 
     async def verify_otp(self, email: str, code: str) -> tuple[dict, User]:
         await self.otp.verify("email", email, code)
