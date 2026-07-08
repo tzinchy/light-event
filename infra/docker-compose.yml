@@ -28,6 +28,8 @@ services:
       retries: 10
 
   mailpit:
+    # нужен только полному стенду (make full) и e2e; в dev письма идут через реальный SMTP из .env
+    profiles: ["full"]
     image: axllent/mailpit:latest
     ports:
       - "1025:1025"   # SMTP — сюда шлёт API в dev
@@ -84,7 +86,10 @@ services:
       APP_SECRET_KEY: ${APP_SECRET_KEY}
       SMS_RU_API_KEY: ${SMS_RU_API_KEY:-}
       SMTP_HOST: ${DOCKER_SMTP_HOST:-mailpit}
-      SMTP_PORT: 1025
+      SMTP_PORT: ${DOCKER_SMTP_PORT:-1025}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_USE_TLS: ${DOCKER_SMTP_USE_TLS:-false}
       SMTP_FROM: ${SMTP_FROM:-light-event <no-reply@light-event.local>}
     depends_on:
       db:
