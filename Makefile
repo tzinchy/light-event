@@ -1,4 +1,4 @@
-.PHONY: infra infra-down full api web test-api test-web migrate revision openapi-client e2e
+.PHONY: infra infra-down full full-rebuild api web test-api test-web migrate revision openapi-client e2e
 
 # postgres + redis + minio для локальной разработки
 infra:
@@ -10,6 +10,11 @@ infra-down:
 # полный стенд: db + redis + minio + mailpit + api + web + nginx (http://localhost:8080)
 full:
 	docker compose --env-file .env -f infra/docker-compose.yml --profile full up -d --build
+
+# форс: образы без кэша + пересоздание контейнеров (данные в томах не трогает)
+full-rebuild:
+	docker compose --env-file .env -f infra/docker-compose.yml --profile full build --no-cache
+	docker compose --env-file .env -f infra/docker-compose.yml --profile full up -d --force-recreate
 
 api: migrate
 	cd apps/api && uv run uvicorn app.main:app --reload --port 8000
