@@ -713,6 +713,48 @@ export type EmailConfirmIn = {
 };
 
 /**
+ * EmailMessageOut
+ */
+export type EmailMessageOut = {
+    /**
+     * Email Message Uuid
+     */
+    email_message_uuid: string;
+    /**
+     * To Email
+     */
+    to_email: string;
+    /**
+     * Subject
+     */
+    subject: string;
+    /**
+     * Body
+     */
+    body: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Error
+     */
+    error: string | null;
+    /**
+     * Created By
+     */
+    created_by: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
  * EmailRequestIn
  */
 export type EmailRequestIn = {
@@ -720,6 +762,24 @@ export type EmailRequestIn = {
      * Email
      */
     email: string;
+};
+
+/**
+ * EmailSendIn
+ */
+export type EmailSendIn = {
+    /**
+     * To Email
+     */
+    to_email: string;
+    /**
+     * Subject
+     */
+    subject: string;
+    /**
+     * Body
+     */
+    body: string;
 };
 
 /**
@@ -3374,6 +3434,66 @@ export type MarkReadApiV1NotificationsReadPostResponses = {
 };
 
 export type MarkReadApiV1NotificationsReadPostResponse = MarkReadApiV1NotificationsReadPostResponses[keyof MarkReadApiV1NotificationsReadPostResponses];
+
+export type ListEmailsApiV1AdminEmailsGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/admin/emails';
+};
+
+export type ListEmailsApiV1AdminEmailsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListEmailsApiV1AdminEmailsGetError = ListEmailsApiV1AdminEmailsGetErrors[keyof ListEmailsApiV1AdminEmailsGetErrors];
+
+export type ListEmailsApiV1AdminEmailsGetResponses = {
+    /**
+     * Response List Emails Api V1 Admin Emails Get
+     * Successful Response
+     */
+    200: Array<EmailMessageOut>;
+};
+
+export type ListEmailsApiV1AdminEmailsGetResponse = ListEmailsApiV1AdminEmailsGetResponses[keyof ListEmailsApiV1AdminEmailsGetResponses];
+
+export type SendEmailApiV1AdminEmailsSendPostData = {
+    body: EmailSendIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/emails/send';
+};
+
+export type SendEmailApiV1AdminEmailsSendPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SendEmailApiV1AdminEmailsSendPostError = SendEmailApiV1AdminEmailsSendPostErrors[keyof SendEmailApiV1AdminEmailsSendPostErrors];
+
+export type SendEmailApiV1AdminEmailsSendPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: EmailMessageOut;
+};
+
+export type SendEmailApiV1AdminEmailsSendPostResponse = SendEmailApiV1AdminEmailsSendPostResponses[keyof SendEmailApiV1AdminEmailsSendPostResponses];
 
 export type ListAccountsApiV1AdminPaymentAccountsGetData = {
     body?: never;

@@ -27,6 +27,9 @@ import {
   setCompanyPriceApiV1AdminCompaniesCompanyUuidPricingKeyPut,
   createAccountApiV1AdminPaymentAccountsPost,
   listAccountsApiV1AdminPaymentAccountsGet,
+  listEmailsApiV1AdminEmailsGet,
+  sendEmailApiV1AdminEmailsSendPost,
+  type EmailMessageOut,
   setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost,
   updateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatch,
   type PaymentAccountOut,
@@ -865,6 +868,106 @@ function PaymentAccountsPanel() {
   );
 }
 
+function EmailsPanel() {
+  const [letters, setLetters] = useState<EmailMessageOut[] | null>(null);
+  const [toEmail, setToEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const reload = useCallback(async () => {
+    const { data } = await listEmailsApiV1AdminEmailsGet({ query: { limit: 100 } });
+    setLetters(data ?? []);
+  }, []);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  async function send() {
+    if (!toEmail.includes("@") || !subject.trim() || !body.trim()) return;
+    setBusy(true);
+    const { error } = await sendEmailApiV1AdminEmailsSendPost({
+      body: { to_email: toEmail.trim(), subject: subject.trim(), body: body.trim() },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось отправить письмо"));
+      void reload(); // неудачная попытка тоже попадает в журнал
+      return;
+    }
+    toast.success("Письмо отправлено");
+    setToEmail("");
+    setSubject("");
+    setBody("");
+    void reload();
+  }
+
+  if (letters === null) {
+    return (
+      <div className="flex justify-center py-10 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="space-y-3 pt-5">
+          <div className="font-semibold">Отправить письмо</div>
+          <Input
+            type="email"
+            placeholder="Кому (email)"
+            value={toEmail}
+            onChange={(e) => setToEmail(e.target.value)}
+          />
+          <Input placeholder="Тема" value={subject} onChange={(e) => setSubject(e.target.value)} />
+          <textarea
+            className="min-h-24 w-full rounded-lg border bg-transparent px-3 py-2 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+            placeholder="Текст письма"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+          />
+          <Button size="sm" disabled={busy} onClick={() => void send()}>
+            {busy ? <Loader2 className="size-4 animate-spin" /> : "Отправить"}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {letters.length === 0 ? (
+        <EmptyCard text="Писем пока нет — здесь появится каждый отправленный код и письмо" />
+      ) : (
+        letters.map((m) => (
+          <Card key={m.email_message_uuid}>
+            <CardContent className="pt-5">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 font-medium",
+                    m.status === "sent"
+                      ? "bg-brand-soft text-brand-strong"
+                      : "bg-status-danger/10 text-status-danger",
+                  )}
+                >
+                  {m.status === "sent" ? "Отправлено" : "Ошибка"}
+                </span>
+                <span className="rounded-full bg-secondary px-2 py-0.5">
+                  {m.kind === "otp" ? "Код входа" : "От админа"}
+                </span>
+                <span className="font-mono">{m.to_email}</span>
+                <span>· {formatDateTime(m.created_at)}</span>
+              </div>
+              <div className="mt-2 text-sm font-medium">{m.subject}</div>
+              <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">{m.body}</p>
+              {m.error && <p className="mt-1 text-xs text-status-danger">{m.error}</p>}
+            </CardContent>
+          </Card>
+        ))
+      )}
+    </div>
+  );
+}
+
 type TabKey =
   | "overview"
   | "companies"
@@ -874,7 +977,8 @@ type TabKey =
   | "complaints"
   | "chats"
   | "pricing"
-  | "accounts";
+  | "accounts"
+  | "emails";
 
 function adminInitials(text: string | null | undefined): string {
   const src = (text ?? "").trim();
@@ -959,6 +1063,7 @@ export default function AdminPage() {
     { key: "chats", label: "Чаты", count: null },
     { key: "accounts", label: "Счета", count: null },
     { key: "pricing", label: "Тарифы", count: null },
+    { key: "emails", label: "Письма", count: null },
   ];
   const TITLES: Record<TabKey, { title: string; subtitle: string }> = {
     overview: { title: "Обзор", subtitle: "Здоровье платформы · реальное время" },
@@ -970,6 +1075,7 @@ export default function AdminPage() {
     chats: { title: "Чаты", subtitle: "Отредактированные и удалённые сообщения · версии" },
     accounts: { title: "Счета", subtitle: "Приём пополнений · лимиты по месяцам" },
     pricing: { title: "Тарифы", subtitle: "Стоимость услуг платформы" },
+    emails: { title: "Письма", subtitle: "Журнал исходящих · ручная отправка" },
   };
   const head = TITLES[tab];
 
@@ -1179,6 +1285,7 @@ export default function AdminPage() {
           ))}
         {tab === "chats" && <ModeratedChatsPanel />}
         {tab === "accounts" && <PaymentAccountsPanel />}
+        {tab === "emails" && <EmailsPanel />}
         {tab === "pricing" && (
           <>
             {prices.map((p) => (
