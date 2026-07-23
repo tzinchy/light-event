@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class CompanyModerationOut(BaseModel):
@@ -40,6 +40,51 @@ class ModerationRequestOut(BaseModel):
     company_uuid: UUID | None
     company_name: str | None
     submitted_at: datetime
+
+
+class AdminUserOut(BaseModel):
+    """Строка списка пользователей в админке (PLAN §11.15)."""
+
+    model_config = {"from_attributes": True}
+
+    user_uuid: UUID
+    email: str | None
+    phone: str | None
+    name: str | None
+    platform_role: str
+    moderation_status: str
+    moderation_reason: str | None
+    is_active: bool
+    documents_count: int = 0
+    created_at: datetime
+
+
+class AdminUserDocumentOut(BaseModel):
+    model_config = {"from_attributes": True}
+
+    document_uuid: UUID
+    kind: str
+    status: str
+    reject_reason: str | None
+    created_at: datetime
+
+
+class AdminUserDetailOut(AdminUserOut):
+    documents: list[AdminUserDocumentOut] = []
+
+
+class UserRoleUpdateIn(BaseModel):
+    platform_role: str | None = None
+    name: str | None = Field(default=None, max_length=120)
+
+
+class ModerationReasonIn(BaseModel):
+    reason: str = Field(min_length=3, max_length=500)
+
+
+class AdminUserCreateIn(BaseModel):
+    email: EmailStr = Field(max_length=254)
+    platform_role: str = "user"
 
 
 class OverviewOut(BaseModel):

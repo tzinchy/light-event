@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.user.models import User
+from app.document.models import Document
+from app.user.models import ModerationStatus, User
 
 
 class UserRepo:
@@ -13,6 +14,32 @@ class UserRepo:
 
     async def get(self, user_uuid: UUID) -> User | None:
         return await self.session.get(User, user_uuid)
+
+    async def list_for_admin(
+        self,
+        *,
+        status: ModerationStatus | None = None,
+        query: str | None = None,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[tuple[User, int]]:
+        """Пользователи для админки: (user, число документов), новые сверху."""
+        doc_count = func.count(Document.document_uuid)
+        stmt = (
+            select(User, doc_count)
+            .outerjoin(Document, Document.owner_uuid == User.user_uuid)
+            .group_by(User.user_uuid)
+            .order_by(User.user_uuid.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        if status is not None:
+            stmt = stmt.where(User.moderation_status == status)
+        if query:
+            like = f"%{query}%"
+            stmt = stmt.where(or_(User.email.ilike(like), User.name.ilike(like)))
+        result = await self.session.execute(stmt)
+        return [(row[0], row[1]) for row in result.all()]
 
     async def get_by_phone(self, phone: str) -> User | None:
         result = await self.session.execute(select(User).where(User.phone == phone))

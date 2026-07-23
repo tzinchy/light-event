@@ -2,7 +2,7 @@ import enum
 from datetime import date, datetime
 from uuid import UUID
 
-from sqlalchemy import ARRAY, Date, DateTime, Enum, String, text
+from sqlalchemy import ARRAY, Date, DateTime, Enum, ForeignKey, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base, TimestampMixin
@@ -12,6 +12,13 @@ class PlatformRole(str, enum.Enum):
     user = "user"
     vip_user = "vip_user"
     admin = "admin"
+
+
+class ModerationStatus(str, enum.Enum):
+    pending = "pending"  # документы на проверке
+    approved = "approved"  # админ подтвердил
+    resubmit = "resubmit"  # нужно дослать документ
+    banned = "banned"  # заблокирован (is_active=False)
 
 
 class User(TimestampMixin, Base):
@@ -40,3 +47,12 @@ class User(TimestampMixin, Base):
     gender: Mapped[str | None] = mapped_column(String(10))  # male | female
     pd_consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     is_active: Mapped[bool] = mapped_column(default=True)
+    # модерация пользователя (PLAN §11.15) — отдельно от per-document document.status
+    moderation_status: Mapped[ModerationStatus] = mapped_column(
+        Enum(ModerationStatus, native_enum=False, length=20),
+        default=ModerationStatus.pending,
+        server_default=ModerationStatus.pending.value,
+    )
+    moderation_reason: Mapped[str | None] = mapped_column(String(500))
+    moderated_by_uuid: Mapped[UUID | None] = mapped_column(ForeignKey("user.user_uuid"))
+    moderated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
