@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import {
   listNotificationsApiV1NotificationsGet,
   myCompaniesApiV1CompaniesMyGet,
@@ -12,7 +13,8 @@ import { DICT } from "@/lib/dict";
 import { useAuth } from "@/lib/auth-context";
 
 export function SiteHeader() {
-  const { me, loading } = useAuth();
+  const { me, loading, logout } = useAuth();
+  const router = useRouter();
   // кнопка кабинета — только у участников компании; обычному пользователю её не показываем
   const [isMember, setIsMember] = useState(false);
   const [unread, setUnread] = useState(0);
@@ -89,6 +91,18 @@ export function SiteHeader() {
                     <Link href="/org">{DICT.openOrgConsole}</Link>
                   </Button>
                 )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Выйти"
+                  title="Выйти"
+                  onClick={() => {
+                    logout();
+                    router.replace("/");
+                  }}
+                >
+                  <LogOut className="size-4" />
+                </Button>
               </>
             ) : (
               <>

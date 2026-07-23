@@ -70,6 +70,143 @@ export type AdminMessageOut = {
 };
 
 /**
+ * AdminUserCreateIn
+ */
+export type AdminUserCreateIn = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Platform Role
+     */
+    platform_role?: string;
+};
+
+/**
+ * AdminUserDetailOut
+ */
+export type AdminUserDetailOut = {
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Email
+     */
+    email: string | null;
+    /**
+     * Phone
+     */
+    phone: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Platform Role
+     */
+    platform_role: string;
+    /**
+     * Moderation Status
+     */
+    moderation_status: string;
+    /**
+     * Moderation Reason
+     */
+    moderation_reason: string | null;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Documents Count
+     */
+    documents_count?: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Documents
+     */
+    documents?: Array<AdminUserDocumentOut>;
+};
+
+/**
+ * AdminUserDocumentOut
+ */
+export type AdminUserDocumentOut = {
+    /**
+     * Document Uuid
+     */
+    document_uuid: string;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
+ * AdminUserOut
+ * Строка списка пользователей в админке (PLAN §11.15).
+ */
+export type AdminUserOut = {
+    /**
+     * User Uuid
+     */
+    user_uuid: string;
+    /**
+     * Email
+     */
+    email: string | null;
+    /**
+     * Phone
+     */
+    phone: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Platform Role
+     */
+    platform_role: string;
+    /**
+     * Moderation Status
+     */
+    moderation_status: string;
+    /**
+     * Moderation Reason
+     */
+    moderation_reason: string | null;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Documents Count
+     */
+    documents_count?: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
  * AnswerIn
  */
 export type AnswerIn = {
@@ -1190,6 +1327,16 @@ export type ModerateIn = {
 };
 
 /**
+ * ModerationReasonIn
+ */
+export type ModerationReasonIn = {
+    /**
+     * Reason
+     */
+    reason: string;
+};
+
+/**
  * ModerationRequestOut
  * Элемент единой очереди модерации: платная публикация смены или теста компании.
  */
@@ -1219,6 +1366,11 @@ export type ModerationRequestOut = {
      */
     submitted_at: string;
 };
+
+/**
+ * ModerationStatus
+ */
+export type ModerationStatus = 'pending' | 'approved' | 'resubmit' | 'banned';
 
 /**
  * MyApplicationOut
@@ -2182,6 +2334,20 @@ export type UserOut = {
      * Pd Consent At
      */
     pd_consent_at: string | null;
+};
+
+/**
+ * UserRoleUpdateIn
+ */
+export type UserRoleUpdateIn = {
+    /**
+     * Platform Role
+     */
+    platform_role?: string | null;
+    /**
+     * Name
+     */
+    name?: string | null;
 };
 
 /**
@@ -5311,3 +5477,251 @@ export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses = {
 };
 
 export type RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponse = RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses[keyof RejectCompanyApiV1AdminCompaniesCompanyUuidRejectPostResponses];
+
+export type ListUsersApiV1AdminUsersGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Status
+         */
+        status?: ModerationStatus | null;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/admin/users';
+};
+
+export type ListUsersApiV1AdminUsersGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListUsersApiV1AdminUsersGetError = ListUsersApiV1AdminUsersGetErrors[keyof ListUsersApiV1AdminUsersGetErrors];
+
+export type ListUsersApiV1AdminUsersGetResponses = {
+    /**
+     * Response List Users Api V1 Admin Users Get
+     * Successful Response
+     */
+    200: Array<AdminUserOut>;
+};
+
+export type ListUsersApiV1AdminUsersGetResponse = ListUsersApiV1AdminUsersGetResponses[keyof ListUsersApiV1AdminUsersGetResponses];
+
+export type CreateUserApiV1AdminUsersPostData = {
+    body: AdminUserCreateIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/users';
+};
+
+export type CreateUserApiV1AdminUsersPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateUserApiV1AdminUsersPostError = CreateUserApiV1AdminUsersPostErrors[keyof CreateUserApiV1AdminUsersPostErrors];
+
+export type CreateUserApiV1AdminUsersPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: AdminUserOut;
+};
+
+export type CreateUserApiV1AdminUsersPostResponse = CreateUserApiV1AdminUsersPostResponses[keyof CreateUserApiV1AdminUsersPostResponses];
+
+export type UserDetailApiV1AdminUsersUserUuidGetData = {
+    body?: never;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}';
+};
+
+export type UserDetailApiV1AdminUsersUserUuidGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UserDetailApiV1AdminUsersUserUuidGetError = UserDetailApiV1AdminUsersUserUuidGetErrors[keyof UserDetailApiV1AdminUsersUserUuidGetErrors];
+
+export type UserDetailApiV1AdminUsersUserUuidGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserDetailOut;
+};
+
+export type UserDetailApiV1AdminUsersUserUuidGetResponse = UserDetailApiV1AdminUsersUserUuidGetResponses[keyof UserDetailApiV1AdminUsersUserUuidGetResponses];
+
+export type UpdateUserApiV1AdminUsersUserUuidPatchData = {
+    body: UserRoleUpdateIn;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}';
+};
+
+export type UpdateUserApiV1AdminUsersUserUuidPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateUserApiV1AdminUsersUserUuidPatchError = UpdateUserApiV1AdminUsersUserUuidPatchErrors[keyof UpdateUserApiV1AdminUsersUserUuidPatchErrors];
+
+export type UpdateUserApiV1AdminUsersUserUuidPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserOut;
+};
+
+export type UpdateUserApiV1AdminUsersUserUuidPatchResponse = UpdateUserApiV1AdminUsersUserUuidPatchResponses[keyof UpdateUserApiV1AdminUsersUserUuidPatchResponses];
+
+export type ApproveUserApiV1AdminUsersUserUuidApprovePostData = {
+    body?: never;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}/approve';
+};
+
+export type ApproveUserApiV1AdminUsersUserUuidApprovePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ApproveUserApiV1AdminUsersUserUuidApprovePostError = ApproveUserApiV1AdminUsersUserUuidApprovePostErrors[keyof ApproveUserApiV1AdminUsersUserUuidApprovePostErrors];
+
+export type ApproveUserApiV1AdminUsersUserUuidApprovePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserOut;
+};
+
+export type ApproveUserApiV1AdminUsersUserUuidApprovePostResponse = ApproveUserApiV1AdminUsersUserUuidApprovePostResponses[keyof ApproveUserApiV1AdminUsersUserUuidApprovePostResponses];
+
+export type ResubmitUserApiV1AdminUsersUserUuidResubmitPostData = {
+    body: ModerationReasonIn;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}/resubmit';
+};
+
+export type ResubmitUserApiV1AdminUsersUserUuidResubmitPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ResubmitUserApiV1AdminUsersUserUuidResubmitPostError = ResubmitUserApiV1AdminUsersUserUuidResubmitPostErrors[keyof ResubmitUserApiV1AdminUsersUserUuidResubmitPostErrors];
+
+export type ResubmitUserApiV1AdminUsersUserUuidResubmitPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserOut;
+};
+
+export type ResubmitUserApiV1AdminUsersUserUuidResubmitPostResponse = ResubmitUserApiV1AdminUsersUserUuidResubmitPostResponses[keyof ResubmitUserApiV1AdminUsersUserUuidResubmitPostResponses];
+
+export type BanUserApiV1AdminUsersUserUuidBanPostData = {
+    body: ModerationReasonIn;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}/ban';
+};
+
+export type BanUserApiV1AdminUsersUserUuidBanPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type BanUserApiV1AdminUsersUserUuidBanPostError = BanUserApiV1AdminUsersUserUuidBanPostErrors[keyof BanUserApiV1AdminUsersUserUuidBanPostErrors];
+
+export type BanUserApiV1AdminUsersUserUuidBanPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserOut;
+};
+
+export type BanUserApiV1AdminUsersUserUuidBanPostResponse = BanUserApiV1AdminUsersUserUuidBanPostResponses[keyof BanUserApiV1AdminUsersUserUuidBanPostResponses];
+
+export type UnbanUserApiV1AdminUsersUserUuidUnbanPostData = {
+    body?: never;
+    path: {
+        /**
+         * User Uuid
+         */
+        user_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/users/{user_uuid}/unban';
+};
+
+export type UnbanUserApiV1AdminUsersUserUuidUnbanPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UnbanUserApiV1AdminUsersUserUuidUnbanPostError = UnbanUserApiV1AdminUsersUserUuidUnbanPostErrors[keyof UnbanUserApiV1AdminUsersUserUuidUnbanPostErrors];
+
+export type UnbanUserApiV1AdminUsersUserUuidUnbanPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminUserOut;
+};
+
+export type UnbanUserApiV1AdminUsersUserUuidUnbanPostResponse = UnbanUserApiV1AdminUsersUserUuidUnbanPostResponses[keyof UnbanUserApiV1AdminUsersUserUuidUnbanPostResponses];

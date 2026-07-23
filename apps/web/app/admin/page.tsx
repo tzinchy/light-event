@@ -33,6 +33,17 @@ import {
   setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost,
   updateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatch,
   type PaymentAccountOut,
+  listUsersApiV1AdminUsersGet,
+  createUserApiV1AdminUsersPost,
+  userDetailApiV1AdminUsersUserUuidGet,
+  updateUserApiV1AdminUsersUserUuidPatch,
+  approveUserApiV1AdminUsersUserUuidApprovePost,
+  resubmitUserApiV1AdminUsersUserUuidResubmitPost,
+  banUserApiV1AdminUsersUserUuidBanPost,
+  unbanUserApiV1AdminUsersUserUuidUnbanPost,
+  type AdminUserOut,
+  type AdminUserDetailOut,
+  type ModerationStatus,
   listCompaniesApiV1AdminCompaniesGet,
   listPricesApiV1AdminPricingGet,
   listRequestsApiV1AdminRequestsGet,
@@ -968,8 +979,385 @@ function EmailsPanel() {
   );
 }
 
+const MOD_STATUS: Record<string, { label: string; cls: string }> = {
+  pending: { label: "На проверке", cls: "bg-status-warn-bg text-status-warn" },
+  approved: { label: "Подтверждён", cls: "bg-brand-soft text-brand-strong" },
+  resubmit: { label: "Дослать документ", cls: "bg-status-info-bg text-status-info" },
+  banned: { label: "Заблокирован", cls: "bg-status-danger/10 text-status-danger" },
+};
+const MOD_FILTERS: { key: string; label: string }[] = [
+  { key: "", label: "Все" },
+  { key: "pending", label: "На проверке" },
+  { key: "approved", label: "Подтверждены" },
+  { key: "resubmit", label: "На дослать" },
+  { key: "banned", label: "Заблокированы" },
+];
+const ROLE_LABEL: Record<string, string> = { user: "Пользователь", vip_user: "VIP", admin: "Администратор" };
+const ROLE_OPTIONS = ["user", "vip_user", "admin"];
+
+function ModBadge({ status }: { status: string }) {
+  const s = MOD_STATUS[status] ?? { label: status, cls: "bg-secondary text-muted-foreground" };
+  return <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", s.cls)}>{s.label}</span>;
+}
+
+async function viewDocument(documentUuid: string) {
+  const tokens = getTokens();
+  const resp = await fetch(`/api/v1/documents/${documentUuid}/content`, {
+    headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : undefined,
+  });
+  if (!resp.ok) {
+    toast.error("Не удалось открыть документ");
+    return;
+  }
+  window.open(URL.createObjectURL(await resp.blob()), "_blank");
+}
+
+function UserDetailView({
+  user,
+  meUuid,
+  onBack,
+  onChanged,
+}: {
+  user: AdminUserDetailOut;
+  meUuid: string;
+  onBack: () => void;
+  onChanged: () => void;
+}) {
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+  const isSelf = user.user_uuid === meUuid;
+
+  async function run(label: string, fn: () => Promise<{ error?: unknown }>, ok: string, needReason = false) {
+    if (needReason && reason.trim().length < 3) {
+      toast.error("Укажите причину (минимум 3 символа)");
+      return;
+    }
+    setBusy(label);
+    const { error } = await fn();
+    setBusy(null);
+    if (error) {
+      toast.error(detailText(error, "Не удалось выполнить действие"));
+      return;
+    }
+    toast.success(ok);
+    setReason("");
+    onChanged();
+  }
+
+  return (
+    <div className="space-y-4">
+      <button className="text-sm text-muted-foreground hover:text-foreground" onClick={onBack}>
+        ← К списку
+      </button>
+
+      <Card>
+        <CardContent className="space-y-3 pt-5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="truncate font-semibold">{user.name ?? user.email ?? "Без имени"}</div>
+              <div className="truncate text-xs text-muted-foreground">
+                {user.email ?? user.phone ?? user.user_uuid}
+              </div>
+            </div>
+            <ModBadge status={user.moderation_status} />
+          </div>
+          {user.moderation_reason && (
+            <p className="text-sm text-muted-foreground">Причина: {user.moderation_reason}</p>
+          )}
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Роль</span>
+            <select
+              className="rounded-lg border bg-transparent px-2 py-1 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30 disabled:opacity-50"
+              value={user.platform_role}
+              disabled={isSelf || busy !== null}
+              onChange={(e) =>
+                void run(
+                  "role",
+                  () =>
+                    updateUserApiV1AdminUsersUserUuidPatch({
+                      path: { user_uuid: user.user_uuid },
+                      body: { platform_role: e.target.value },
+                    }),
+                  "Роль обновлена",
+                )
+              }
+            >
+              {ROLE_OPTIONS.map((r) => (
+                <option key={r} value={r}>
+                  {ROLE_LABEL[r]}
+                </option>
+              ))}
+            </select>
+            {isSelf && <span className="text-xs text-muted-foreground">(своя учётка)</span>}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-2 pt-5">
+          <div className="font-semibold">Документы</div>
+          {(user.documents ?? []).length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">Документов нет</p>
+          ) : (
+            (user.documents ?? []).map((d) => (
+              <div key={d.document_uuid} className="flex items-center justify-between gap-2 border-b py-2 last:border-0">
+                <div className="min-w-0">
+                  <div className="truncate text-sm">{d.kind}</div>
+                  <div className="text-xs text-muted-foreground">{formatDateTime(d.created_at)}</div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{d.status}</span>
+                  <Button variant="outline" size="sm" onClick={() => void viewDocument(d.document_uuid)}>
+                    Открыть
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
+
+      {!isSelf && (
+        <Card>
+          <CardContent className="space-y-3 pt-5">
+            <div className="font-semibold">Модерация</div>
+            <Input
+              placeholder="Причина (для «дослать» и блокировки)"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                disabled={busy !== null}
+                onClick={() =>
+                  void run(
+                    "approve",
+                    () => approveUserApiV1AdminUsersUserUuidApprovePost({ path: { user_uuid: user.user_uuid } }),
+                    "Пользователь подтверждён",
+                  )
+                }
+              >
+                Подтвердить
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={busy !== null}
+                onClick={() =>
+                  void run(
+                    "resubmit",
+                    () =>
+                      resubmitUserApiV1AdminUsersUserUuidResubmitPost({
+                        path: { user_uuid: user.user_uuid },
+                        body: { reason: reason.trim() },
+                      }),
+                    "Запрошена повторная загрузка",
+                    true,
+                  )
+                }
+              >
+                Запросить повторно
+              </Button>
+              {user.moderation_status === "banned" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={busy !== null}
+                  onClick={() =>
+                    void run(
+                      "unban",
+                      () => unbanUserApiV1AdminUsersUserUuidUnbanPost({ path: { user_uuid: user.user_uuid } }),
+                      "Пользователь разблокирован",
+                    )
+                  }
+                >
+                  Разблокировать
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-status-danger"
+                  disabled={busy !== null}
+                  onClick={() =>
+                    void run(
+                      "ban",
+                      () =>
+                        banUserApiV1AdminUsersUserUuidBanPost({
+                          path: { user_uuid: user.user_uuid },
+                          body: { reason: reason.trim() },
+                        }),
+                      "Пользователь заблокирован",
+                      true,
+                    )
+                  }
+                >
+                  Заблокировать
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function UsersPanel({ meUuid }: { meUuid: string }) {
+  const [users, setUsers] = useState<AdminUserOut[] | null>(null);
+  const [status, setStatus] = useState("");
+  const [q, setQ] = useState("");
+  const [openUuid, setOpenUuid] = useState<string | null>(null);
+  const [detail, setDetail] = useState<AdminUserDetailOut | null>(null);
+  const [createEmail, setCreateEmail] = useState("");
+  const [createRole, setCreateRole] = useState("user");
+  const [busy, setBusy] = useState(false);
+
+  const reload = useCallback(async () => {
+    const { data } = await listUsersApiV1AdminUsersGet({
+      query: { status: (status || undefined) as ModerationStatus | undefined, q: q.trim() || undefined },
+    });
+    setUsers(data ?? []);
+  }, [status, q]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const openDetail = useCallback(async (userUuid: string) => {
+    setOpenUuid(userUuid);
+    setDetail(null);
+    const { data } = await userDetailApiV1AdminUsersUserUuidGet({ path: { user_uuid: userUuid } });
+    setDetail(data ?? null);
+  }, []);
+
+  async function createUser() {
+    if (!createEmail.includes("@")) return;
+    setBusy(true);
+    const { error } = await createUserApiV1AdminUsersPost({
+      body: { email: createEmail.trim(), platform_role: createRole },
+    });
+    setBusy(false);
+    if (error) {
+      toast.error(detailText(error, "Не удалось создать пользователя"));
+      return;
+    }
+    toast.success("Пользователь создан");
+    setCreateEmail("");
+    setCreateRole("user");
+    void reload();
+  }
+
+  if (openUuid) {
+    if (!detail) {
+      return (
+        <div className="flex justify-center py-10 text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" />
+        </div>
+      );
+    }
+    return (
+      <UserDetailView
+        user={detail}
+        meUuid={meUuid}
+        onBack={() => {
+          setOpenUuid(null);
+          void reload();
+        }}
+        onChanged={() => void openDetail(openUuid)}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="space-y-3 pt-5">
+          <div className="font-semibold">Создать пользователя</div>
+          <div className="flex flex-wrap gap-2">
+            <Input
+              type="email"
+              placeholder="Email"
+              className="flex-1"
+              value={createEmail}
+              onChange={(e) => setCreateEmail(e.target.value)}
+            />
+            <select
+              className="rounded-lg border bg-transparent px-2 py-1 text-sm outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
+              value={createRole}
+              onChange={(e) => setCreateRole(e.target.value)}
+            >
+              {ROLE_OPTIONS.map((r) => (
+                <option key={r} value={r}>
+                  {ROLE_LABEL[r]}
+                </option>
+              ))}
+            </select>
+            <Button size="sm" disabled={busy} onClick={() => void createUser()}>
+              {busy ? <Loader2 className="size-4 animate-spin" /> : "Создать"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {MOD_FILTERS.map((f) => (
+          <button
+            key={f.key || "all"}
+            onClick={() => setStatus(f.key)}
+            className={cn(
+              "rounded-full border px-3 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              status === f.key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
+        <Input
+          placeholder="Поиск по email или имени"
+          className="ml-auto w-full max-w-xs"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+        />
+      </div>
+
+      {users === null ? (
+        <div className="flex justify-center py-10 text-muted-foreground">
+          <Loader2 className="size-5 animate-spin" />
+        </div>
+      ) : users.length === 0 ? (
+        <EmptyCard text="Пользователи не найдены" />
+      ) : (
+        users.map((u) => (
+          <button key={u.user_uuid} className="block w-full text-left" onClick={() => void openDetail(u.user_uuid)}>
+            <Card className="transition-colors hover:border-ring">
+              <CardContent className="flex items-center justify-between gap-3 pt-5">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{u.name ?? u.email ?? "Без имени"}</div>
+                  <div className="truncate text-xs text-muted-foreground">{u.email ?? u.phone ?? u.user_uuid}</div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{ROLE_LABEL[u.platform_role] ?? u.platform_role}</span>
+                  {(u.documents_count ?? 0) > 0 && (
+                    <span className="rounded-full bg-secondary px-1.5 text-xs tabular-nums">{u.documents_count}📄</span>
+                  )}
+                  <ModBadge status={u.moderation_status} />
+                </div>
+              </CardContent>
+            </Card>
+          </button>
+        ))
+      )}
+    </div>
+  );
+}
+
 type TabKey =
   | "overview"
+  | "users"
   | "companies"
   | "requests"
   | "topups"
@@ -1055,6 +1443,7 @@ export default function AdminPage() {
 
   const NAV: { key: TabKey; label: string; count: number | null }[] = [
     { key: "overview", label: "Обзор", count: null },
+    { key: "users", label: "Пользователи", count: null },
     { key: "companies", label: "Организации", count: companies.length },
     { key: "requests", label: "Публикации", count: requests.length },
     { key: "topups", label: "Пополнения", count: topups.length },
@@ -1067,6 +1456,7 @@ export default function AdminPage() {
   ];
   const TITLES: Record<TabKey, { title: string; subtitle: string }> = {
     overview: { title: "Обзор", subtitle: "Здоровье платформы · реальное время" },
+    users: { title: "Пользователи", subtitle: "Модерация KYC · роли · создание" },
     companies: { title: "Организации", subtitle: "Заявки на подтверждение" },
     requests: { title: "Публикации", subtitle: "Модерация событий и тестов" },
     topups: { title: "Пополнения", subtitle: "Заявки на зачисление средств" },
@@ -1169,12 +1559,16 @@ export default function AdminPage() {
                   {overview && (
                     <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                       {[
-                        { label: "Пользователи", value: String(overview.users_count) },
-                        { label: "KYC пройден", value: `${overview.kyc_verified_pct}%` },
-                        { label: "Оборот", value: kopToRub(overview.turnover_kop) },
-                        { label: "Споры", value: String(overview.open_complaints) },
+                        { label: "Пользователи", value: String(overview.users_count), to: "users" as TabKey },
+                        { label: "KYC пройден", value: `${overview.kyc_verified_pct}%`, to: undefined },
+                        { label: "Оборот", value: kopToRub(overview.turnover_kop), to: undefined },
+                        { label: "Споры", value: String(overview.open_complaints), to: "complaints" as TabKey },
                       ].map((stat) => (
-                        <Card key={stat.label}>
+                        <Card
+                          key={stat.label}
+                          onClick={stat.to ? () => setTab(stat.to as TabKey) : undefined}
+                          className={cn(stat.to && "cursor-pointer transition-colors hover:border-ring")}
+                        >
                           <CardContent className="pt-5">
                             <div className="text-sm text-muted-foreground">{stat.label}</div>
                             <div className="mt-2 text-3xl font-bold tracking-tight tabular-nums">{stat.value}</div>
@@ -1285,6 +1679,7 @@ export default function AdminPage() {
           ))}
         {tab === "chats" && <ModeratedChatsPanel />}
         {tab === "accounts" && <PaymentAccountsPanel />}
+        {tab === "users" && <UsersPanel meUuid={me?.user_uuid ?? ""} />}
         {tab === "emails" && <EmailsPanel />}
         {tab === "pricing" && (
           <>
