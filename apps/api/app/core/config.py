@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     otp_request_limit: int = 3          # запросов кода на телефон за окно
     otp_request_window_sec: int = 600
     otp_verify_max_attempts: int = 5
-    access_token_ttl_sec: int = 900
+    access_token_ttl_sec: int = 9000
     refresh_token_ttl_sec: int = 60 * 60 * 24 * 30
 
     # SMS.ru: ключ с sms.ru; пустой — коды в лог (ConsoleSmsProvider).
@@ -57,6 +57,6 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = False
 
 
-@lru_cache
+@lru_cache n 
 def get_settings() -> Settings:
     return Settings()
