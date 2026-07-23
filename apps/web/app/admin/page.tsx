@@ -1148,14 +1148,14 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => setTab(item.key)}
                   className={cn(
-                    "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
+                    "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     tab === item.key
                       ? "border-primary bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                   )}
                 >
                   {item.label}
-                  {item.count ? <span className="rounded-full bg-secondary px-1.5">{item.count}</span> : null}
+                  {item.count ? <span className="rounded-full bg-secondary px-1.5 tabular-nums">{item.count}</span> : null}
                 </button>
               ))}
             </nav>
@@ -1177,7 +1177,7 @@ export default function AdminPage() {
                         <Card key={stat.label}>
                           <CardContent className="pt-5">
                             <div className="text-sm text-muted-foreground">{stat.label}</div>
-                            <div className="mt-2 text-3xl font-bold tracking-tight">{stat.value}</div>
+                            <div className="mt-2 text-3xl font-bold tracking-tight tabular-nums">{stat.value}</div>
                           </CardContent>
                         </Card>
                       ))}
