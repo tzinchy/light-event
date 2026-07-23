@@ -85,7 +85,7 @@ class CapturingEmailProvider(CapturingSmsProvider):
         self.messages: list[tuple[str, str, str]] = []
         self.fail_next = False
 
-    async def send(self, email: str, subject: str, body: str) -> None:
+    async def send(self, email: str, subject: str, body: str, html: str | None = None) -> None:
         if self.fail_next:
             self.fail_next = False
             raise RuntimeError("SMTP недоступен (тестовый сбой)")

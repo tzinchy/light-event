@@ -1082,7 +1082,7 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-[#fafafa]">
       <div className="mx-auto max-w-[1280px] px-4 py-6">
-        <div className="flex min-h-[calc(100vh-3rem)] overflow-hidden rounded-2xl border bg-card shadow-sm">
+        <div className="flex min-h-[calc(100dvh-3rem)] overflow-hidden rounded-2xl border bg-card shadow-sm">
           <aside className="hidden w-64 shrink-0 flex-col border-r md:flex">
             <div className="flex items-center gap-3 border-b px-4 py-4">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-sm font-bold text-primary-foreground">
@@ -1101,7 +1101,7 @@ export default function AdminPage() {
                   type="button"
                   onClick={() => setTab(item.key)}
                   className={cn(
-                    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium",
+                    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     tab === item.key
                       ? "bg-secondary text-foreground"
                       : "text-muted-foreground hover:bg-secondary hover:text-foreground",
@@ -1109,7 +1109,7 @@ export default function AdminPage() {
                 >
                   {item.label}
                   {item.count ? (
-                    <span className="ml-auto rounded-full bg-primary px-1.5 text-xs text-primary-foreground">
+                    <span className="ml-auto rounded-full bg-primary px-1.5 text-xs text-primary-foreground tabular-nums">
                       {item.count}
                     </span>
                   ) : null}

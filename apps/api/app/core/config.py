@@ -57,6 +57,6 @@ class Settings(BaseSettings):
     smtp_use_tls: bool = False
 
 
-@lru_cache n 
+@lru_cache
 def get_settings() -> Settings:
     return Settings()
