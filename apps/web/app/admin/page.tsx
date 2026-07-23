@@ -33,6 +33,10 @@ import {
   setPriorityApiV1AdminPaymentAccountsPaymentAccountUuidPriorityPost,
   updateAccountApiV1AdminPaymentAccountsPaymentAccountUuidPatch,
   type PaymentAccountOut,
+  listApplicationsApiV1AdminCompanyApplicationsGet,
+  approveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePost,
+  rejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPost,
+  type AdminApplicationOut,
   listUsersApiV1AdminUsersGet,
   createUserApiV1AdminUsersPost,
   userDetailApiV1AdminUsersUserUuidGet,
@@ -1355,9 +1359,137 @@ function UsersPanel({ meUuid }: { meUuid: string }) {
   );
 }
 
+function ApplicationsPanel() {
+  const [apps, setApps] = useState<AdminApplicationOut[] | null>(null);
+  const [reason, setReason] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const reload = useCallback(async () => {
+    const { data } = await listApplicationsApiV1AdminCompanyApplicationsGet({ query: { status: "pending" } });
+    setApps(data ?? []);
+  }, []);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  async function approve(uuid: string) {
+    setBusy(uuid);
+    const { error } = await approveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePost({
+      path: { application_uuid: uuid },
+    });
+    setBusy(null);
+    if (error) {
+      toast.error(detailText(error, "Не удалось одобрить заявку"));
+      return;
+    }
+    toast.success("Отель подключён, владельцу отправлен доступ");
+    void reload();
+  }
+
+  async function reject(uuid: string) {
+    const r = (reason[uuid] ?? "").trim();
+    if (r.length < 3) {
+      toast.error("Укажите причину отказа");
+      return;
+    }
+    setBusy(uuid);
+    const { error } = await rejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPost({
+      path: { application_uuid: uuid },
+      body: { reason: r },
+    });
+    setBusy(null);
+    if (error) {
+      toast.error(detailText(error, "Не удалось отклонить заявку"));
+      return;
+    }
+    toast.success("Заявка отклонена");
+    void reload();
+  }
+
+  if (apps === null) {
+    return (
+      <div className="flex justify-center py-10 text-muted-foreground">
+        <Loader2 className="size-5 animate-spin" />
+      </div>
+    );
+  }
+  if (apps.length === 0) {
+    return <EmptyCard text="Новых заявок на подключение отеля нет" />;
+  }
+
+  return (
+    <div className="space-y-4">
+      {apps.map((a) => (
+        <Card key={a.company_application_uuid}>
+          <CardContent className="space-y-3 pt-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate font-semibold">{a.name}</div>
+                <div className="text-xs text-muted-foreground">
+                  ИНН {a.inn} · ОГРН {a.ogrn}
+                </div>
+                <div className="text-xs text-muted-foreground">{a.address}</div>
+              </div>
+              {a.has_document ? (
+                <Button variant="outline" size="sm" onClick={() => void viewApplicationProof(a.company_application_uuid)}>
+                  Документ
+                </Button>
+              ) : (
+                <span className="text-xs text-status-warn">без документа</span>
+              )}
+            </div>
+            <div className="text-sm">
+              {a.contact_name} · {a.contact_position}
+              <div className="text-xs text-muted-foreground">
+                {a.contact_email} · {a.contact_phone}
+              </div>
+            </div>
+            <Input
+              placeholder="Причина отказа"
+              value={reason[a.company_application_uuid] ?? ""}
+              onChange={(e) => setReason((prev) => ({ ...prev, [a.company_application_uuid]: e.target.value }))}
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                disabled={busy !== null}
+                onClick={() => void approve(a.company_application_uuid)}
+              >
+                Одобрить и завести кабинет
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-status-danger"
+                disabled={busy !== null}
+                onClick={() => void reject(a.company_application_uuid)}
+              >
+                Отклонить
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+async function viewApplicationProof(applicationUuid: string) {
+  const tokens = getTokens();
+  const resp = await fetch(`/api/v1/admin/company-applications/${applicationUuid}/document`, {
+    headers: tokens ? { Authorization: `Bearer ${tokens.access}` } : undefined,
+  });
+  if (!resp.ok) {
+    toast.error("Не удалось открыть документ");
+    return;
+  }
+  window.open(URL.createObjectURL(await resp.blob()), "_blank");
+}
+
 type TabKey =
   | "overview"
   | "users"
+  | "applications"
   | "companies"
   | "requests"
   | "topups"
@@ -1444,6 +1576,7 @@ export default function AdminPage() {
   const NAV: { key: TabKey; label: string; count: number | null }[] = [
     { key: "overview", label: "Обзор", count: null },
     { key: "users", label: "Пользователи", count: null },
+    { key: "applications", label: "Заявки на отель", count: null },
     { key: "companies", label: "Организации", count: companies.length },
     { key: "requests", label: "Публикации", count: requests.length },
     { key: "topups", label: "Пополнения", count: topups.length },
@@ -1457,6 +1590,7 @@ export default function AdminPage() {
   const TITLES: Record<TabKey, { title: string; subtitle: string }> = {
     overview: { title: "Обзор", subtitle: "Здоровье платформы · реальное время" },
     users: { title: "Пользователи", subtitle: "Модерация KYC · роли · создание" },
+    applications: { title: "Заявки на отель", subtitle: "Публичные заявки без аккаунта · документ должности" },
     companies: { title: "Организации", subtitle: "Заявки на подтверждение" },
     requests: { title: "Публикации", subtitle: "Модерация событий и тестов" },
     topups: { title: "Пополнения", subtitle: "Заявки на зачисление средств" },
@@ -1680,6 +1814,7 @@ export default function AdminPage() {
         {tab === "chats" && <ModeratedChatsPanel />}
         {tab === "accounts" && <PaymentAccountsPanel />}
         {tab === "users" && <UsersPanel meUuid={me?.user_uuid ?? ""} />}
+        {tab === "applications" && <ApplicationsPanel />}
         {tab === "emails" && <EmailsPanel />}
         {tab === "pricing" && (
           <>

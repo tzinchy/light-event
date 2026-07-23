@@ -106,6 +106,9 @@ export function SiteHeader() {
               </>
             ) : (
               <>
+                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                  <Link href="/apply">Подключить отель</Link>
+                </Button>
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/auth">{DICT.signIn}</Link>
                 </Button>
