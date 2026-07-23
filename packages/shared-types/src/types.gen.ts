@@ -27,6 +27,76 @@ export type AccountOut = {
 };
 
 /**
+ * AdminApplicationOut
+ */
+export type AdminApplicationOut = {
+    /**
+     * Company Application Uuid
+     */
+    company_application_uuid: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Inn
+     */
+    inn: string;
+    /**
+     * Ogrn
+     */
+    ogrn: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+    /**
+     * Contact Phone
+     */
+    contact_phone: string;
+    /**
+     * Contact Name
+     */
+    contact_name: string;
+    /**
+     * Contact Email
+     */
+    contact_email: string;
+    /**
+     * Contact Position
+     */
+    contact_position: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Reject Reason
+     */
+    reject_reason: string | null;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string | null;
+    /**
+     * Has Document
+     */
+    has_document?: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+};
+
+/**
  * AdminMessageOut
  * Для админа: текущий текст (в т.ч. удалённый) + все прежние версии (§11.11).
  */
@@ -221,6 +291,24 @@ export type AnswerIn = {
 };
 
 /**
+ * ApplicationApproveOut
+ */
+export type ApplicationApproveOut = {
+    /**
+     * Company Application Uuid
+     */
+    company_application_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Company Uuid
+     */
+    company_uuid: string;
+};
+
+/**
  * ApplicationDetailOut
  */
 export type ApplicationDetailOut = {
@@ -274,6 +362,90 @@ export type ApplicationOut = {
      * Created At
      */
     created_at: string;
+};
+
+/**
+ * ApplicationRejectIn
+ */
+export type ApplicationRejectIn = {
+    /**
+     * Reason
+     */
+    reason: string;
+};
+
+/**
+ * ApplicationStatus
+ */
+export type ApplicationStatus = 'pending' | 'approved' | 'rejected';
+
+/**
+ * ApplicationSubmitIn
+ * Данные заявки совпадают с созданием компании (валидаторы ИНН/ОГРН переиспользуются).
+ */
+export type ApplicationSubmitIn = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Inn
+     */
+    inn: string;
+    /**
+     * Ogrn
+     */
+    ogrn: string;
+    /**
+     * Address
+     */
+    address: string;
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+    /**
+     * Contact Phone
+     */
+    contact_phone: string;
+    /**
+     * Contact Name
+     */
+    contact_name: string;
+    /**
+     * Contact Email
+     */
+    contact_email: string;
+    /**
+     * Contact Position
+     */
+    contact_position: string;
+};
+
+/**
+ * ApplicationSubmitOut
+ */
+export type ApplicationSubmitOut = {
+    /**
+     * Company Application Uuid
+     */
+    company_application_uuid: string;
+    /**
+     * Status
+     */
+    status: string;
+    /**
+     * Upload Token
+     */
+    upload_token: string;
 };
 
 /**
@@ -352,6 +524,20 @@ export type AttemptWithQuestionsOut = {
     answers?: {
         [key: string]: unknown;
     };
+};
+
+/**
+ * Body_attach_document_api_v1_company_applications__application_uuid__document_post
+ */
+export type BodyAttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPost = {
+    /**
+     * Token
+     */
+    token: string;
+    /**
+     * File
+     */
+    file: string;
 };
 
 /**
@@ -3183,6 +3369,180 @@ export type ListTeamApiV1CompaniesCompanyUuidTeamGetResponses = {
 };
 
 export type ListTeamApiV1CompaniesCompanyUuidTeamGetResponse = ListTeamApiV1CompaniesCompanyUuidTeamGetResponses[keyof ListTeamApiV1CompaniesCompanyUuidTeamGetResponses];
+
+export type SubmitApplicationApiV1CompanyApplicationsPostData = {
+    body: ApplicationSubmitIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/company-applications';
+};
+
+export type SubmitApplicationApiV1CompanyApplicationsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type SubmitApplicationApiV1CompanyApplicationsPostError = SubmitApplicationApiV1CompanyApplicationsPostErrors[keyof SubmitApplicationApiV1CompanyApplicationsPostErrors];
+
+export type SubmitApplicationApiV1CompanyApplicationsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: ApplicationSubmitOut;
+};
+
+export type SubmitApplicationApiV1CompanyApplicationsPostResponse = SubmitApplicationApiV1CompanyApplicationsPostResponses[keyof SubmitApplicationApiV1CompanyApplicationsPostResponses];
+
+export type AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostData = {
+    body: BodyAttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPost;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/company-applications/{application_uuid}/document';
+};
+
+export type AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostError = AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostErrors[keyof AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostErrors];
+
+export type AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostResponses = {
+    /**
+     * Response Attach Document Api V1 Company Applications  Application Uuid  Document Post
+     * Successful Response
+     */
+    200: {
+        [key: string]: unknown;
+    };
+};
+
+export type AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostResponse = AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostResponses[keyof AttachDocumentApiV1CompanyApplicationsApplicationUuidDocumentPostResponses];
+
+export type ListApplicationsApiV1AdminCompanyApplicationsGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: ApplicationStatus;
+    };
+    url: '/api/v1/admin/company-applications';
+};
+
+export type ListApplicationsApiV1AdminCompanyApplicationsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListApplicationsApiV1AdminCompanyApplicationsGetError = ListApplicationsApiV1AdminCompanyApplicationsGetErrors[keyof ListApplicationsApiV1AdminCompanyApplicationsGetErrors];
+
+export type ListApplicationsApiV1AdminCompanyApplicationsGetResponses = {
+    /**
+     * Response List Applications Api V1 Admin Company Applications Get
+     * Successful Response
+     */
+    200: Array<AdminApplicationOut>;
+};
+
+export type ListApplicationsApiV1AdminCompanyApplicationsGetResponse = ListApplicationsApiV1AdminCompanyApplicationsGetResponses[keyof ListApplicationsApiV1AdminCompanyApplicationsGetResponses];
+
+export type ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetData = {
+    body?: never;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/company-applications/{application_uuid}/document';
+};
+
+export type ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetError = ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetErrors[keyof ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetErrors];
+
+export type ApplicationDocumentApiV1AdminCompanyApplicationsApplicationUuidDocumentGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostData = {
+    body?: never;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/company-applications/{application_uuid}/approve';
+};
+
+export type ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostError = ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostErrors[keyof ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostErrors];
+
+export type ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApplicationApproveOut;
+};
+
+export type ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostResponse = ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostResponses[keyof ApproveApplicationApiV1AdminCompanyApplicationsApplicationUuidApprovePostResponses];
+
+export type RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostData = {
+    body: ApplicationRejectIn;
+    path: {
+        /**
+         * Application Uuid
+         */
+        application_uuid: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/company-applications/{application_uuid}/reject';
+};
+
+export type RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostError = RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostErrors[keyof RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostErrors];
+
+export type RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: AdminApplicationOut;
+};
+
+export type RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostResponse = RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostResponses[keyof RejectApplicationApiV1AdminCompanyApplicationsApplicationUuidRejectPostResponses];
 
 export type ListFilialsApiV1CompaniesCompanyUuidFilialsGetData = {
     body?: never;

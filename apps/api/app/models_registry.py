@@ -9,6 +9,7 @@ import app.balance.models  # noqa: F401
 import app.candidate_list.models  # noqa: F401
 import app.chat.models  # noqa: F401
 import app.company.models  # noqa: F401
+import app.company_application.models  # noqa: F401
 import app.complaint.models  # noqa: F401
 import app.document.models  # noqa: F401
 import app.favorite.models  # noqa: F401

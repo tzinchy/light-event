@@ -12,6 +12,7 @@ from app.candidate_list import router as candidate_list_router
 from app.chat import router as chat_router
 from app.complaint import router as complaint_router
 from app.company import router as company_router
+from app.company_application import router as company_application_router
 from app.core import health
 from app.document import router as document_router
 from app.favorite import router as favorite_router
@@ -66,6 +67,8 @@ def create_app(
     app.include_router(user_router.router)
     app.include_router(document_router.router)
     app.include_router(company_router.router)
+    app.include_router(company_application_router.router)
+    app.include_router(company_application_router.admin_router)
     app.include_router(filial_router.router)
     app.include_router(team_router.router)
     app.include_router(invite_router.router)
